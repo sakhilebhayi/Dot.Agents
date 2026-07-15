@@ -2,6 +2,7 @@
 
 namespace App\Actions\Compliance;
 
+use App\Events\UserDataErased;
 use App\Models\User;
 use App\Services\Governance\AuditService;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -66,6 +67,8 @@ class EraseUserDataAction
             description: "GDPR right-to-erasure executed for user {$subject->id} (original email: {$originalEmail}) by user {$requester->id}",
             subject: $subject,
         );
+
+        event(new UserDataErased($subject, $requester->id));
 
         Log::info('EraseUserDataAction: user erased', [
             'subject_id' => $subject->id,

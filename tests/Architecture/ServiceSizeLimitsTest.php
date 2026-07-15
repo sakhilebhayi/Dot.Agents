@@ -444,6 +444,105 @@ class ServiceSizeLimitsTest extends TestCase
         return str_replace(base_path().'/', '', $absolutePath);
     }
 
+    // ── Layer Boundary Guards ─────────────────────────────────────────────────
+
+    #[Test]
+    public function livewire_components_do_not_import_from_services_directly(): void
+    {
+        $violations = [];
+
+        $files = File::allFiles(app_path('Livewire'));
+
+        foreach ($files as $file) {
+            if ($file->getExtension() !== 'php') {
+                continue;
+            }
+
+            // Skip Concern traits — they are shared orchestration helpers
+            if (str_contains($file->getPathname(), '/Concerns/')) {
+                continue;
+            }
+
+            $content = file_get_contents($file->getRealPath());
+            $path = $this->relativePath($file->getRealPath());
+
+            // Livewire components may only call Services via Actions or via constructor injection.
+            // Direct inline `app(SomeService::class)->doSomething()` is a smell.
+            // Detect multiple distinct service resolves (> 2 is a threshold for God components).
+            preg_match_all('/app\(.*Service::class\)/', $content, $matches);
+            if (count($matches[0]) > 2) {
+                $violations[] = sprintf(
+                    '%s: resolves %d services inline (max 2 — use Action classes)',
+                    $path,
+                    count($matches[0])
+                );
+            }
+        }
+
+        $this->assertEmpty(
+            $violations,
+            "Livewire components resolving too many services inline (use Action classes):\n"
+            .implode("\n", $violations)
+        );
+    }
+
+    #[Test]
+    public function jobs_implement_should_queue(): void
+    {
+        $violations = [];
+
+        $files = File::allFiles(app_path('Jobs'));
+
+        foreach ($files as $file) {
+            if ($file->getExtension() !== 'php') {
+                continue;
+            }
+
+            $content = file_get_contents($file->getRealPath());
+
+            if (! str_contains($content, 'ShouldQueue')) {
+                $violations[] = $this->relativePath($file->getRealPath());
+            }
+        }
+
+        $this->assertEmpty(
+            $violations,
+            "Jobs must implement ShouldQueue to run asynchronously:\n"
+            .implode("\n", $violations)
+        );
+    }
+
+    #[Test]
+    public function listeners_for_heavy_operations_implement_should_queue(): void
+    {
+        $violations = [];
+
+        $files = File::allFiles(app_path('Listeners'));
+
+        foreach ($files as $file) {
+            if ($file->getExtension() !== 'php') {
+                continue;
+            }
+
+            $content = file_get_contents($file->getRealPath());
+
+            // Heavy operations are those that use AuditService, dispatch jobs, or make HTTP calls
+            $isHeavy = str_contains($content, 'AuditService')
+                || str_contains($content, '::dispatch(')
+                || str_contains($content, 'Http::');
+
+            if ($isHeavy && ! str_contains($content, 'ShouldQueue')) {
+                $violations[] = $this->relativePath($file->getRealPath());
+            }
+        }
+
+        $this->assertEmpty(
+            $violations,
+            "Heavy listeners (AuditService / dispatch / HTTP) must implement ShouldQueue:\n"
+            .implode("\n", $violations)
+        );
+    }
+
     // ── Event Coverage Guards ─────────────────────────────────────────────────
 
     #[Test]

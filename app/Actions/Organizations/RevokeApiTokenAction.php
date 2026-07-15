@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Actions\Organizations;
 
+use App\Events\ApiTokenRevoked;
 use App\Services\Governance\AuditService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Gate;
@@ -30,5 +31,7 @@ class RevokeApiTokenAction
             event: 'api_key.revoked',
             description: "API key revoked: {$tokenName}",
         );
+
+        event(new ApiTokenRevoked($token->tokenable_id, $tokenName));
     }
 }

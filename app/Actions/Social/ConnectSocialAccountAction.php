@@ -3,6 +3,7 @@
 namespace App\Actions\Social;
 
 use App\DTOs\Social\ConnectSocialAccountData;
+use App\Events\SocialAccountConnected;
 use App\Models\SocialAccount;
 use App\Services\Governance\AuditService;
 use Illuminate\Support\Facades\Gate;
@@ -43,6 +44,8 @@ class ConnectSocialAccountAction
             data: ['platform' => $data->platform, 'account_name' => $data->accountName],
             subject: $account,
         );
+
+        event(new SocialAccountConnected($account));
 
         return $account;
     }

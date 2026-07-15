@@ -39,7 +39,12 @@ class InvoiceEmail extends Mailable implements ShouldQueue
                 'dueDate' => $this->invoice->due_date,
                 'billingPeriod' => $this->invoice->billing_period_label ?? '',
                 'invoiceUrl' => url("/billing/invoices/{$this->invoice->id}"),
-                'lineItems' => $this->invoice->line_items ?? [],
+                'lineItems' => collect($this->invoice->line_items ?? [])
+                    ->map(fn ($item) => [
+                        'description' => $item['description'] ?? 'Service',
+                        'amount' => $item['amount'] ?? 0,
+                    ])
+                    ->all(),
             ],
         );
     }

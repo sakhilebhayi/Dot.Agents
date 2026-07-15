@@ -2,6 +2,7 @@
 
 namespace App\Actions\Compliance;
 
+use App\Events\ConsentRecorded;
 use App\Models\User;
 use App\Services\Governance\AuditService;
 use Illuminate\Support\Facades\Gate;
@@ -46,6 +47,8 @@ class RecordConsentAction
             description: "User {$user->id} {$action} consent for purpose '{$consentPurpose}' (version {$version})",
             subject: $user,
         );
+
+        event(new ConsentRecorded($user, $consentPurpose, $granted, $version));
     }
 
     /**

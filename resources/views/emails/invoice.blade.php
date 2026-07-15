@@ -59,16 +59,22 @@
     @endif
 
     <div class="totals">
-      <div class="totals-row total">
-        <span>Total</span>
-        <span>{{ $currency }} {{ $amount }}</span>
-      </div>
-      @if($dueDate)
-      <div class="totals-row" style="padding-top:8px; font-size:12px;">
+      @if($billingPeriod)
+      <div class="totals-row">
         <span>Billing Period</span>
         <span>{{ $billingPeriod }}</span>
       </div>
       @endif
+      @if($dueDate)
+      <div class="totals-row">
+        <span>Due Date</span>
+        <span>{{ \Carbon\Carbon::parse($dueDate)->format('M j, Y') }}</span>
+      </div>
+      @endif
+      <div class="totals-row total">
+        <span>Total</span>
+        <span>{{ $currency }} {{ $amount }}</span>
+      </div>
     </div>
 
     <a href="{{ $invoiceUrl }}" class="btn">View & Download Invoice →</a>

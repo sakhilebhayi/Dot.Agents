@@ -2,6 +2,7 @@
 
 namespace App\Actions\Billing;
 
+use App\Events\CheckoutSessionCreated;
 use App\Models\Organization;
 use App\Models\SubscriptionPlan;
 use App\Services\Billing\StripeService;
@@ -10,6 +11,8 @@ use Stripe\Checkout\Session;
 
 class CreateCheckoutSessionAction
 {
+    use \App\Actions\Concerns\LogsActionErrors;
+
     public function __construct(
         private readonly StripeService $stripe,
     ) {}
@@ -23,11 +26,15 @@ class CreateCheckoutSessionAction
     ): object {
         Gate::authorize('manage-billing', $organization);
 
-        return $this->stripe->createCheckoutSession(
+        $session = $this->stripe->createCheckoutSession(
             $organization,
             $plan,
             $successUrl,
             $cancelUrl,
         );
+
+        event(new CheckoutSessionCreated($organization, $plan));
+
+        return $session;
     }
 }

@@ -54,8 +54,19 @@ return [
 
         'stack' => [
             'driver' => 'stack',
-            'channels' => explode(',', (string) env('LOG_STACK', 'single')),
+            // Sentry channel is filtered out when SENTRY_LARAVEL_DSN is not configured,
+            // so setting LOG_STACK=single,sentry is safe even in environments without a DSN.
+            'channels' => array_values(array_filter(
+                explode(',', (string) env('LOG_STACK', 'single')),
+                fn ($ch) => trim($ch) !== 'sentry' || env('SENTRY_LARAVEL_DSN'),
+            )),
             'ignore_exceptions' => false,
+        ],
+
+        'sentry' => [
+            'driver' => 'sentry',
+            'level' => env('LOG_LEVEL', 'error'),
+            'bubble' => true,
         ],
 
         'single' => [

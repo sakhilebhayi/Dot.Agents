@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Actions\Governance;
 
+use App\Actions\Concerns\LogsActionErrors;
 use App\DTOs\Governance\AuditLogExportParams;
+use App\Events\AuditLogExported;
 use App\Models\AuditLog;
 use App\Services\Governance\AuditService;
 use Illuminate\Support\Facades\Gate;
@@ -12,6 +14,8 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ExportAuditLogAction
 {
+    use LogsActionErrors;
+
     public function __construct(private readonly AuditService $auditService) {}
 
     /**
@@ -41,6 +45,13 @@ class ExportAuditLogAction
                 'risk_level' => $params->riskLevel,
             ],
         );
+
+        event(new AuditLogExported(
+            organizationId: $params->organizationId,
+            format: $params->format,
+            fromDate: $params->fromDate,
+            toDate: $params->toDate,
+        ));
 
         return match ($params->format) {
             'json' => $this->streamJson($query),

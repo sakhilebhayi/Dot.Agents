@@ -2,6 +2,7 @@
 
 namespace App\Actions\Security;
 
+use App\Events\KillSwitchActivated;
 use App\Models\AgentDeployment;
 use App\Models\AgentWorkflow;
 use App\Models\Organization;
@@ -27,6 +28,7 @@ use Illuminate\Support\Facades\Log;
  */
 class EmergencyKillSwitchAction
 {
+    use \App\Actions\Concerns\LogsActionErrors;
     public function __construct(
         private readonly AuditService $auditService,
     ) {}
@@ -66,6 +68,14 @@ class EmergencyKillSwitchAction
                 metadata: ['reason' => $reason, 'triggered_by' => auth()->id()],
             );
         });
+
+        event(new KillSwitchActivated(
+            scope: 'deployment',
+            organizationId: $deployment->organization_id,
+            reason: $reason,
+            actorId: auth()->id(),
+            metadata: ['deployment_id' => $deployment->id, 'deployment_name' => $deployment->name],
+        ));
     }
 
     /**
@@ -104,6 +114,14 @@ class EmergencyKillSwitchAction
                 metadata: ['reason' => $reason, 'executions_aborted' => $affected, 'triggered_by' => auth()->id()],
             );
         });
+
+        event(new KillSwitchActivated(
+            scope: 'workflows',
+            organizationId: $organization->id,
+            reason: $reason,
+            actorId: auth()->id(),
+            metadata: ['executions_aborted' => $affected],
+        ));
 
         return $affected;
     }
@@ -156,6 +174,14 @@ class EmergencyKillSwitchAction
                 metadata: ['reason' => $reason, 'stats' => $stats, 'triggered_by' => auth()->id()],
             );
         });
+
+        event(new KillSwitchActivated(
+            scope: 'organization',
+            organizationId: $organization->id,
+            reason: $reason,
+            actorId: auth()->id(),
+            metadata: $stats,
+        ));
 
         return $stats;
     }

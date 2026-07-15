@@ -2,6 +2,7 @@
 
 namespace App\Actions\Social;
 
+use App\Events\SocialPostApproved;
 use App\Jobs\PublishSocialPostJob;
 use App\Models\SocialPost;
 use App\Services\Governance\AuditService;
@@ -34,6 +35,8 @@ class ApproveSocialPostAction
             description: 'Social post approved for publishing',
             subject: $post,
         );
+
+        event(new SocialPostApproved($post->fresh(), $approverId));
 
         return $post->fresh();
     }

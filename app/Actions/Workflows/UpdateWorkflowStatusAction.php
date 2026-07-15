@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Actions\Workflows;
 
 use App\DTOs\Workflows\UpdateWorkflowStatusData;
+use App\Events\WorkflowStatusUpdated;
 use App\Models\AgentWorkflow;
 use App\Services\Governance\AuditService;
 use Illuminate\Support\Facades\Gate;
@@ -29,7 +30,10 @@ class UpdateWorkflowStatusAction
             subject: $workflow,
         );
 
-        return $workflow->refresh();
+        $refreshed = $workflow->refresh();
+        event(new WorkflowStatusUpdated($refreshed, 'active'));
+
+        return $refreshed;
     }
 
     /**
@@ -48,6 +52,9 @@ class UpdateWorkflowStatusAction
             subject: $workflow,
         );
 
-        return $workflow->refresh();
+        $refreshed = $workflow->refresh();
+        event(new WorkflowStatusUpdated($refreshed, 'draft'));
+
+        return $refreshed;
     }
 }

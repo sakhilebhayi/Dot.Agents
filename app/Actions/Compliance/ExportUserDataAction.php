@@ -2,6 +2,7 @@
 
 namespace App\Actions\Compliance;
 
+use App\Events\UserDataExported;
 use App\Models\User;
 use App\Services\Governance\AuditService;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -81,6 +82,8 @@ class ExportUserDataAction
             description: "GDPR data export requested for user {$subject->id} by user {$requester->id}",
             subject: $subject,
         );
+
+        event(new UserDataExported($subject, $requester->id));
 
         return $data;
     }

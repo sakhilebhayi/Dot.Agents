@@ -3,6 +3,7 @@
 namespace App\Actions\Billing;
 
 use App\DTOs\Billing\ActivateSubscriptionData;
+use App\Events\SubscriptionActivated;
 use App\Models\Organization;
 use App\Models\OrganizationSubscription;
 use App\Models\SubscriptionPlan;
@@ -10,6 +11,8 @@ use Illuminate\Support\Facades\Gate;
 
 class ActivateSubscriptionAction
 {
+    use \App\Actions\Concerns\LogsActionErrors;
+
     public function execute(ActivateSubscriptionData $data): OrganizationSubscription
     {
         $organization = Organization::findOrFail($data->organizationId);
@@ -36,6 +39,8 @@ class ActivateSubscriptionAction
         ]);
 
         $organization->update(['plan' => $plan->slug ?? strtolower($plan->name)]);
+
+        event(new SubscriptionActivated($subscription));
 
         return $subscription;
     }

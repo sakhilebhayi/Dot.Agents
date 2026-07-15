@@ -2,6 +2,7 @@
 
 namespace App\Actions\Social;
 
+use App\Events\ConversationEscalated;
 use App\Models\SocialConversation;
 use App\Services\Governance\AuditService;
 use Illuminate\Support\Facades\Gate;
@@ -41,6 +42,8 @@ class EscalateConversationAction
             ],
             subject: $conversation,
         );
+
+        event(new ConversationEscalated($conversation->fresh(), $escalatedTo, $reason));
 
         return $conversation->fresh();
     }

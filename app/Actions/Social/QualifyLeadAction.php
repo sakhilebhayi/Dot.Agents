@@ -2,6 +2,7 @@
 
 namespace App\Actions\Social;
 
+use App\Events\LeadQualified;
 use App\Models\SocialLead;
 use App\Services\Governance\AuditService;
 use Illuminate\Support\Facades\Gate;
@@ -47,6 +48,8 @@ class QualifyLeadAction
             ],
             subject: $lead,
         );
+
+        event(new LeadQualified($lead->fresh(), $intentLevel));
 
         return $lead->fresh();
     }

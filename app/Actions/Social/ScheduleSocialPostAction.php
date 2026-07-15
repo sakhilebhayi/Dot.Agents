@@ -3,6 +3,7 @@
 namespace App\Actions\Social;
 
 use App\DTOs\Social\SocialPostData;
+use App\Events\SocialPostScheduled;
 use App\Jobs\PublishSocialPostJob;
 use App\Models\SocialPost;
 use App\Services\Governance\AuditService;
@@ -41,6 +42,8 @@ class ScheduleSocialPostAction
             ],
             subject: $post,
         );
+
+        event(new SocialPostScheduled($post));
 
         return $post;
     }

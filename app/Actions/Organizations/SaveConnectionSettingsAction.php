@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Actions\Organizations;
 
 use App\DTOs\Organizations\SaveConnectionSettingsData;
+use App\Events\ConnectionSettingsSaved;
 use App\Models\SocialAccount;
 use App\Models\SocialConnectionSettings;
 use App\Services\Governance\AuditService;
@@ -37,6 +38,8 @@ class SaveConnectionSettingsAction
             subject: $account,
             data: ['platform' => $account->platform],
         );
+
+        event(new ConnectionSettingsSaved($cred));
 
         return $cred;
     }

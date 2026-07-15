@@ -3,6 +3,7 @@
 namespace App\Actions\Organizations;
 
 use App\DTOs\Organizations\SaveDepartmentData;
+use App\Events\DepartmentSaved;
 use App\Models\Department;
 use App\Models\Organization;
 use App\Services\Governance\AuditService;
@@ -44,6 +45,8 @@ class SaveDepartmentAction
             description: ($data->existingId ? 'Updated' : 'Created')." department '{$dept->name}'",
             subject: $dept,
         );
+
+        event(new DepartmentSaved($dept, ! $data->existingId));
 
         return $dept;
     }

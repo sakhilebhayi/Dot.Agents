@@ -2,6 +2,7 @@
 
 namespace App\Actions\Governance;
 
+use App\Events\DecisionLogCreated;
 use App\Models\AgentDeployment;
 use App\Models\AgentTask;
 use App\Models\DecisionLog;
@@ -71,6 +72,8 @@ class CreateDecisionLogAction
                 'flags' => $analysis['flags'],
             ]);
         }
+
+        event(new DecisionLogCreated($decisionLog));
 
         return $decisionLog;
     }
