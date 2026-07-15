@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Actions\Social;
 
 use App\DTOs\Social\DisconnectSocialAccountData;
+use App\Events\SocialAccountDisconnected;
 use App\Models\Organization;
 use App\Models\SocialAccount;
 use App\Services\Governance\AuditService;
@@ -52,5 +53,11 @@ class DisconnectSocialAccountAction
             subject: $account,
             data: ['platform' => $account->platform, 'account_name' => $account->account_name],
         );
+
+        event(new SocialAccountDisconnected(
+            organizationId: $account->organization_id,
+            platform: $account->platform,
+            accountName: $account->account_name,
+        ));
     }
 }

@@ -3,6 +3,7 @@
 namespace Tests\Feature\Actions;
 
 use App\Actions\Governance\CreateDecisionLogAction;
+use App\Events\DecisionLogCreated;
 use App\Models\AgentDeployment;
 use App\Models\AgentTask;
 use App\Models\DecisionLog;
@@ -10,6 +11,7 @@ use App\Models\Organization;
 use App\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Tests\TestCase;
 
@@ -93,5 +95,20 @@ class CreateDecisionLogActionTest extends TestCase
 
         $this->expectException(AuthorizationException::class);
         app(CreateDecisionLogAction::class)->execute($otherDeployment, $otherTask, ['confidence' => 80]);
+    }
+
+    public function test_fires_decision_log_created_event(): void
+    {
+        Event::fake([DecisionLogCreated::class]);
+
+        $this->actingAs($this->user);
+        Gate::before(fn () => true);
+
+        $output = ['summary' => 'Test decision.', 'confidence' => 85];
+        $log = app(CreateDecisionLogAction::class)->execute($this->deployment, $this->task, $output);
+
+        Event::assertDispatched(DecisionLogCreated::class, function (DecisionLogCreated $event) use ($log) {
+            return $event->decisionLog->id === $log->id;
+        });
     }
 }

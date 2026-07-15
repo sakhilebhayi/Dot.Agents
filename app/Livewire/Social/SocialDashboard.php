@@ -28,13 +28,13 @@ class SocialDashboard extends Component
             default => 30,
         };
 
-        return app(SocialCommerceService::class)->getScorecard($this->orgId, $days);
+        return $this->socialCommerce()->getScorecard($this->orgId, $days);
     }
 
     #[Computed]
     public function urgentConversations()
     {
-        return app(SocialCommerceService::class)->getUrgentConversations($this->orgId);
+        return $this->socialCommerce()->getUrgentConversations($this->orgId);
     }
 
     #[Computed]
@@ -69,6 +69,11 @@ class SocialDashboard extends Component
     public function setTimeframe(string $timeframe): void
     {
         $this->timeframe = $timeframe;
+    }
+
+    private function socialCommerce(): SocialCommerceService
+    {
+        return app(SocialCommerceService::class);
     }
 
     public function render()

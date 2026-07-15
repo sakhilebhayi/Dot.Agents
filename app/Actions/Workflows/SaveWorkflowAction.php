@@ -3,6 +3,7 @@
 namespace App\Actions\Workflows;
 
 use App\DTOs\Workflows\SaveWorkflowData;
+use App\Events\WorkflowSaved;
 use App\Models\AgentWorkflow;
 use App\Services\Governance\AuditService;
 use Illuminate\Support\Facades\Gate;
@@ -77,6 +78,10 @@ class SaveWorkflowAction
             subject: $workflow,
         );
 
-        return $workflow->fresh();
+        $fresh = $workflow->fresh();
+
+        event(new WorkflowSaved($fresh, count($nodes)));
+
+        return $fresh;
     }
 }

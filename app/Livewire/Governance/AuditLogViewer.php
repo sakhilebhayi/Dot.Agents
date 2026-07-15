@@ -2,11 +2,14 @@
 
 namespace App\Livewire\Governance;
 
+use App\Actions\Governance\ExportAuditLogAction;
+use App\DTOs\Governance\AuditLogExportParams;
 use App\Models\AgentDeployment;
 use App\Models\AuditLog;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class AuditLogViewer extends Component
 {
@@ -68,5 +71,26 @@ class AuditLogViewer extends Component
     public function render()
     {
         return view('livewire.governance.audit-log-viewer');
+    }
+
+    /**
+     * Trigger a streamed CSV/JSON download of the current filtered audit log.
+     * The response is returned via a redirect to a temporary signed URL served
+     * by the ExportAuditLogAction; Livewire cannot stream binary downloads directly.
+     */
+    public function export(string $format = 'csv'): StreamedResponse
+    {
+        $this->authorize('viewAny', AuditLog::class);
+
+        $params = new AuditLogExportParams(
+            organizationId: session('current_organization_id'),
+            format: in_array($format, ['csv', 'json']) ? $format : 'csv',
+            fromDate: $this->dateFrom ?: null,
+            toDate: $this->dateTo ?: null,
+            eventCategory: $this->filterCategory ?: null,
+            riskLevel: $this->filterRisk ?: null,
+        );
+
+        return app(ExportAuditLogAction::class)->execute($params);
     }
 }

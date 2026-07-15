@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Actions\Organizations;
 
 use App\DTOs\Organizations\DeleteKnowledgeArticleData;
+use App\Events\KnowledgeArticleDeleted;
 use App\Models\KnowledgeArticle;
 use App\Models\Organization;
 use App\Services\Governance\AuditService;
@@ -29,5 +30,7 @@ class DeleteKnowledgeArticleAction
             description: "Deleted knowledge article '{$title}'",
             subject: $organization,
         );
+
+        event(new KnowledgeArticleDeleted($organization->id, $title));
     }
 }

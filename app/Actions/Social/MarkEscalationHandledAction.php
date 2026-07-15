@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Actions\Social;
 
 use App\DTOs\Social\MarkEscalationHandledData;
+use App\Events\EscalationHandled;
 use App\Models\SocialSentimentScore;
 use App\Services\Governance\AuditService;
 use Illuminate\Support\Facades\Gate;
@@ -27,5 +28,7 @@ class MarkEscalationHandledAction
             description: "Sentiment escalation #{$data->scoreId} marked as handled",
             subject: $score,
         );
+
+        event(new EscalationHandled($score));
     }
 }

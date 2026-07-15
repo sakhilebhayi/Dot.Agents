@@ -3,6 +3,9 @@
 namespace App\Notifications;
 
 use App\Mail\InvoiceEmail;
+use App\Mail\PaymentFailedEmail;
+use App\Mail\SubscriptionCancelledEmail;
+use App\Mail\TrialEndingEmail;
 use App\Models\Invoice;
 use App\Models\Organization;
 use Illuminate\Bus\Queueable;
@@ -35,11 +38,24 @@ class BillingNotification extends Notification implements ShouldQueue
 
     public function toMail(object $notifiable): mixed
     {
-        if ($this->billingEvent === 'invoice_created' && $this->invoice) {
-            return new InvoiceEmail($this->invoice, $this->organization);
-        }
+        $email = $notifiable->routeNotificationFor('mail', $this) ?? $notifiable->email;
 
-        // Fallback generic mail
+        return match ($this->billingEvent) {
+            'invoice_created' => $this->invoice
+                ? (new InvoiceEmail($this->invoice, $this->organization))->to($email)
+                : $this->genericMail(),
+            'payment_failed' => (new PaymentFailedEmail($this->organization))->to($email),
+            'trial_ending' => (new TrialEndingEmail(
+                $this->organization,
+                $this->context['trial_ends_at'] ?? null,
+            ))->to($email),
+            'subscription_cancelled' => (new SubscriptionCancelledEmail($this->organization))->to($email),
+            default => $this->genericMail(),
+        };
+    }
+
+    private function genericMail(): MailMessage
+    {
         return (new MailMessage)
             ->subject($this->resolveSubject())
             ->line($this->resolveBody())

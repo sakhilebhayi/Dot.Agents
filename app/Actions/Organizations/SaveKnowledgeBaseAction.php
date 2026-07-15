@@ -2,6 +2,7 @@
 
 namespace App\Actions\Organizations;
 
+use App\Events\KnowledgeBaseCreated;
 use App\Models\KnowledgeBase;
 use App\Models\Organization;
 use App\Services\Governance\AuditService;
@@ -33,6 +34,8 @@ class SaveKnowledgeBaseAction
             description: "Created knowledge base '{$kb->name}'",
             subject: $kb,
         );
+
+        event(new KnowledgeBaseCreated($kb));
 
         return $kb;
     }

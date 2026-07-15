@@ -73,7 +73,7 @@ Route::middleware([
             abort_unless(Gate::allows('chat', $deployment), 403);
 
             return view('agents.chat', compact('deployment'));
-        })->name('chat');
+        })->name('chat')->middleware('throttle:agent-chat');
         Route::get('/{deployment}/scorecard', function (AgentDeployment $deployment) {
             abort_unless(Gate::allows('view', $deployment), 403);
 

@@ -76,4 +76,32 @@ class AgentChatTest extends TestCase
             ->test(AgentChat::class, ['deploymentId' => $this->deployment->id])
             ->assertStatus(200);
     }
+
+    public function test_send_message_validates_max_length(): void
+    {
+        $this->actingAs($this->user);
+
+        Livewire::actingAs($this->user)
+            ->test(AgentChat::class, ['deploymentId' => $this->deployment->id])
+            ->set('message', str_repeat('a', 10001))
+            ->call('sendMessage')
+            ->assertHasErrors(['message' => 'max']);
+    }
+
+    public function test_show_task_panel_can_be_toggled(): void
+    {
+        $this->actingAs($this->user);
+
+        Livewire::actingAs($this->user)
+            ->test(AgentChat::class, ['deploymentId' => $this->deployment->id])
+            ->assertSet('showTaskPanel', false)
+            ->set('showTaskPanel', true)
+            ->assertSet('showTaskPanel', true);
+    }
+
+    public function test_chat_route_requires_authentication(): void
+    {
+        $this->get("/my-agents/{$this->deployment->id}/chat")
+            ->assertRedirect();
+    }
 }

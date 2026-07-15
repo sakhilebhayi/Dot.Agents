@@ -2,6 +2,7 @@
 
 namespace App\Actions\Social;
 
+use App\Events\SocialCredentialsSaved;
 use App\Models\Organization;
 use App\Models\OrganizationSocialCredential;
 use App\Services\Governance\AuditService;
@@ -41,6 +42,8 @@ class SaveSocialCredentialsAction
             data: ['platform' => $platform, 'organization_id' => $organization->id],
             subject: $organization,
         );
+
+        event(new SocialCredentialsSaved($organization, $platform));
 
         return $cred;
     }

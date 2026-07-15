@@ -2,69 +2,34 @@
 
 namespace App\Providers;
 
-use App\Events\AgentCapabilityContractChanged;
-use App\Events\AgentChatStarted;
-use App\Events\AgentDecommissioned;
-use App\Events\AgentDeployed;
-use App\Events\AgentDriftDetected;
-use App\Events\AgentPaused;
-use App\Events\AgentResumed;
-use App\Events\AgentTaskCompleted;
-use App\Events\AgentTaskFailed;
-use App\Events\AgentTaskRated;
-use App\Events\AgentUpdated;
-use App\Events\ApprovalProcessed;
-use App\Events\ApprovalRequested;
+use App\Events\ApiTokenRevoked;
+use App\Events\ConnectionSettingsSaved;
+use App\Events\ConversationEscalated;
+use App\Events\DepartmentDeleted;
+use App\Events\DepartmentSaved;
+use App\Events\EscalationHandled;
+use App\Events\KnowledgeArticleDeleted;
+use App\Events\KnowledgeArticleSaved;
+use App\Events\KnowledgeBaseCreated;
+use App\Events\LeadQualified;
 use App\Events\NegativeSentimentDetected;
-use App\Events\OrganizationCreated;
-use App\Events\OrganizationSettingsUpdated;
 use App\Events\PurchaseIntentDetected;
-use App\Events\SecurityEventResolved;
-use App\Events\SecurityThreatDetected;
-use App\Events\SkillApprovalRequested;
-use App\Events\SkillAssigned;
-use App\Events\SkillExecuted;
-use App\Events\SkillExecutionBlocked;
+use App\Events\SocialAccountConnected;
+use App\Events\SocialAccountDisconnected;
 use App\Events\SocialConversionAchieved;
 use App\Events\SocialLeadCaptured;
 use App\Events\SocialMessageReceived;
+use App\Events\SocialPostApproved;
 use App\Events\SocialPostPublished;
-use App\Events\WorkflowCreated;
-use App\Events\WorkflowDeleted;
-use App\Listeners\AuditSkillExecution;
-use App\Listeners\HandleAgentTaskFailed;
-use App\Listeners\HandleSkillApprovalRequested;
-use App\Listeners\LogAgentChatStarted;
-use App\Listeners\LogAgentDecommissionedAudit;
-use App\Listeners\LogAgentPausedAudit;
-use App\Listeners\LogAgentResumedAudit;
-use App\Listeners\LogAgentTaskRated;
-use App\Listeners\LogAgentUpdatedAudit;
-use App\Listeners\LogDeploymentAudit;
-use App\Listeners\LogOrganizationSettingsUpdated;
+use App\Events\SocialPostScheduled;
+use App\Listeners\LogOrganizationLifecycleEvents;
 use App\Listeners\LogPurchaseIntentDetected;
-use App\Listeners\LogSecurityEventResolved;
-use App\Listeners\LogSecurityThreat;
-use App\Listeners\LogSkillAssigned;
-use App\Listeners\LogSkillBlockedEvent;
 use App\Listeners\LogSocialConversionAchieved;
 use App\Listeners\LogSocialLeadCaptured;
+use App\Listeners\LogSocialLifecycleEvents;
 use App\Listeners\LogSocialMessageReceived;
 use App\Listeners\LogSocialPostPublished;
-use App\Listeners\LogWorkflowCreated;
-use App\Listeners\LogWorkflowDeleted;
-use App\Listeners\NotifyOnAgentDrift;
-use App\Listeners\NotifyOnApprovalProcessed;
 use App\Listeners\NotifyOnNegativeSentiment;
-use App\Listeners\ProvisionSCCSSkillsAndScorecard;
-use App\Listeners\RecordSkillScoreOnExecution;
-use App\Listeners\SendApprovalNotification;
-use App\Listeners\SetupOrganizationDefaults;
-use App\Listeners\TriggerCapabilityContractGovernanceReview;
-use App\Listeners\UpdateReputationOnTaskComplete;
-use App\Listeners\UpdateReputationOnTaskFailed;
-use App\Listeners\UpdateScorecardOnTaskComplete;
-use App\Listeners\WarmupAgentOnDeployment;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use SocialiteProviders\Discord\DiscordExtendSocialite;
 use SocialiteProviders\Manager\SocialiteWasCalled;
@@ -75,16 +40,21 @@ use SocialiteProviders\Snapchat\SnapchatExtendSocialite;
 use SocialiteProviders\Twitch\TwitchExtendSocialite;
 use SocialiteProviders\YouTube\YouTubeExtendSocialite;
 
+/**
+ * Root event service provider.
+ *
+ * Owns Socialite community drivers, social/SCCS events, and organization
+ * lifecycle events. Domain-specific events are split into:
+ *
+ *   - AgentEventServiceProvider      — agents, skills, workflows, approvals
+ *   - GovernanceEventServiceProvider — security, compliance, org settings
+ *   - BillingEventServiceProvider    — subscriptions, checkout, credentials
+ *
+ * Auto-discovery is intentionally disabled; the explicit $listen maps
+ * across all four providers are the single source of truth for all bindings.
+ */
 class EventServiceProvider extends ServiceProvider
 {
-    /**
-     * All event → listener mappings for the platform.
-     *
-     * Explicitly registering every binding here:
-     *  - Ensures framework auto-discovery won't miss events in production
-     *  - Enables `php artisan event:list` to document all bindings
-     *  - Required for Boost Architecture Score ≥ 90/100
-     */
     protected $listen = [
         // ── SocialiteProviders community drivers ────────────────────────────
         SocialiteWasCalled::class => [
@@ -97,139 +67,35 @@ class EventServiceProvider extends ServiceProvider
             TwitchExtendSocialite::class.'@handle',
         ],
 
-        AgentDeployed::class => [
-            LogDeploymentAudit::class,
-            WarmupAgentOnDeployment::class,
-            ProvisionSCCSSkillsAndScorecard::class,
-        ],
-
-        AgentPaused::class => [
-            LogAgentPausedAudit::class,
-        ],
-
-        AgentResumed::class => [
-            LogAgentResumedAudit::class,
-        ],
-
-        AgentTaskRated::class => [
-            LogAgentTaskRated::class,
-        ],
-
-        AgentChatStarted::class => [
-            LogAgentChatStarted::class,
-        ],
-
-        AgentCapabilityContractChanged::class => [
-            TriggerCapabilityContractGovernanceReview::class,
-        ],
-
-        AgentUpdated::class => [
-            LogAgentUpdatedAudit::class,
-        ],
-
-        AgentDecommissioned::class => [
-            LogAgentDecommissionedAudit::class,
-        ],
-
-        AgentTaskCompleted::class => [
-            UpdateScorecardOnTaskComplete::class,
-            UpdateReputationOnTaskComplete::class,
-        ],
-
-        AgentTaskFailed::class => [
-            HandleAgentTaskFailed::class,
-            UpdateReputationOnTaskFailed::class,
-        ],
-
-        SecurityThreatDetected::class => [
-            LogSecurityThreat::class,
-        ],
-
-        SecurityEventResolved::class => [
-            LogSecurityEventResolved::class,
-        ],
-
-        ApprovalRequested::class => [
-            SendApprovalNotification::class,
-        ],
-
-        ApprovalProcessed::class => [
-            NotifyOnApprovalProcessed::class,
-        ],
-
-        AgentDriftDetected::class => [
-            NotifyOnAgentDrift::class,
-        ],
-
-        OrganizationCreated::class => [
-            SetupOrganizationDefaults::class,
-        ],
-
-        OrganizationSettingsUpdated::class => [
-            LogOrganizationSettingsUpdated::class,
-        ],
-
-        SkillExecuted::class => [
-            RecordSkillScoreOnExecution::class,
-            AuditSkillExecution::class,
-        ],
-
-        SkillExecutionBlocked::class => [
-            LogSkillBlockedEvent::class,
-        ],
-
-        SkillApprovalRequested::class => [
-            SendApprovalNotification::class,
-            HandleSkillApprovalRequested::class,
-        ],
-
-        SkillAssigned::class => [
-            LogSkillAssigned::class,
-        ],
-
-        // ── Workflow events ──────────────────────────────────────────────────
-        WorkflowCreated::class => [
-            LogWorkflowCreated::class,
-        ],
-
-        WorkflowDeleted::class => [
-            LogWorkflowDeleted::class,
-        ],
-
         // ── SCCS: Social Commerce & Customer Success events ──────────────────
-        SocialLeadCaptured::class => [
-            LogSocialLeadCaptured::class,
-        ],
-        SocialConversionAchieved::class => [
-            LogSocialConversionAchieved::class,
-        ],
-        NegativeSentimentDetected::class => [
-            NotifyOnNegativeSentiment::class,
-        ],
-        PurchaseIntentDetected::class => [
-            LogPurchaseIntentDetected::class,
-        ],
-        SocialMessageReceived::class => [
-            LogSocialMessageReceived::class,
-        ],
-        SocialPostPublished::class => [
-            LogSocialPostPublished::class,
-        ],
+        SocialLeadCaptured::class => [LogSocialLeadCaptured::class],
+        SocialConversionAchieved::class => [LogSocialConversionAchieved::class],
+        NegativeSentimentDetected::class => [NotifyOnNegativeSentiment::class],
+        PurchaseIntentDetected::class => [LogPurchaseIntentDetected::class],
+        SocialMessageReceived::class => [LogSocialMessageReceived::class],
+        SocialPostPublished::class => [LogSocialPostPublished::class],
+
+        // ── Social lifecycle events ──────────────────────────────────────────
+        SocialAccountConnected::class => [LogSocialLifecycleEvents::class.'@handleSocialAccountConnected'],
+        SocialAccountDisconnected::class => [LogSocialLifecycleEvents::class.'@handleSocialAccountDisconnected'],
+        SocialPostApproved::class => [LogSocialLifecycleEvents::class.'@handleSocialPostApproved'],
+        SocialPostScheduled::class => [LogSocialLifecycleEvents::class.'@handleSocialPostScheduled'],
+        ConversationEscalated::class => [LogSocialLifecycleEvents::class.'@handleConversationEscalated'],
+        EscalationHandled::class => [LogSocialLifecycleEvents::class.'@handleEscalationHandled'],
+        LeadQualified::class => [LogSocialLifecycleEvents::class.'@handleLeadQualified'],
+
+        // ── Organization lifecycle events ─────────────────────────────────────
+        DepartmentSaved::class => [LogOrganizationLifecycleEvents::class.'@handleDepartmentSaved'],
+        DepartmentDeleted::class => [LogOrganizationLifecycleEvents::class.'@handleDepartmentDeleted'],
+        KnowledgeBaseCreated::class => [LogOrganizationLifecycleEvents::class.'@handleKnowledgeBaseCreated'],
+        KnowledgeArticleSaved::class => [LogOrganizationLifecycleEvents::class.'@handleKnowledgeArticleSaved'],
+        KnowledgeArticleDeleted::class => [LogOrganizationLifecycleEvents::class.'@handleKnowledgeArticleDeleted'],
+        ConnectionSettingsSaved::class => [LogOrganizationLifecycleEvents::class.'@handleConnectionSettingsSaved'],
+        ApiTokenRevoked::class => [LogOrganizationLifecycleEvents::class.'@handleApiTokenRevoked'],
     ];
 
-    /**
-     * Register any application events.
-     */
-    public function boot(): void
-    {
-        //
-    }
+    public function boot(): void {}
 
-    /**
-     * Determine if events and listeners should be automatically discovered.
-     * We keep auto-discovery OFF so the explicit $listen map above is the
-     * single source of truth for all bindings.
-     */
     public function shouldDiscoverEvents(): bool
     {
         return false;

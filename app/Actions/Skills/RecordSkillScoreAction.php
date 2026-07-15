@@ -2,6 +2,7 @@
 
 namespace App\Actions\Skills;
 
+use App\Events\SkillScoreRecorded;
 use App\Models\AgentDeployment;
 use App\Models\AgentSkillScore;
 use Illuminate\Support\Facades\Gate;
@@ -91,5 +92,7 @@ class RecordSkillScoreAction
         if (! empty($updates)) {
             $score->update($updates);
         }
+
+        event(new SkillScoreRecorded($skillId, $deploymentId, $organizationId, $executionStatus, $confidence));
     }
 }

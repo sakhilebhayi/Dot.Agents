@@ -2,6 +2,7 @@
 
 namespace App\Actions\Governance;
 
+use App\Actions\Concerns\LogsActionErrors;
 use App\DTOs\Governance\ProcessApprovalData;
 use App\Events\ApprovalProcessed;
 use App\Models\AgentApproval;
@@ -14,6 +15,8 @@ use Illuminate\Support\Facades\Gate;
 
 class ProcessApprovalAction
 {
+    use LogsActionErrors;
+
     public function __construct(
         private readonly AuditService $auditService,
         private readonly PredictionAccuracyTrackingService $predictionAccuracy,

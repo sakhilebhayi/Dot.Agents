@@ -2,6 +2,7 @@
 
 namespace App\Actions\Organizations;
 
+use App\Events\KnowledgeArticleSaved;
 use App\Models\KnowledgeArticle;
 use App\Models\Organization;
 use App\Services\Governance\AuditService;
@@ -43,6 +44,8 @@ class SaveKnowledgeArticleAction
             description: ($existingId ? 'Updated' : 'Created')." knowledge article '{$article->title}'",
             subject: $article,
         );
+
+        event(new KnowledgeArticleSaved($article, ! $existingId));
 
         return $article;
     }

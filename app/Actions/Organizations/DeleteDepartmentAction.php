@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Actions\Organizations;
 
 use App\DTOs\Organizations\DeleteDepartmentData;
+use App\Events\DepartmentDeleted;
 use App\Models\Department;
 use App\Models\Organization;
 use App\Services\Governance\AuditService;
@@ -29,5 +30,7 @@ class DeleteDepartmentAction
             description: "Deleted department '{$name}'",
             subject: $organization,
         );
+
+        event(new DepartmentDeleted($organization->id, $name));
     }
 }

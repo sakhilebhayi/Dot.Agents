@@ -7,6 +7,18 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * AgentVersion — platform-level catalog resource.
+ *
+ * Versioned snapshots of an Agent's configuration and capabilities.
+ * This model belongs to Agent (a platform catalog item) and is NOT
+ * tenant-scoped itself. Tenant isolation is enforced at the AgentDeployment
+ * layer: every deployment references an AgentVersion and is scoped to an
+ * organization_id. Querying AgentVersions in isolation (e.g. the marketplace
+ * browse page) is intentionally cross-tenant — users see all published versions.
+ *
+ * @see AgentDeployment — the tenant-scoped join between an org and a version
+ */
 class AgentVersion extends Model
 {
     protected $fillable = [
