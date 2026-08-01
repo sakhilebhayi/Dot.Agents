@@ -46,9 +46,16 @@ class ApprovalQueue extends Component
 
     public function selectApproval(int $id): void
     {
-        $this->selectedApproval = AgentApproval::with([
+        $approval = AgentApproval::with([
             'deployment.agent', 'task', 'requestedFrom',
-        ])->find($id);
+        ])->findOrFail($id);
+
+        // SECURITY: $id is a Livewire method argument, not a synced/checksummed
+        // property — it is fully attacker-controlled. Enforce tenancy here rather
+        // than relying on the query above, or another org's approval details leak.
+        abort_unless(auth()->user()->can('view', $approval), 403);
+
+        $this->selectedApproval = $approval;
         $this->reviewerNotes = '';
         $this->responseForm->reset();
     }

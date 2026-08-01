@@ -67,17 +67,26 @@ class KnowledgeManager extends Component
     #[Computed]
     public function activeBase(): ?KnowledgeBase
     {
-        return $this->activeBaseId ? KnowledgeBase::find($this->activeBaseId) : null;
+        if (! $this->activeBaseId) {
+            return null;
+        }
+
+        // SECURITY: activeBaseId can be set via selectBase(), a method argument
+        // that is not checksum-protected, so it must be scoped to the current org.
+        return KnowledgeBase::where('organization_id', $this->organization->id)
+            ->find($this->activeBaseId);
     }
 
     #[Computed]
     public function articles()
     {
-        if (! $this->activeBaseId) {
+        // Route through the org-scoped activeBase() computed rather than the raw
+        // activeBaseId, so a tampered/foreign base id yields no results.
+        if (! $this->activeBase) {
             return collect();
         }
 
-        return KnowledgeArticle::where('knowledge_base_id', $this->activeBaseId)
+        return KnowledgeArticle::where('knowledge_base_id', $this->activeBase->id)
             ->orderByDesc('created_at')
             ->get();
     }
@@ -133,7 +142,10 @@ class KnowledgeManager extends Component
 
     public function editArticle(int $id): void
     {
-        $a = KnowledgeArticle::findOrFail($id);
+        // SECURITY: $id is an unchecksummed method argument — scope the lookup to
+        // the current org to prevent cross-org reads of article content.
+        $a = KnowledgeArticle::where('organization_id', $this->organization->id)
+            ->findOrFail($id);
         $this->editingArticleId = $id;
         $this->articleTitle = $a->title;
         $this->articleContent = $a->content;
