@@ -34,8 +34,10 @@
     <meta name="twitter:image:alt" content="Dot.Agents — The Adaptive Enterprise Operating System">
 
     {{-- ── Favicons ────────────────────────────────────────────────────── --}}
+    <link rel="icon" href="/favicon-32x32.png" sizes="32x32" type="image/png">
+    <link rel="icon" href="/favicon-16x16.png" sizes="16x16" type="image/png">
     <link rel="icon" href="/dot.logos3.png" type="image/png">
-    <link rel="apple-touch-icon" href="/dot.logos3.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
     {{-- ── Structured Data: Organization ──────────────────────────────── --}}
     <script type="application/ld+json">

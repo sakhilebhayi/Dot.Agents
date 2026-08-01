@@ -13,24 +13,25 @@ class PlatformNotificationFactory extends Factory
         return [
             'organization_id' => Organization::factory(),
             'user_id' => User::factory(),
-            'type' => $this->faker->randomElement(['info', 'warning', 'error', 'success', 'security_threat']),
+            'type' => $this->faker->randomElement(['alert', 'approval_request', 'task_complete', 'system', 'billing', 'security']),
+            'channel' => 'platform',
             'title' => $this->faker->sentence(5),
-            'message' => $this->faker->sentence(10),
-            'severity' => $this->faker->randomElement(['info', 'warning', 'error', 'critical']),
-            'is_read' => false,
-            'read_at' => null,
+            'body' => $this->faker->sentence(10),
             'data' => [],
             'action_url' => null,
+            'priority' => $this->faker->randomElement(['low', 'normal', 'high', 'urgent']),
+            'read_at' => null,
+            'acted_at' => null,
         ];
     }
 
     public function read(): static
     {
-        return $this->state(['is_read' => true, 'read_at' => now()]);
+        return $this->state(['read_at' => now()]);
     }
 
     public function critical(): static
     {
-        return $this->state(['severity' => 'critical', 'type' => 'security_threat']);
+        return $this->state(['priority' => 'urgent', 'type' => 'security']);
     }
 }

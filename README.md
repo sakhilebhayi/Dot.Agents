@@ -8,7 +8,7 @@
 
 <br />
 
-![Laravel](https://img.shields.io/badge/Laravel-12-FF2D20?style=flat-square&logo=laravel&logoColor=white) ![PHP](https://img.shields.io/badge/PHP-8.4-777BB4?style=flat-square&logo=php&logoColor=white) ![Livewire](https://img.shields.io/badge/Livewire-3-FB70A9?style=flat-square) ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-336791?style=flat-square&logo=postgresql&logoColor=white)
+![Laravel](https://img.shields.io/badge/Laravel-12-FF2D20?style=flat-square&logo=laravel&logoColor=white) ![PHP](https://img.shields.io/badge/PHP-8.4-777BB4?style=flat-square&logo=php&logoColor=white) ![Livewire](https://img.shields.io/badge/Livewire-3-FB70A9?style=flat-square) ![MySQL](https://img.shields.io/badge/MySQL-8-4479A1?style=flat-square&logo=mysql&logoColor=white)
 
 <br /><br />
 
@@ -20,25 +20,31 @@
 
 ## What is Dot.Agents?
 
-Dot.Agents lets organisations build and manage a digital AI workforce. Define specialised agents with unique skill sets, assign them to teams, monitor their tasks in real time, and govern their outputs — all powered by Anthropic Claude through a structured workforce model.
+Dot.Agents is a multi-tenant SaaS platform that lets organisations hire, deploy, monitor, and govern specialised AI agents as digital workforce members. Every agent decision is auditable, every deployment runs under an enforced confidence threshold and approval mode, and a background Digital Immune System watches for drift, failure spikes, and security anomalies. See [`wiki.md`](wiki.md) for the full architecture.
 
 ## Core Features
 
-- Agent registry — define skills, personas, and capability boundaries
-- Team-based agent assignment with role hierarchy
-- Real-time task monitoring and audit log
-- Conversation history per agent with context retention
-- Cost and token usage tracking per agent
-- Governance rules — output filters and human-in-the-loop gates
-- Claude claude-sonnet-4-6 backbone with configurable system prompts
-- Ecosystem SSO from InfoDot hub
+- Agent marketplace and deployment — hire an agent type, configure its deployment mode and confidence threshold
+- Task execution with full audit trail — every AI decision is logged, scored, and reviewable
+- Delusion-risk scoring and human-in-the-loop approval workflow for higher-risk decisions
+- Digital Immune System — automatic suspension of deployments on failure/drift/security breach
+- 10-dimension agent scorecards, computed per agent per period
+- Visual multi-step agent workflow builder
+- Social-channel agents — publishing, inbox triage, sentiment, and lead qualification
+- Prism PHP-mediated, provider-agnostic AI orchestration (OpenAI → Anthropic → Google AI → local Ollama failover)
+- Ecosystem SSO from the wider InfoDot/Dot hub
 
 ## Domain Models
 
-- **Agent** — AI persona with skills and system prompt
-- **AgentTask** — individual task execution record
-- **AgentConversation** — threaded conversation history
-- **AgentUsage** — token and cost tracking
+- **Agent / AgentVersion** — marketplace catalog entry (an agent type, not tenant-owned)
+- **AgentDeployment** — an organisation's hired, configured instance of an agent
+- **AgentTask** — a unit of work executed by a deployment, with confidence, latency, cost, and token tracking
+- **AgentSession / AgentMessage** — threaded conversation history per deployment
+- **AgentApproval / DecisionLog** — the human-in-the-loop approval workflow and delusion-risk-scored decision record
+- **AgentScorecard** — the 10-dimension agent health score
+- **AuditLog / SecurityEvent** — the append-only governance and security event trail
+
+40 models in total — see [`docs/architecture/database-schema.md`](docs/architecture/database-schema.md).
 
 ## Tech Stack
 
@@ -47,12 +53,9 @@ Dot.Agents lets organisations build and manage a digital AI workforce. Define sp
 | Framework | Laravel 12 |
 | Language | PHP 8.4 |
 | Frontend | Livewire 3 · Alpine.js 3 · Tailwind CSS |
-| Database | PostgreSQL 16 (shared across ecosystem) |
-| Realtime | Laravel Reverb |
-| Auth | Laravel Sanctum (InfoDot SSO) |
-| AI | Anthropic Claude (`claude-sonnet-4-6`) |
-| Storage | AWS S3 / Local (Flysystem) |
-| Search | Laravel Scout · Meilisearch |
+| Database | SQLite (dev) / MySQL 8+ (prod) · Redis (cache + queue) |
+| Auth | Laravel Jetstream · Sanctum (ecosystem SSO handoff) |
+| AI orchestration | Prism PHP — provider-agnostic (OpenAI, Anthropic, Google AI, Ollama) |
 | Queue | Redis · Laravel Horizon |
 
 ## Quick Start
@@ -68,7 +71,7 @@ php artisan migrate
 php artisan serve
 ```
 
-> **Ecosystem SSO:** Set `DB_*` env vars to the shared InfoDot PostgreSQL instance and `APP_URL=https://agents.infodot.app`. Users authenticated through InfoDot gain access automatically via Sanctum handoff tokens.
+> **Ecosystem SSO:** Set `APP_URL=https://agents.infodot.app`. Users authenticated through the InfoDot hub gain access automatically via Sanctum handoff tokens (`EcosystemAuthController`).
 
 ## Ecosystem
 
