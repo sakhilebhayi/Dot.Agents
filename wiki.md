@@ -1,6 +1,6 @@
 ---
 title: Dot.Agents — Platform Wiki
-version: 0.1.0
+version: 0.2.0
 status: active
 owners: [Agents Platform Lead]
 platform-id: dot-agents
@@ -176,6 +176,7 @@ Dot.Agents shares a PostgreSQL/MySQL instance and Laravel Sanctum handoff-token 
 
 | Version | Date | Author | Change |
 |---|---|---|---|
+| 0.2.0 | 2026-08-03 | Sakhile Bhayi | Welcome-page hero background pass. The nav/footer brand marks were already the real `public/dot.logos3.png` lockup (byte-identical to `public/images/logo.png`) from an earlier platform-loop pass, so no logo change was needed here. Added a real photographic background to the hero section (`resources/views/welcome.blade.php`), which previously had only a flat `bg-[#1e1660]` fill with a subtle dot-grid pattern and blurred color accents: a data-center server-room photo by Kier in Sight Archives (@kierinsightarchives), unsplash.com/photos/a-close-up-of-a-server-room-3Nwt6w-KU3E, hotlinked via Unsplash's CDN (`images.unsplash.com/photo-1667264501379-c1537934c7ab`). Layered a `#1e1660`-tinted dark overlay plus the existing dot-grid/blur accents on top so the brand's deep-purple palette and text contrast are preserved. Verified the image URL resolves with `curl -sI` (HTTP/2 200) before committing. |
 | 0.1.0 | 2026-08-01 | Agents Platform Lead | Initial wiki: architecture, domain entities, governance stack, events, and Dot.Brain connection derived from the actual codebase (Laravel 12, 40 models, 57 events, ADR-001/003, governance-spec.md, database-schema.md) |
 | 0.1.1 | 2026-08-01 | Platform Loop Pass | Engineering-quality pass (UI/branding/tests/docs, bounded scope): wired the real logo (`dot.logos3.png`) into favicons and the remaining generic Jetstream logo components (`application-mark`, `application-logo`, `authentication-card-logo`); added a live notification bell (Livewire) reading the existing but previously unused `PlatformNotification` model; fixed `PlatformNotificationFactory`, whose fields (`message`/`severity`/`is_read`) didn't match the actual `platform_notifications` migration schema (`body`/`priority`/`read_at`) — factory-created rows would have failed the NOT NULL `body` column; added dark-mode persistence (localStorage) to the platform layout's existing toggle; added Feature tests for the outer HTTP/middleware layer of the dashboard/marketplace/my-agents pages (previously only covered at the Livewire-component level) and for the new notification bell; removed an unreferenced duplicate logo file at the repo root. Governance/scoring/approval-workflow internals were not touched. See commit for full diff. |
 | 0.1.2 | 2026-08-01 | Security Deep Pass | Follow-up governance-internals security review (see §4a). Fixed a cross-tenant IDOR affecting `ApprovalQueue` and `KnowledgeManager` Livewire components, where an unchecksummed method-call argument let any authenticated user read another organization's approval/knowledge-base records. Approval workflow's server-side approve/reject authorization, the prompt-injection guard's coverage across all LLM call paths, and the Digital Immune System's lack of a user-triggerable bypass were all checked and found sound. Commit `b488978`.

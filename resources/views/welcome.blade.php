@@ -214,6 +214,10 @@
 ════════════════════════════════════════════════ --}}
 <main id="main-content">
 <section class="bg-[#1e1660] pt-40 pb-28 px-6 relative overflow-hidden" aria-label="Hero — Dot.Agents Adaptive Enterprise Operating System">
+    <!-- Photographic Background: real data-center server-room photo by Kier in Sight Archives (@kierinsightarchives), unsplash.com/photos/a-close-up-of-a-server-room-3Nwt6w-KU3E -->
+    <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1667264501379-c1537934c7ab?q=80&w=2400&auto=format&fit=crop');"></div>
+    <div class="absolute inset-0 bg-[#1e1660]/90"></div>
+    <div class="absolute inset-0 bg-gradient-to-t from-[#1e1660] via-[#1e1660]/85 to-[#1e1660]/60"></div>
     <div class="absolute inset-0 opacity-[0.04]"
          style="background-image: radial-gradient(circle at 1px 1px, white 1px, transparent 0); background-size: 32px 32px;"></div>
     <div class="absolute bottom-0 right-0 w-[700px] h-[700px] bg-brand-purple-mid/15 rounded-full blur-3xl translate-x-1/3 translate-y-1/3"></div>
