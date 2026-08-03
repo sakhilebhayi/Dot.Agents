@@ -17,38 +17,44 @@ return new class extends Migration
      */
     public function up(): void
     {
-        $indexes = DB::select("SELECT name FROM sqlite_master WHERE type='index'");
-        $existingIndexes = array_column($indexes, 'name');
-
-        Schema::table('agent_tasks', function (Blueprint $table) use ($existingIndexes) {
-            if (! in_array('agent_tasks_org_created_at_idx', $existingIndexes)) {
+        // NOTE: previously queried `sqlite_master` directly, which only exists on
+        // SQLite connections and blew up with "Undefined table: sqlite_master" on
+        // every other driver (e.g. pgsql). Use Laravel's driver-agnostic schema
+        // introspection (Schema::getIndexes()) instead so this migration works on
+        // any supported database.
+        $agentTasksIndexes = array_column(Schema::getIndexes('agent_tasks'), 'name');
+        Schema::table('agent_tasks', function (Blueprint $table) use ($agentTasksIndexes) {
+            if (! in_array('agent_tasks_org_created_at_idx', $agentTasksIndexes)) {
                 $table->index(['organization_id', 'created_at'], 'agent_tasks_org_created_at_idx');
             }
         });
 
-        Schema::table('security_events', function (Blueprint $table) use ($existingIndexes) {
-            if (! in_array('security_events_org_created_at_idx', $existingIndexes)) {
+        $securityEventsIndexes = array_column(Schema::getIndexes('security_events'), 'name');
+        Schema::table('security_events', function (Blueprint $table) use ($securityEventsIndexes) {
+            if (! in_array('security_events_org_created_at_idx', $securityEventsIndexes)) {
                 $table->index(['organization_id', 'created_at'], 'security_events_org_created_at_idx');
             }
-            if (! in_array('security_events_org_type_status_idx', $existingIndexes)) {
+            if (! in_array('security_events_org_type_status_idx', $securityEventsIndexes)) {
                 $table->index(['organization_id', 'event_type', 'status'], 'security_events_org_type_status_idx');
             }
         });
 
-        Schema::table('decision_logs', function (Blueprint $table) use ($existingIndexes) {
-            if (! in_array('decision_logs_org_created_at_idx', $existingIndexes)) {
+        $decisionLogsIndexes = array_column(Schema::getIndexes('decision_logs'), 'name');
+        Schema::table('decision_logs', function (Blueprint $table) use ($decisionLogsIndexes) {
+            if (! in_array('decision_logs_org_created_at_idx', $decisionLogsIndexes)) {
                 $table->index(['organization_id', 'created_at'], 'decision_logs_org_created_at_idx');
             }
-            if (! in_array('decision_logs_deployment_created_at_idx', $existingIndexes)) {
+            if (! in_array('decision_logs_deployment_created_at_idx', $decisionLogsIndexes)) {
                 $table->index(['agent_deployment_id', 'created_at'], 'decision_logs_deployment_created_at_idx');
             }
         });
 
-        Schema::table('audit_logs', function (Blueprint $table) use ($existingIndexes) {
-            if (! in_array('audit_logs_org_created_at_idx', $existingIndexes)) {
+        $auditLogsIndexes = array_column(Schema::getIndexes('audit_logs'), 'name');
+        Schema::table('audit_logs', function (Blueprint $table) use ($auditLogsIndexes) {
+            if (! in_array('audit_logs_org_created_at_idx', $auditLogsIndexes)) {
                 $table->index(['organization_id', 'created_at'], 'audit_logs_org_created_at_idx');
             }
-            if (! in_array('audit_logs_org_event_idx', $existingIndexes)) {
+            if (! in_array('audit_logs_org_event_idx', $auditLogsIndexes)) {
                 $table->index(['organization_id', 'event'], 'audit_logs_org_event_idx');
             }
         });

@@ -18,12 +18,15 @@ class ApprovalResponseFormTest extends TestCase
 
     private function makeForm(): ApprovalResponseForm
     {
-        // Livewire\Form requires ComponentRegistry + propertyName injected by the framework.
-        // We can resolve it via the container by binding a minimal stub registry.
-        /** @var \Livewire\ComponentRegistry $registry */
-        $registry = $this->createMock(\Livewire\ComponentRegistry::class);
+        // Livewire\Form requires a Component + propertyName injected by the framework
+        // (see Livewire\Features\SupportFormObjects\Form::__construct). Stub out a
+        // Component since the form's own logic under test doesn't touch it.
+        /** @var \Livewire\Component $component */
+        $component = $this->getMockBuilder(\Livewire\Component::class)
+            ->disableOriginalConstructor()
+            ->getMockForAbstractClass();
 
-        return new ApprovalResponseForm($registry, 'responseForm');
+        return new ApprovalResponseForm($component, 'responseForm');
     }
 
     #[Test]

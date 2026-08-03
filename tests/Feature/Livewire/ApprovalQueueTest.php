@@ -24,6 +24,7 @@ class ApprovalQueueTest extends TestCase
         parent::setUp();
         $this->user = User::factory()->create();
         $this->organization = Organization::factory()->create(['owner_id' => $this->user->id]);
+        $this->organization->users()->attach($this->user->id, ['role' => 'owner', 'is_primary' => true, 'joined_at' => now()]);
         session(['current_organization_id' => $this->organization->id]);
     }
 
