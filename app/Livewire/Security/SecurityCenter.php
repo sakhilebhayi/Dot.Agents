@@ -41,8 +41,9 @@ class SecurityCenter extends Component
     #[Computed]
     public function events()
     {
-        return SecurityEvent::where('organization_id', $this->organizationId)
-            ->when($this->filterSeverity, fn ($q) => $q->where('severity', $this->filterSeverity))
+        // No explicit organization_id filter needed: SecurityEvent's
+        // HasOrganizationScope trait applies it automatically from the session.
+        return SecurityEvent::when($this->filterSeverity, fn ($q) => $q->where('severity', $this->filterSeverity))
             ->when($this->filterType, fn ($q) => $q->where('event_type', $this->filterType))
             ->orderByDesc('created_at')
             ->paginate(15);
@@ -51,13 +52,15 @@ class SecurityCenter extends Component
     #[Computed]
     public function stats(): array
     {
-        $events = SecurityEvent::where('organization_id', $this->organizationId);
+        // No explicit organization_id filter needed: SecurityEvent's and
+        // AgentDeployment's HasOrganizationScope trait applies it automatically.
+        $events = SecurityEvent::query();
 
         return [
             'total_24h' => (clone $events)->where('created_at', '>=', now()->subDay())->count(),
             'critical' => (clone $events)->where('severity', 'critical')->where('status', 'open')->count(),
             'auto_remediated' => (clone $events)->where('auto_remediated', true)->count(),
-            'quarantined' => AgentDeployment::where('organization_id', $this->organizationId)->where('status', 'suspended')->count(),
+            'quarantined' => AgentDeployment::where('status', 'suspended')->count(),
         ];
     }
 

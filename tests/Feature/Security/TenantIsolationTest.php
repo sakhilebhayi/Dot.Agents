@@ -79,4 +79,19 @@ class TenantIsolationTest extends TestCase
         $this->assertEquals($this->userA->id, $this->orgA->owner_id);
         $this->assertEquals($this->userB->id, $this->orgB->owner_id);
     }
+
+    public function test_scope_alone_blocks_cross_organization_access_even_without_an_explicit_where_or_policy_check(): void
+    {
+        $deployment = AgentDeployment::factory()->create(['organization_id' => $this->orgA->id]);
+
+        session(['current_organization_id' => $this->orgB->id]);
+
+        $this->assertNull(AgentDeployment::find($deployment->id));
+        $this->assertSame(0, AgentDeployment::query()->count());
+
+        session(['current_organization_id' => $this->orgA->id]);
+
+        $this->assertNotNull(AgentDeployment::find($deployment->id));
+        $this->assertSame(1, AgentDeployment::query()->count());
+    }
 }

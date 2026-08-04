@@ -25,7 +25,6 @@ class DecisionLogViewer extends Component
     #[Computed]
     public function decisions()
     {
-        $orgId = session('current_organization_id');
         $since = match ($this->timeframe) {
             '24h' => now()->subDay(),
             '7d' => now()->subDays(7),
@@ -33,8 +32,9 @@ class DecisionLogViewer extends Component
             default => now()->subDays(30),
         };
 
-        return DecisionLog::where('organization_id', $orgId)
-            ->where('created_at', '>=', $since)
+        // No explicit organization_id filter needed: DecisionLog's
+        // HasOrganizationScope trait applies it automatically from the session.
+        return DecisionLog::where('created_at', '>=', $since)
             ->when($this->filterRisk, fn ($q) => $q->where('risk_score', $this->filterRisk === 'high' ? '>=' : ($this->filterRisk === 'medium' ? '>=' : '<'), $this->filterRisk === 'high' ? 70 : ($this->filterRisk === 'medium' ? 40 : 40)))
             ->when($this->filterDeployment, fn ($q) => $q->where('agent_deployment_id', $this->filterDeployment))
             ->when($this->filterReviewRequired === '1', fn ($q) => $q->where('requires_human_review', true))
@@ -47,10 +47,9 @@ class DecisionLogViewer extends Component
     #[Computed]
     public function deployments()
     {
-        $orgId = session('current_organization_id');
-
-        return AgentDeployment::where('organization_id', $orgId)
-            ->with('agent')
+        // No explicit organization_id filter needed: AgentDeployment's
+        // HasOrganizationScope trait applies it automatically from the session.
+        return AgentDeployment::with('agent')
             ->orderBy('name')
             ->get(['id', 'name', 'agent_id']);
     }

@@ -40,8 +40,9 @@ class SocialDashboard extends Component
     #[Computed]
     public function hotLeads()
     {
-        return SocialLead::where('organization_id', $this->orgId)
-            ->where(fn ($q) => $q->where('priority', 'hot')->orWhere('lead_score', '>=', 80))
+        // No explicit organization_id filter needed: SocialLead's
+        // HasOrganizationScope trait applies it automatically from the session.
+        return SocialLead::where(fn ($q) => $q->where('priority', 'hot')->orWhere('lead_score', '>=', 80))
             ->whereIn('status', ['new', 'contacted', 'qualified'])
             ->orderByDesc('lead_score')
             ->limit(10)
@@ -51,8 +52,9 @@ class SocialDashboard extends Component
     #[Computed]
     public function pendingPosts()
     {
-        return SocialPost::where('organization_id', $this->orgId)
-            ->where('approval_status', 'pending')
+        // No explicit organization_id filter needed: SocialPost's
+        // HasOrganizationScope trait applies it automatically from the session.
+        return SocialPost::where('approval_status', 'pending')
             ->with(['socialPage.socialAccount'])
             ->orderBy('scheduled_at')
             ->limit(10)

@@ -47,9 +47,9 @@ class SocialCredentials extends Component
     #[Computed]
     public function credentials(): Collection
     {
-        return OrganizationSocialCredential::where('organization_id', $this->organization->id)
-            ->get()
-            ->keyBy('platform');
+        // No explicit organization_id filter needed: OrganizationSocialCredential's
+        // HasOrganizationScope trait applies it automatically from the session.
+        return OrganizationSocialCredential::get()->keyBy('platform');
     }
 
     public function openEdit(string $platform): void

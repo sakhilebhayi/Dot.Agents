@@ -26,8 +26,9 @@ class LeadPipeline extends Component
     #[Computed]
     public function leads()
     {
-        $query = SocialLead::where('organization_id', $this->orgId)
-            ->with(['socialConversation', 'agentDeployment'])
+        // No explicit organization_id filter needed: SocialLead's
+        // HasOrganizationScope trait applies it automatically from the session.
+        $query = SocialLead::with(['socialConversation', 'agentDeployment'])
             ->orderByDesc($this->sortBy);
 
         if ($this->stage !== 'all') {
@@ -48,9 +49,10 @@ class LeadPipeline extends Component
     {
         $stages = ['awareness', 'interest', 'consideration', 'intent', 'evaluation', 'purchase'];
 
+        // No explicit organization_id filter needed: SocialLead's
+        // HasOrganizationScope trait applies it automatically from the session.
         return collect($stages)->mapWithKeys(fn ($stage) => [
-            $stage => SocialLead::where('organization_id', $this->orgId)
-                ->where('stage', $stage)
+            $stage => SocialLead::where('stage', $stage)
                 ->count(),
         ])->toArray();
     }
@@ -58,8 +60,9 @@ class LeadPipeline extends Component
     #[Computed]
     public function hotLeadCount(): int
     {
-        return SocialLead::where('organization_id', $this->orgId)
-            ->where(fn ($q) => $q->where('priority', 'hot')->orWhere('lead_score', '>=', 80))
+        // No explicit organization_id filter needed: SocialLead's
+        // HasOrganizationScope trait applies it automatically from the session.
+        return SocialLead::where(fn ($q) => $q->where('priority', 'hot')->orWhere('lead_score', '>=', 80))
             ->whereIn('status', ['new', 'contacted', 'qualified'])
             ->count();
     }

@@ -38,8 +38,9 @@ class SlaMonitoringDashboard extends Component
     #[Computed]
     public function deployments()
     {
-        return AgentDeployment::where('organization_id', $this->organizationId)
-            ->whereIn('status', ['active', 'paused'])
+        // No explicit organization_id filter needed: AgentDeployment's
+        // HasOrganizationScope trait applies it automatically from the session.
+        return AgentDeployment::whereIn('status', ['active', 'paused'])
             ->with('agent:id,name,slug')
             ->orderBy('created_at', 'desc')
             ->get(['id', 'agent_id', 'display_name', 'status']);
@@ -50,8 +51,9 @@ class SlaMonitoringDashboard extends Component
     {
         $since = $this->sinceDate();
 
-        $query = AgentTask::where('organization_id', $this->organizationId)
-            ->where('created_at', '>=', $since)
+        // No explicit organization_id filter needed: AgentTask's
+        // HasOrganizationScope trait applies it automatically from the session.
+        $query = AgentTask::where('created_at', '>=', $since)
             ->whereNotNull('actual_duration_minutes')
             ->when($this->deploymentId, fn ($q) => $q->where('agent_deployment_id', $this->deploymentId));
 
@@ -84,8 +86,9 @@ class SlaMonitoringDashboard extends Component
     {
         $since = $this->sinceDate();
 
-        return AgentTask::where('organization_id', $this->organizationId)
-            ->where('created_at', '>=', $since)
+        // No explicit organization_id filter needed: AgentTask's
+        // HasOrganizationScope trait applies it automatically from the session.
+        return AgentTask::where('created_at', '>=', $since)
             ->where('status', 'completed')
             ->whereNotNull('actual_duration_minutes')
             ->when($this->deploymentId, fn ($q) => $q->where('agent_deployment_id', $this->deploymentId))
@@ -106,15 +109,15 @@ class SlaMonitoringDashboard extends Component
         $threshold = (float) config('ai.sla_threshold_minutes', 10.0);
         $since = $this->sinceDate();
 
-        $breaches = AgentTask::where('organization_id', $this->organizationId)
-            ->where('created_at', '>=', $since)
+        // No explicit organization_id filter needed: AgentTask's
+        // HasOrganizationScope trait applies it automatically from the session.
+        $breaches = AgentTask::where('created_at', '>=', $since)
             ->where('status', 'completed')
             ->where('actual_duration_minutes', '>', $threshold)
             ->when($this->deploymentId, fn ($q) => $q->where('agent_deployment_id', $this->deploymentId))
             ->count();
 
-        $total = AgentTask::where('organization_id', $this->organizationId)
-            ->where('created_at', '>=', $since)
+        $total = AgentTask::where('created_at', '>=', $since)
             ->where('status', 'completed')
             ->when($this->deploymentId, fn ($q) => $q->where('agent_deployment_id', $this->deploymentId))
             ->count();

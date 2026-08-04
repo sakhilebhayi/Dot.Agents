@@ -27,8 +27,9 @@ class ApprovalQueue extends Component
     #[Computed]
     public function approvals()
     {
-        return AgentApproval::where('organization_id', session('current_organization_id'))
-            ->when($this->filterStatus, fn ($q) => $q->where('status', $this->filterStatus))
+        // No explicit organization_id filter needed: AgentApproval's
+        // HasOrganizationScope trait applies it automatically from the session.
+        return AgentApproval::when($this->filterStatus, fn ($q) => $q->where('status', $this->filterStatus))
             ->when($this->filterRisk, fn ($q) => $q->where('risk_level', $this->filterRisk))
             ->with(['deployment.agent', 'task', 'requestedFrom'])
             ->orderByRaw("CASE risk_level WHEN 'critical' THEN 1 WHEN 'high' THEN 2 WHEN 'medium' THEN 3 ELSE 4 END")

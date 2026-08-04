@@ -38,8 +38,9 @@ class SocialPostManager extends Component
     #[Computed]
     public function posts()
     {
-        $query = SocialPost::where('organization_id', $this->orgId)
-            ->with(['socialPage.socialAccount', 'approvedBy']);
+        // No explicit organization_id filter needed: SocialPost's
+        // HasOrganizationScope trait applies it automatically from the session.
+        $query = SocialPost::with(['socialPage.socialAccount', 'approvedBy']);
 
         if ($this->filter === 'pending') {
             $query->where('approval_status', 'pending');
@@ -57,9 +58,9 @@ class SocialPostManager extends Component
     #[Computed]
     public function pendingCount(): int
     {
-        return SocialPost::where('organization_id', $this->orgId)
-            ->where('approval_status', 'pending')
-            ->count();
+        // No explicit organization_id filter needed: SocialPost's
+        // HasOrganizationScope trait applies it automatically from the session.
+        return SocialPost::where('approval_status', 'pending')->count();
     }
 
     public function schedulePost(): void

@@ -30,8 +30,9 @@ class SocialInbox extends Component
     #[Computed]
     public function conversations()
     {
-        $query = SocialConversation::where('organization_id', $this->orgId)
-            ->with(['socialAccount', 'agentDeployment', 'messages' => fn ($q) => $q->latest()->limit(1)])
+        // No explicit organization_id filter needed: SocialConversation's
+        // HasOrganizationScope trait applies it automatically from the session.
+        $query = SocialConversation::with(['socialAccount', 'agentDeployment', 'messages' => fn ($q) => $q->latest()->limit(1)])
             ->orderByDesc('last_message_at');
 
         if ($this->filter !== 'all') {

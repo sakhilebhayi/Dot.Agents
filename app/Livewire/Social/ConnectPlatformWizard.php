@@ -48,8 +48,9 @@ class ConnectPlatformWizard extends Component
     #[Computed]
     public function connectedPlatforms(): array
     {
-        return SocialAccount::where('organization_id', (int) session('current_organization_id'))
-            ->where('status', 'active')
+        // No explicit organization_id filter needed: SocialAccount's
+        // HasOrganizationScope trait applies it automatically from the session.
+        return SocialAccount::where('status', 'active')
             ->pluck('platform')
             ->unique()
             ->toArray();

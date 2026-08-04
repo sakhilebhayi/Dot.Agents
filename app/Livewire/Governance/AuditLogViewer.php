@@ -37,8 +37,9 @@ class AuditLogViewer extends Component
     #[Computed]
     public function logs()
     {
-        return AuditLog::where('organization_id', session('current_organization_id'))
-            ->when($this->search, fn ($q) => $q->where('description', 'like', "%{$this->search}%")
+        // No explicit organization_id filter needed: AuditLog's
+        // HasOrganizationScope trait applies it automatically from the session.
+        return AuditLog::when($this->search, fn ($q) => $q->where('description', 'like', "%{$this->search}%")
                 ->orWhere('event', 'like', "%{$this->search}%")
             )
             ->when($this->filterCategory, fn ($q) => $q->where('event_category', $this->filterCategory))
@@ -55,17 +56,17 @@ class AuditLogViewer extends Component
     #[Computed]
     public function deployments()
     {
-        return AgentDeployment::where('organization_id', session('current_organization_id'))
-            ->with('agent')
-            ->get();
+        // No explicit organization_id filter needed: AgentDeployment's
+        // HasOrganizationScope trait applies it automatically from the session.
+        return AgentDeployment::with('agent')->get();
     }
 
     #[Computed]
     public function flaggedCount(): int
     {
-        return AuditLog::where('organization_id', session('current_organization_id'))
-            ->where('flagged', true)
-            ->count();
+        // No explicit organization_id filter needed: AuditLog's
+        // HasOrganizationScope trait applies it automatically from the session.
+        return AuditLog::where('flagged', true)->count();
     }
 
     public function render()

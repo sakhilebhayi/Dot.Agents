@@ -44,8 +44,9 @@ class DepartmentManager extends Component
     #[Computed]
     public function departments()
     {
-        return Department::where('organization_id', $this->organization->id)
-            ->withCount('deployments')
+        // No explicit organization_id filter needed: Department's
+        // HasOrganizationScope trait applies it automatically from the session.
+        return Department::withCount('deployments')
             ->orderBy('name')
             ->get();
     }

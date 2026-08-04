@@ -27,10 +27,9 @@ class WorkflowList extends Component
     #[Computed]
     public function workflows()
     {
-        $orgId = session('current_organization_id');
-
+        // No explicit organization_id filter needed: AgentWorkflow's
+        // HasOrganizationScope trait applies it automatically from the session.
         return AgentWorkflow::withCount(['nodes'])
-            ->where('organization_id', $orgId)
             ->orderByDesc('updated_at')
             ->get();
     }

@@ -28,8 +28,9 @@ class SentimentMonitor extends Component
         $since = $this->getSince();
         $sentiments = ['positive', 'neutral', 'concerned', 'frustrated', 'angry'];
 
-        $query = SocialSentimentScore::where('organization_id', $this->orgId)
-            ->where('scored_at', '>=', $since);
+        // No explicit organization_id filter needed: SocialSentimentScore's
+        // HasOrganizationScope trait applies it automatically from the session.
+        $query = SocialSentimentScore::where('scored_at', '>=', $since);
 
         if ($this->platform !== 'all') {
             $query->where('platform', $this->platform);
@@ -46,8 +47,9 @@ class SentimentMonitor extends Component
     #[Computed]
     public function unhandledEscalations()
     {
-        return SocialSentimentScore::where('organization_id', $this->orgId)
-            ->where('requires_escalation', true)
+        // No explicit organization_id filter needed: SocialSentimentScore's
+        // HasOrganizationScope trait applies it automatically from the session.
+        return SocialSentimentScore::where('requires_escalation', true)
             ->where('escalation_handled', false)
             ->with(['socialConversation', 'socialAccount'])
             ->orderByDesc('scored_at')
@@ -67,8 +69,9 @@ class SentimentMonitor extends Component
     {
         $since = $this->getSince();
 
-        return (float) SocialSentimentScore::where('organization_id', $this->orgId)
-            ->where('scored_at', '>=', $since)
+        // No explicit organization_id filter needed: SocialSentimentScore's
+        // HasOrganizationScope trait applies it automatically from the session.
+        return (float) SocialSentimentScore::where('scored_at', '>=', $since)
             ->avg('score') ?? 50.0;
     }
 

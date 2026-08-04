@@ -39,8 +39,9 @@ class ConnectedAccounts extends Component
     #[Computed]
     public function platformStatus(): array
     {
-        $accounts = SocialAccount::where('organization_id', $this->orgId)
-            ->withCount('conversations')
+        // No explicit organization_id filter needed: SocialAccount's
+        // HasOrganizationScope trait applies it automatically from the session.
+        $accounts = SocialAccount::withCount('conversations')
             ->with(['pages', 'connectionSettings'])
             ->whereNull('deleted_at')
             ->get()

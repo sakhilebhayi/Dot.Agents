@@ -58,8 +58,9 @@ class KnowledgeManager extends Component
     #[Computed]
     public function knowledgeBases()
     {
-        return KnowledgeBase::where('organization_id', $this->organization->id)
-            ->withCount('articles')
+        // No explicit organization_id filter needed: KnowledgeBase's
+        // HasOrganizationScope trait applies it automatically from the session.
+        return KnowledgeBase::withCount('articles')
             ->orderBy('name')
             ->get();
     }
