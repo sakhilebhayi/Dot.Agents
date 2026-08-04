@@ -6,6 +6,7 @@ use App\Actions\Organizations\SaveConnectionSettingsAction;
 use App\Actions\Social\DisconnectSocialAccountAction;
 use App\DTOs\Organizations\SaveConnectionSettingsData;
 use App\DTOs\Social\DisconnectSocialAccountData;
+use App\Livewire\Concerns\ResolvesCurrentOrganization;
 use App\Models\Organization;
 use App\Models\SocialAccount;
 use Livewire\Attributes\Computed;
@@ -13,6 +14,8 @@ use Livewire\Component;
 
 class ConnectedAccounts extends Component
 {
+    use ResolvesCurrentOrganization;
+
     /** Platform whose settings panel is open for inline editing. */
     public ?string $managing = null;
 
@@ -126,7 +129,9 @@ class ConnectedAccounts extends Component
 
     public function disconnect(string $platform): void
     {
-        $organization = Organization::findOrFail($this->orgId);
+        // See ResolvesCurrentOrganization: session org context can be null
+        // for this request even though the user is authenticated.
+        $organization = $this->requireCurrentOrganization();
         app(DisconnectSocialAccountAction::class)->executeForPlatform($organization, DisconnectSocialAccountData::fromPlatform($platform));
 
         unset($this->platformStatus);

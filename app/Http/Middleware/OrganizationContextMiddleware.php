@@ -28,7 +28,14 @@ class OrganizationContextMiddleware
                 }
             }
 
-            // Validate that the session org still belongs to this user
+            // Validate that the session org still belongs to this user. Mirrors
+            // the ecosystem's EnsureTeamContext convention: a *present but
+            // invalid* org id (e.g. the user was removed from it since the
+            // session was set) is a hard 403, not a silent forget-and-continue.
+            // Silently continuing here used to leave every downstream
+            // component reading session('current_organization_id') as null
+            // for the remainder of the request, which either crashed on a
+            // null findOrFail() lookup or silently wrote organization_id => 0.
             $orgId = session('current_organization_id');
             if ($orgId) {
                 $valid = $request->user()
@@ -38,6 +45,7 @@ class OrganizationContextMiddleware
 
                 if (! $valid) {
                     session()->forget('current_organization_id');
+                    abort(403, 'Unauthorized to access this organization.');
                 }
             }
         }

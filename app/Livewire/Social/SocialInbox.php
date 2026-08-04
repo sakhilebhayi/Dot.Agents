@@ -5,12 +5,15 @@ namespace App\Livewire\Social;
 use App\Actions\Social\EscalateConversationAction;
 use App\Actions\Social\RespondToSocialMessageAction;
 use App\DTOs\Social\SocialMessageResponseData;
+use App\Livewire\Concerns\ResolvesCurrentOrganization;
 use App\Models\SocialConversation;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
 class SocialInbox extends Component
 {
+    use ResolvesCurrentOrganization;
+
     public string $filter = 'open';             // open|escalated|resolved|all
 
     public string $platform = 'all';
@@ -70,8 +73,12 @@ class SocialInbox extends Component
     {
         $this->validate(['replyContent' => 'required|string|max:4000']);
 
+        // Guard before writing: without this, a null session org context
+        // would silently persist a reply with organization_id => 0.
+        $orgId = $this->requireCurrentOrganizationId();
+
         $data = new SocialMessageResponseData(
-            organizationId: $this->orgId,
+            organizationId: $orgId,
             socialConversationId: $this->activeConversationId,
             content: $this->replyContent,
             isAiGenerated: false,

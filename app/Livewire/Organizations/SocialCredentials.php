@@ -3,6 +3,7 @@
 namespace App\Livewire\Organizations;
 
 use App\Actions\Social\SaveSocialCredentialsAction;
+use App\Livewire\Concerns\ResolvesCurrentOrganization;
 use App\Models\Organization;
 use App\Models\OrganizationSocialCredential;
 use Illuminate\Support\Collection;
@@ -11,6 +12,8 @@ use Livewire\Component;
 
 class SocialCredentials extends Component
 {
+    use ResolvesCurrentOrganization;
+
     /** Which platform panel is currently open for editing. */
     public ?string $editing = null;
 
@@ -41,7 +44,10 @@ class SocialCredentials extends Component
     #[Computed]
     public function organization(): Organization
     {
-        return Organization::findOrFail(session('current_organization_id'));
+        // OrganizationContextMiddleware only guarantees a session org for the
+        // request that set it; a membership revoked mid-request forgets it
+        // and leaves this null. Abort instead of crashing on findOrFail(null).
+        return $this->requireCurrentOrganization();
     }
 
     #[Computed]

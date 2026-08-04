@@ -5,6 +5,7 @@ namespace App\Livewire\Social;
 use App\Actions\Social\ApproveSocialPostAction;
 use App\Actions\Social\ScheduleSocialPostAction;
 use App\DTOs\Social\SocialPostData;
+use App\Livewire\Concerns\ResolvesCurrentOrganization;
 use App\Models\SocialPost;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
@@ -12,6 +13,7 @@ use Livewire\WithPagination;
 
 class SocialPostManager extends Component
 {
+    use ResolvesCurrentOrganization;
     use WithPagination;
 
     public string $filter = 'pending';           // pending|scheduled|published|draft
@@ -72,8 +74,12 @@ class SocialPostManager extends Component
             'composingScheduledAt' => 'nullable|date|after:now',
         ]);
 
+        // Guard before writing: without this, a null session org context
+        // would silently persist a post with organization_id => 0.
+        $orgId = $this->requireCurrentOrganizationId();
+
         $data = SocialPostData::fromArray([
-            'organization_id' => $this->orgId,
+            'organization_id' => $orgId,
             'social_page_id' => $this->composingPageId,
             'content' => $this->composingContent,
             'post_type' => $this->composingPostType,

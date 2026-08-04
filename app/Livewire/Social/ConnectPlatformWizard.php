@@ -4,6 +4,7 @@ namespace App\Livewire\Social;
 
 use App\Actions\Social\SaveSocialCredentialsAction;
 use App\Livewire\Concerns\ManagesOAuthFlow;
+use App\Livewire\Concerns\ResolvesCurrentOrganization;
 use App\Models\Organization;
 use App\Models\SocialAccount;
 use Livewire\Attributes\Computed;
@@ -12,6 +13,7 @@ use Livewire\Component;
 class ConnectPlatformWizard extends Component
 {
     use ManagesOAuthFlow;
+    use ResolvesCurrentOrganization;
 
     public int $step = 1;
 
@@ -66,8 +68,9 @@ class ConnectPlatformWizard extends Component
 
     public function activate(SaveSocialCredentialsAction $saveCredentials): void
     {
-        $orgId = (int) session('current_organization_id');
-        $org = Organization::findOrFail($orgId);
+        // See ResolvesCurrentOrganization: session org context can be null
+        // for this request even though the user is authenticated.
+        $org = $this->requireCurrentOrganization();
 
         if ($this->connectionMode === 'advanced' && $this->advClientId && $this->advClientSecret) {
             $saveCredentials->execute($org, $this->selectedPlatform, [

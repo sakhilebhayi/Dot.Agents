@@ -45,13 +45,21 @@ class SocialOAuthController extends Controller
                 ->with('error', 'Connection cancelled or denied by the platform.');
         }
 
-        Gate::authorize('create', [SocialAccount::class, session('current_organization_id')]);
+        // No unscoped fallback here: OrganizationContextMiddleware only
+        // guarantees a session org for the request that set it — a
+        // membership revoked mid-request leaves this null. SocialAccountPolicy
+        // ::create() takes a non-nullable int, so passing null through would
+        // TypeError instead of denying access; guard explicitly.
+        $orgId = session('current_organization_id');
+        abort_if(! $orgId, 403, 'No active organization context.');
+
+        Gate::authorize('create', [SocialAccount::class, (int) $orgId]);
 
         $oauthUser = $this->resolveDriver($platform)->user();
         $agentDeploymentId = session()->pull("social_oauth_{$platform}_deployment_id");
 
         $account = $action->execute(ConnectSocialAccountData::fromArray([
-            'organization_id' => (int) session('current_organization_id'),
+            'organization_id' => (int) $orgId,
             'connected_by' => Auth::id(),
             'platform' => $platform,
             'platform_account_id' => (string) $oauthUser->getId(),

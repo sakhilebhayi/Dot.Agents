@@ -129,4 +129,27 @@ class WorkflowListTest extends TestCase
         Livewire::test(WorkflowList::class)
             ->call('deleteWorkflow', $otherWorkflow->id);
     }
+
+    /**
+     * Regression test for the null-organization-context bug pattern (see
+     * Dot.Mines commit 0cc4362): OrganizationContextMiddleware can leave
+     * session('current_organization_id') null for a request even though the
+     * user is authenticated (e.g. their org membership was revoked between
+     * requests). createWorkflow() used to call
+     * Organization::findOrFail(session('current_organization_id')) directly,
+     * which crashed with ModelNotFoundException instead of a clean 403. It
+     * now goes through ResolvesCurrentOrganization::requireCurrentOrganization().
+     */
+    public function test_create_workflow_with_no_organization_context_aborts_instead_of_crashing(): void
+    {
+        $this->actingAs($this->user);
+        session()->forget('current_organization_id');
+
+        Livewire::test(WorkflowList::class)
+            ->set('newName', 'Orphaned Workflow Name')
+            ->call('createWorkflow')
+            ->assertForbidden();
+
+        $this->assertDatabaseMissing('agent_workflows', ['name' => 'Orphaned Workflow Name']);
+    }
 }

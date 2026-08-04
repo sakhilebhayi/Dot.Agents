@@ -4,6 +4,7 @@ namespace App\Livewire\Social;
 
 use App\Actions\Social\MarkEscalationHandledAction;
 use App\DTOs\Social\MarkEscalationHandledData;
+use App\Livewire\Concerns\ResolvesCurrentOrganization;
 use App\Models\SocialSentimentScore;
 use App\Services\Social\ReputationMonitoringService;
 use Carbon\Carbon;
@@ -12,6 +13,8 @@ use Livewire\Component;
 
 class SentimentMonitor extends Component
 {
+    use ResolvesCurrentOrganization;
+
     public string $timeframe = '24h';
 
     public string $platform = 'all';
@@ -77,7 +80,11 @@ class SentimentMonitor extends Component
 
     public function markHandled(int $scoreId): void
     {
-        app(MarkEscalationHandledAction::class)->execute(MarkEscalationHandledData::from($this->orgId, $scoreId));
+        // Guard before writing: without this, a null session org context
+        // would silently record the action against organization_id => 0.
+        $orgId = $this->requireCurrentOrganizationId();
+
+        app(MarkEscalationHandledAction::class)->execute(MarkEscalationHandledData::from($orgId, $scoreId));
 
         $this->dispatch('escalation-handled');
     }

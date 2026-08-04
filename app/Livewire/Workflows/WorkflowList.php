@@ -5,6 +5,7 @@ namespace App\Livewire\Workflows;
 use App\Actions\Workflows\CreateWorkflowAction;
 use App\Actions\Workflows\DeleteWorkflowAction;
 use App\DTOs\Workflows\CreateWorkflowData;
+use App\Livewire\Concerns\ResolvesCurrentOrganization;
 use App\Models\AgentWorkflow;
 use App\Models\Organization;
 use Livewire\Attributes\Computed;
@@ -13,6 +14,8 @@ use Livewire\Component;
 
 class WorkflowList extends Component
 {
+    use ResolvesCurrentOrganization;
+
     public bool $showCreateModal = false;
 
     #[Validate('required|string|min:2|max:100')]
@@ -45,7 +48,9 @@ class WorkflowList extends Component
     {
         $this->validate();
 
-        $organization = Organization::findOrFail(session('current_organization_id'));
+        // See ResolvesCurrentOrganization: session org context can be null
+        // for this request even though the user is authenticated.
+        $organization = $this->requireCurrentOrganization();
 
         $workflow = app(CreateWorkflowAction::class)->execute($organization, new CreateWorkflowData(
             name: $this->newName,
