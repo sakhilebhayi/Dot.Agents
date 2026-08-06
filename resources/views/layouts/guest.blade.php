@@ -20,6 +20,12 @@
     <div class="hidden lg:flex lg:w-[45%] xl:w-[42%] flex-col justify-between
                 bg-[#150f2e] px-12 py-10 relative overflow-hidden">
 
+        {{-- Same hero photo as welcome.blade.php (control room from above, Patrick Konior,
+        unsplash.com/photos/a-view-of-a-control-room-from-above-FwHJ6mJjVd4), kept low-opacity so
+        the existing texture/glow treatment still reads as the primary surface --}}
+        <div class="absolute inset-0 bg-cover bg-center opacity-[0.16]" style="background-image: url('https://images.unsplash.com/photo-1737502483537-19b698ff7d00?q=80&w=2400&auto=format&fit=crop');"></div>
+        <div class="absolute inset-0 bg-[#150f2e]/70"></div>
+
         {{-- Background texture --}}
         <div class="absolute inset-0 opacity-[0.04]"
              style="background-image: radial-gradient(circle at 1px 1px, white 1px, transparent 0); background-size: 28px 28px;"></div>
