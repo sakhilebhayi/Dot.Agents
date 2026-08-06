@@ -56,7 +56,7 @@
 
         @if (Route::has('register'))
             <p class="mt-6 text-center text-sm text-[#909088]">
-                Don\'t have an account?
+                Don't have an account?
                 <a href="{{ route('register') }}" class="text-brand-purple font-medium hover:text-brand-purple-mid transition-colors">
                     Create one
                 </a>

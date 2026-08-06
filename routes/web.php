@@ -31,6 +31,11 @@ Route::get('/', function () {
     return Auth::check() ? redirect()->route('dashboard') : view('welcome');
 });
 
+// Guest-facing legal pages
+
+Route::get('/terms', fn () => view('terms'))->name('terms.show');
+Route::get('/policy', fn () => view('policy'))->name('policy.show');
+
 // Consent routes — accessible to authenticated users regardless of consent status
 
 Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])

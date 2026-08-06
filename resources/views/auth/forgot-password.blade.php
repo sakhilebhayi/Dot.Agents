@@ -2,7 +2,7 @@
     <div>
         <h1 class="text-2xl font-bold text-[#111111] font-display mb-1">Reset your password</h1>
         <p class="text-sm text-[#909088] mb-8">
-            Enter your work email and we\'ll send you a reset link.
+            Enter your work email and we'll send you a reset link.
         </p>
 
         @session('status')

@@ -1,7 +1,7 @@
 <x-guest-layout>
     <div>
         <h1 class="text-2xl font-bold text-[#111111] font-display mb-1">Create your account</h1>
-        <p class="text-sm text-[#909088] mb-8">Set up your organization\'s workforce platform</p>
+        <p class="text-sm text-[#909088] mb-8">Set up your organization's workforce platform</p>
 
         <x-validation-errors class="mb-5 da-alert da-alert-critical" />
 

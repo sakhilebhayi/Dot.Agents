@@ -10,13 +10,13 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     @endif
 </head>
-<body class="font-sans antialiased bg-white text-[#111111]">
+<body class="font-sans antialiased bg-[#f3f0ea] text-[#111111]">
 
 {{-- Nav --}}
-<nav class="fixed top-0 inset-x-0 z-50 bg-white/95 backdrop-blur border-b border-[#e8e8e2]">
-    <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-        <a href="/" class="flex items-center gap-2.5">
-            <img src="/dot.logos3.png" alt="Dot.Agents" class="h-8 w-auto">
+<nav class="fixed top-0 inset-x-0 z-50 bg-[#f3f0ea]/95 backdrop-blur border-b border-[#e8e8e2]">
+    <div class="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
+        <a href="/" class="flex items-center gap-3">
+            <img src="/dot.logos3.png" alt="Dot.Agents" class="h-14 sm:h-[72px] w-auto">
             <span class="font-semibold text-[#111111] font-display text-base">Dot.Agents</span>
         </a>
         <div class="flex items-center gap-3">
@@ -33,9 +33,9 @@
 </nav>
 
 {{-- Hero --}}
-<section class="bg-[#1e1660] pt-32 pb-16 px-6">
+<section class="bg-[#150f2e] pt-32 pb-16 px-6">
     <div class="max-w-3xl mx-auto text-center">
-        <p class="text-xs font-semibold uppercase tracking-widest text-brand-yellow mb-3">Legal</p>
+        <p class="text-xs font-semibold uppercase tracking-widest text-[#f0c23a] mb-3">Legal</p>
         <h1 class="text-4xl md:text-5xl font-black font-display text-white mb-4">Privacy Policy</h1>
         <p class="text-white/50">Last updated: {{ date('F j, Y') }}</p>
     </div>
@@ -46,7 +46,7 @@
     <div class="max-w-3xl mx-auto">
 
         {{-- Intro statement --}}
-        <div class="bg-[#1e1660] rounded-2xl p-8 mb-12 text-center">
+        <div class="bg-[#150f2e] rounded-2xl p-8 mb-12 text-center">
             <p class="text-white/80 leading-relaxed text-base">
                 Dot.Agents is built on a foundation of trust. We handle your data with the same governance standards
                 we build into our platform — transparent, controlled, and accountable.
@@ -55,7 +55,7 @@
 
         {{-- Quick nav --}}
         <div class="da-card p-6 mb-12">
-            <p class="text-xs font-semibold uppercase tracking-widest text-brand-purple mb-4">In This Document</p>
+            <p class="text-xs font-semibold uppercase tracking-widest text-[#453798] mb-4">In This Document</p>
             <div class="grid sm:grid-cols-2 gap-y-2 gap-x-6">
                 @foreach([
                     ['#who-we-are',        '1. Who We Are'],
@@ -73,7 +73,7 @@
                     ['#changes',           '13. Changes to This Policy'],
                     ['#contact',           '14. Contact & DPO'],
                 ] as [$href, $label])
-                    <a href="{{ $href }}" class="text-sm text-brand-purple hover:text-[#111111] transition-colors py-0.5">{{ $label }}</a>
+                    <a href="{{ $href }}" class="text-sm text-[#453798] hover:text-[#111111] transition-colors py-0.5">{{ $label }}</a>
                 @endforeach
             </div>
         </div>
@@ -83,7 +83,7 @@
             {{-- 1 --}}
             <div id="who-we-are" class="scroll-mt-24 mb-12">
                 <div class="flex items-center gap-3 mb-5">
-                    <span class="w-8 h-8 rounded-lg bg-[#1e1660] text-brand-yellow text-xs font-black flex items-center justify-center flex-shrink-0">1</span>
+                    <span class="w-8 h-8 rounded-lg bg-[#150f2e] text-[#f0c23a] text-xs font-black flex items-center justify-center flex-shrink-0">1</span>
                     <h2 class="text-xl font-black font-display text-[#111111]">Who We Are</h2>
                 </div>
                 <p class="mb-3">Dot.Agents (<strong class="text-[#111111]">"we"</strong>, <strong class="text-[#111111]">"us"</strong>, <strong class="text-[#111111]">"our"</strong>) is the operator of the Dot.Agents Adaptive Enterprise Operating System. We are the data controller for personal information processed in connection with the Service.</p>
@@ -95,7 +95,7 @@
             {{-- 2 --}}
             <div id="what-we-collect" class="scroll-mt-24 mb-12">
                 <div class="flex items-center gap-3 mb-5">
-                    <span class="w-8 h-8 rounded-lg bg-[#1e1660] text-brand-yellow text-xs font-black flex items-center justify-center flex-shrink-0">2</span>
+                    <span class="w-8 h-8 rounded-lg bg-[#150f2e] text-[#f0c23a] text-xs font-black flex items-center justify-center flex-shrink-0">2</span>
                     <h2 class="text-xl font-black font-display text-[#111111]">Information We Collect</h2>
                 </div>
 
@@ -113,7 +113,7 @@
                                 'Support communications and feedback',
                             ] as $item)
                                 <li class="flex items-start gap-2">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-brand-purple mt-1.5 flex-shrink-0"></span>
+                                    <span class="w-1.5 h-1.5 rounded-full bg-[#453798] mt-1.5 flex-shrink-0"></span>
                                     <span>{{ $item }}</span>
                                 </li>
                             @endforeach
@@ -131,7 +131,7 @@
                                 'Performance data (API response times, error rates)',
                             ] as $item)
                                 <li class="flex items-start gap-2">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-brand-purple mt-1.5 flex-shrink-0"></span>
+                                    <span class="w-1.5 h-1.5 rounded-full bg-[#453798] mt-1.5 flex-shrink-0"></span>
                                     <span>{{ $item }}</span>
                                 </li>
                             @endforeach
@@ -147,7 +147,7 @@
                                 'Payment verification data from our billing processor',
                             ] as $item)
                                 <li class="flex items-start gap-2">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-brand-purple mt-1.5 flex-shrink-0"></span>
+                                    <span class="w-1.5 h-1.5 rounded-full bg-[#453798] mt-1.5 flex-shrink-0"></span>
                                     <span>{{ $item }}</span>
                                 </li>
                             @endforeach
@@ -161,7 +161,7 @@
             {{-- 3 --}}
             <div id="how-we-use" class="scroll-mt-24 mb-12">
                 <div class="flex items-center gap-3 mb-5">
-                    <span class="w-8 h-8 rounded-lg bg-[#1e1660] text-brand-yellow text-xs font-black flex items-center justify-center flex-shrink-0">3</span>
+                    <span class="w-8 h-8 rounded-lg bg-[#150f2e] text-[#f0c23a] text-xs font-black flex items-center justify-center flex-shrink-0">3</span>
                     <h2 class="text-xl font-black font-display text-[#111111]">How We Use Your Information</h2>
                 </div>
 
@@ -197,7 +197,7 @@
             {{-- 4 --}}
             <div id="ai-data" class="scroll-mt-24 mb-12">
                 <div class="flex items-center gap-3 mb-5">
-                    <span class="w-8 h-8 rounded-lg bg-[#1e1660] text-brand-yellow text-xs font-black flex items-center justify-center flex-shrink-0">4</span>
+                    <span class="w-8 h-8 rounded-lg bg-[#150f2e] text-[#f0c23a] text-xs font-black flex items-center justify-center flex-shrink-0">4</span>
                     <h2 class="text-xl font-black font-display text-[#111111]">AI Processing & Agent Data</h2>
                 </div>
                 <p class="mb-3"><strong class="text-[#111111]">Agent Inputs.</strong> Content you submit to agents (prompts, documents, instructions) is processed by AI models to generate responses. This data is logged as part of the governance audit trail and may be subject to our delusion detection and moderation systems.</p>
@@ -212,7 +212,7 @@
             {{-- 5 --}}
             <div id="sharing" class="scroll-mt-24 mb-12">
                 <div class="flex items-center gap-3 mb-5">
-                    <span class="w-8 h-8 rounded-lg bg-[#1e1660] text-brand-yellow text-xs font-black flex items-center justify-center flex-shrink-0">5</span>
+                    <span class="w-8 h-8 rounded-lg bg-[#150f2e] text-[#f0c23a] text-xs font-black flex items-center justify-center flex-shrink-0">5</span>
                     <h2 class="text-xl font-black font-display text-[#111111]">Sharing & Disclosure</h2>
                 </div>
                 <p class="mb-4">We do not sell your personal data. We may share data only in the following circumstances:</p>
@@ -237,7 +237,7 @@
             {{-- 6 --}}
             <div id="international" class="scroll-mt-24 mb-12">
                 <div class="flex items-center gap-3 mb-5">
-                    <span class="w-8 h-8 rounded-lg bg-[#1e1660] text-brand-yellow text-xs font-black flex items-center justify-center flex-shrink-0">6</span>
+                    <span class="w-8 h-8 rounded-lg bg-[#150f2e] text-[#f0c23a] text-xs font-black flex items-center justify-center flex-shrink-0">6</span>
                     <h2 class="text-xl font-black font-display text-[#111111]">International Transfers</h2>
                 </div>
                 <p class="mb-3">Dot.Agents operates globally. Your data may be stored and processed in countries outside your country of residence, including South Africa, the United States, and the European Union.</p>
@@ -250,7 +250,7 @@
             {{-- 7 --}}
             <div id="retention" class="scroll-mt-24 mb-12">
                 <div class="flex items-center gap-3 mb-5">
-                    <span class="w-8 h-8 rounded-lg bg-[#1e1660] text-brand-yellow text-xs font-black flex items-center justify-center flex-shrink-0">7</span>
+                    <span class="w-8 h-8 rounded-lg bg-[#150f2e] text-[#f0c23a] text-xs font-black flex items-center justify-center flex-shrink-0">7</span>
                     <h2 class="text-xl font-black font-display text-[#111111]">Data Retention</h2>
                 </div>
                 <div class="overflow-hidden rounded-xl border border-[#e8e8e2]">
@@ -283,7 +283,7 @@
             {{-- 8 --}}
             <div id="security" class="scroll-mt-24 mb-12">
                 <div class="flex items-center gap-3 mb-5">
-                    <span class="w-8 h-8 rounded-lg bg-[#1e1660] text-brand-yellow text-xs font-black flex items-center justify-center flex-shrink-0">8</span>
+                    <span class="w-8 h-8 rounded-lg bg-[#150f2e] text-[#f0c23a] text-xs font-black flex items-center justify-center flex-shrink-0">8</span>
                     <h2 class="text-xl font-black font-display text-[#111111]">Security</h2>
                 </div>
                 <p class="mb-4">We implement enterprise-grade security controls to protect your data:</p>
@@ -314,7 +314,7 @@
             {{-- 9 --}}
             <div id="your-rights" class="scroll-mt-24 mb-12">
                 <div class="flex items-center gap-3 mb-5">
-                    <span class="w-8 h-8 rounded-lg bg-[#1e1660] text-brand-yellow text-xs font-black flex items-center justify-center flex-shrink-0">9</span>
+                    <span class="w-8 h-8 rounded-lg bg-[#150f2e] text-[#f0c23a] text-xs font-black flex items-center justify-center flex-shrink-0">9</span>
                     <h2 class="text-xl font-black font-display text-[#111111]">Your Rights</h2>
                 </div>
                 <p class="mb-5">Depending on your jurisdiction, you may have the following rights regarding your personal data:</p>
@@ -335,7 +335,7 @@
                         </div>
                     @endforeach
                 </div>
-                <p>To exercise your rights, contact our Data Protection Officer at <a href="mailto:privacy@dotagents.com" class="text-brand-purple hover:underline">privacy@dotagents.com</a>. We will respond within 30 days (or as required by applicable law).</p>
+                <p>To exercise your rights, contact our Data Protection Officer at <a href="mailto:privacy@dotagents.com" class="text-[#453798] hover:underline">privacy@dotagents.com</a>. We will respond within 30 days (or as required by applicable law).</p>
             </div>
 
             <div class="border-b border-[#f3f3ef] mb-12"></div>
@@ -343,7 +343,7 @@
             {{-- 10 --}}
             <div id="cookies" class="scroll-mt-24 mb-12">
                 <div class="flex items-center gap-3 mb-5">
-                    <span class="w-8 h-8 rounded-lg bg-[#1e1660] text-brand-yellow text-xs font-black flex items-center justify-center flex-shrink-0">10</span>
+                    <span class="w-8 h-8 rounded-lg bg-[#150f2e] text-[#f0c23a] text-xs font-black flex items-center justify-center flex-shrink-0">10</span>
                     <h2 class="text-xl font-black font-display text-[#111111]">Cookies & Tracking</h2>
                 </div>
                 <p class="mb-5">We use the following categories of cookies and similar technologies:</p>
@@ -368,10 +368,10 @@
             {{-- 11 --}}
             <div id="children" class="scroll-mt-24 mb-12">
                 <div class="flex items-center gap-3 mb-5">
-                    <span class="w-8 h-8 rounded-lg bg-[#1e1660] text-brand-yellow text-xs font-black flex items-center justify-center flex-shrink-0">11</span>
+                    <span class="w-8 h-8 rounded-lg bg-[#150f2e] text-[#f0c23a] text-xs font-black flex items-center justify-center flex-shrink-0">11</span>
                     <h2 class="text-xl font-black font-display text-[#111111]">Children's Privacy</h2>
                 </div>
-                <p>The Service is not directed to individuals under the age of 18. We do not knowingly collect personal data from children. If you become aware that a child has provided us with personal data, please contact us at <a href="mailto:privacy@dotagents.com" class="text-brand-purple hover:underline">privacy@dotagents.com</a> and we will take steps to delete such data.</p>
+                <p>The Service is not directed to individuals under the age of 18. We do not knowingly collect personal data from children. If you become aware that a child has provided us with personal data, please contact us at <a href="mailto:privacy@dotagents.com" class="text-[#453798] hover:underline">privacy@dotagents.com</a> and we will take steps to delete such data.</p>
             </div>
 
             <div class="border-b border-[#f3f3ef] mb-12"></div>
@@ -379,7 +379,7 @@
             {{-- 12 --}}
             <div id="third-party" class="scroll-mt-24 mb-12">
                 <div class="flex items-center gap-3 mb-5">
-                    <span class="w-8 h-8 rounded-lg bg-[#1e1660] text-brand-yellow text-xs font-black flex items-center justify-center flex-shrink-0">12</span>
+                    <span class="w-8 h-8 rounded-lg bg-[#150f2e] text-[#f0c23a] text-xs font-black flex items-center justify-center flex-shrink-0">12</span>
                     <h2 class="text-xl font-black font-display text-[#111111]">Third-Party Services</h2>
                 </div>
                 <p class="mb-3">The platform integrates with third-party services. When you connect or use these services, your data may be processed by those third parties under their own privacy policies:</p>
@@ -407,7 +407,7 @@
             {{-- 13 --}}
             <div id="changes" class="scroll-mt-24 mb-12">
                 <div class="flex items-center gap-3 mb-5">
-                    <span class="w-8 h-8 rounded-lg bg-[#1e1660] text-brand-yellow text-xs font-black flex items-center justify-center flex-shrink-0">13</span>
+                    <span class="w-8 h-8 rounded-lg bg-[#150f2e] text-[#f0c23a] text-xs font-black flex items-center justify-center flex-shrink-0">13</span>
                     <h2 class="text-xl font-black font-display text-[#111111]">Changes to This Policy</h2>
                 </div>
                 <p class="mb-3">We may update this Privacy Policy periodically. When we make material changes, we will notify you by email and post a notice within the platform at least 14 days before the changes take effect.</p>
@@ -419,7 +419,7 @@
             {{-- 14 --}}
             <div id="contact" class="scroll-mt-24 mb-12">
                 <div class="flex items-center gap-3 mb-5">
-                    <span class="w-8 h-8 rounded-lg bg-[#1e1660] text-brand-yellow text-xs font-black flex items-center justify-center flex-shrink-0">14</span>
+                    <span class="w-8 h-8 rounded-lg bg-[#150f2e] text-[#f0c23a] text-xs font-black flex items-center justify-center flex-shrink-0">14</span>
                     <h2 class="text-xl font-black font-display text-[#111111]">Contact & Data Protection Officer</h2>
                 </div>
                 <p class="mb-5">For privacy enquiries, rights requests, or to reach our Data Protection Officer:</p>
@@ -430,13 +430,13 @@
                         ['label' => 'Legal',          'value' => 'legal@dotagents.com',    'desc'  => 'Regulatory, compliance enquiries'],
                     ] as $contact)
                         <div>
-                            <p class="text-xs font-semibold uppercase tracking-widest text-brand-purple mb-1">{{ $contact['label'] }}</p>
-                            <a href="mailto:{{ $contact['value'] }}" class="text-sm text-[#555550] hover:text-brand-purple transition-colors block mb-1">{{ $contact['value'] }}</a>
+                            <p class="text-xs font-semibold uppercase tracking-widest text-[#453798] mb-1">{{ $contact['label'] }}</p>
+                            <a href="mailto:{{ $contact['value'] }}" class="text-sm text-[#555550] hover:text-[#453798] transition-colors block mb-1">{{ $contact['value'] }}</a>
                             <p class="text-xs text-[#909088]">{{ $contact['desc'] }}</p>
                         </div>
                     @endforeach
                 </div>
-                <p class="mt-6 text-xs text-[#909088]">South African residents may also lodge a complaint with the <strong class="text-[#555550]">Information Regulator (South Africa)</strong> at <a href="https://inforegulator.org.za" target="_blank" rel="noopener noreferrer" class="text-brand-purple hover:underline">inforegulator.org.za</a>.</p>
+                <p class="mt-6 text-xs text-[#909088]">South African residents may also lodge a complaint with the <strong class="text-[#555550]">Information Regulator (South Africa)</strong> at <a href="https://inforegulator.org.za" target="_blank" rel="noopener noreferrer" class="text-[#453798] hover:underline">inforegulator.org.za</a>.</p>
             </div>
 
         </div>
@@ -447,15 +447,15 @@
 <footer class="bg-[#f9f9f7] border-t border-[#e8e8e2] py-12 px-6">
     <div class="max-w-6xl mx-auto">
         <div class="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div class="flex items-center gap-2.5">
-                <img src="/dot.logos3.png" alt="Dot.Agents" class="h-7 w-auto">
+            <div class="flex items-center gap-3">
+                <img src="/dot.logos3.png" alt="Dot.Agents" class="h-11 w-auto">
                 <span class="font-semibold text-[#111111] font-display">Dot.Agents</span>
             </div>
             <div class="flex items-center gap-8">
                 @if (Route::has('terms.show'))
                     <a href="{{ route('terms.show') }}" class="text-sm text-[#909088] hover:text-[#111111] transition-colors">Terms</a>
                 @endif
-                <a href="{{ route('policy.show') }}" class="text-sm text-brand-purple font-medium">Privacy</a>
+                <a href="{{ route('policy.show') }}" class="text-sm text-[#453798] font-medium">Privacy</a>
                 <a href="/" class="text-sm text-[#909088] hover:text-[#111111] transition-colors">Home</a>
             </div>
             <p class="text-sm text-[#909088]">&copy; {{ date('Y') }} Dot.Agents. All rights reserved.</p>

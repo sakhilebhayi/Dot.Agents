@@ -10,13 +10,13 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     @endif
 </head>
-<body class="font-sans antialiased bg-white text-[#111111]">
+<body class="font-sans antialiased bg-[#f3f0ea] text-[#111111]">
 
 {{-- Nav --}}
-<nav class="fixed top-0 inset-x-0 z-50 bg-white/95 backdrop-blur border-b border-[#e8e8e2]">
-    <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-        <a href="/" class="flex items-center gap-2.5">
-            <img src="/dot.logos3.png" alt="Dot.Agents" class="h-8 w-auto">
+<nav class="fixed top-0 inset-x-0 z-50 bg-[#f3f0ea]/95 backdrop-blur border-b border-[#e8e8e2]">
+    <div class="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
+        <a href="/" class="flex items-center gap-3">
+            <img src="/dot.logos3.png" alt="Dot.Agents" class="h-14 sm:h-[72px] w-auto">
             <span class="font-semibold text-[#111111] font-display text-base">Dot.Agents</span>
         </a>
         <div class="flex items-center gap-3">
@@ -33,9 +33,9 @@
 </nav>
 
 {{-- Hero --}}
-<section class="bg-[#1e1660] pt-32 pb-16 px-6">
+<section class="bg-[#150f2e] pt-32 pb-16 px-6">
     <div class="max-w-3xl mx-auto text-center">
-        <p class="text-xs font-semibold uppercase tracking-widest text-brand-yellow mb-3">Legal</p>
+        <p class="text-xs font-semibold uppercase tracking-widest text-[#f0c23a] mb-3">Legal</p>
         <h1 class="text-4xl md:text-5xl font-black font-display text-white mb-4">Terms of Service</h1>
         <p class="text-white/50">Last updated: {{ date('F j, Y') }}</p>
     </div>
@@ -47,7 +47,7 @@
 
         {{-- Quick nav --}}
         <div class="da-card p-6 mb-12">
-            <p class="text-xs font-semibold uppercase tracking-widest text-brand-purple mb-4">In This Document</p>
+            <p class="text-xs font-semibold uppercase tracking-widest text-[#453798] mb-4">In This Document</p>
             <div class="grid sm:grid-cols-2 gap-y-2 gap-x-6">
                 @foreach([
                     ['#acceptance',        '1. Acceptance of Terms'],
@@ -66,7 +66,7 @@
                     ['#changes',           '14. Changes to Terms'],
                     ['#contact',           '15. Contact'],
                 ] as [$href, $label])
-                    <a href="{{ $href }}" class="text-sm text-brand-purple hover:text-[#111111] transition-colors py-0.5">{{ $label }}</a>
+                    <a href="{{ $href }}" class="text-sm text-[#453798] hover:text-[#111111] transition-colors py-0.5">{{ $label }}</a>
                 @endforeach
             </div>
         </div>
@@ -76,7 +76,7 @@
             $section = fn(string $id, string $num, string $title) =>
                 "<div id=\"{$id}\" class=\"scroll-mt-24 mb-12\">
                     <div class=\"flex items-center gap-3 mb-5\">
-                        <span class=\"w-8 h-8 rounded-lg bg-[#1e1660] text-brand-yellow text-xs font-black flex items-center justify-center flex-shrink-0\">{$num}</span>
+                        <span class=\"w-8 h-8 rounded-lg bg-[#150f2e] text-[#f0c23a] text-xs font-black flex items-center justify-center flex-shrink-0\">{$num}</span>
                         <h2 class=\"text-xl font-black font-display text-[\#111111]\">{$title}</h2>
                     </div>";
         @endphp
@@ -86,12 +86,12 @@
             {{-- 1 --}}
             <div id="acceptance" class="scroll-mt-24 mb-12">
                 <div class="flex items-center gap-3 mb-5">
-                    <span class="w-8 h-8 rounded-lg bg-[#1e1660] text-brand-yellow text-xs font-black flex items-center justify-center flex-shrink-0">1</span>
+                    <span class="w-8 h-8 rounded-lg bg-[#150f2e] text-[#f0c23a] text-xs font-black flex items-center justify-center flex-shrink-0">1</span>
                     <h2 class="text-xl font-black font-display text-[#111111]">Acceptance of Terms</h2>
                 </div>
                 <p class="mb-3">By accessing or using the Dot.Agents platform (the <strong class="text-[#111111]">"Service"</strong>), you (<strong class="text-[#111111]">"Customer"</strong> or <strong class="text-[#111111]">"User"</strong>) agree to be bound by these Terms of Service (<strong class="text-[#111111]">"Terms"</strong>). If you are entering into these Terms on behalf of an organization, you represent and warrant that you have the authority to bind that organization.</p>
                 <p class="mb-3">If you do not agree to these Terms, you must not access or use the Service.</p>
-                <p>These Terms incorporate our <a href="{{ route('policy.show') }}" class="text-brand-purple hover:underline">Privacy Policy</a> by reference.</p>
+                <p>These Terms incorporate our <a href="{{ route('policy.show') }}" class="text-[#453798] hover:underline">Privacy Policy</a> by reference.</p>
             </div>
 
             <div class="border-b border-[#f3f3ef] mb-12"></div>
@@ -99,7 +99,7 @@
             {{-- 2 --}}
             <div id="description" class="scroll-mt-24 mb-12">
                 <div class="flex items-center gap-3 mb-5">
-                    <span class="w-8 h-8 rounded-lg bg-[#1e1660] text-brand-yellow text-xs font-black flex items-center justify-center flex-shrink-0">2</span>
+                    <span class="w-8 h-8 rounded-lg bg-[#150f2e] text-[#f0c23a] text-xs font-black flex items-center justify-center flex-shrink-0">2</span>
                     <h2 class="text-xl font-black font-display text-[#111111]">Description of Service</h2>
                 </div>
                 <p class="mb-3">Dot.Agents is an <strong class="text-[#111111]">Adaptive Enterprise Operating System</strong> that enables organizations to deploy, manage, govern, and scale AI-powered digital workforces. The Service includes:</p>
@@ -117,7 +117,7 @@
                         'API access, webhooks, and third-party integrations',
                     ] as $item)
                         <li class="flex items-start gap-2">
-                            <span class="w-1.5 h-1.5 rounded-full bg-brand-purple mt-1.5 flex-shrink-0"></span>
+                            <span class="w-1.5 h-1.5 rounded-full bg-[#453798] mt-1.5 flex-shrink-0"></span>
                             <span>{{ $item }}</span>
                         </li>
                     @endforeach
@@ -130,12 +130,12 @@
             {{-- 3 --}}
             <div id="accounts" class="scroll-mt-24 mb-12">
                 <div class="flex items-center gap-3 mb-5">
-                    <span class="w-8 h-8 rounded-lg bg-[#1e1660] text-brand-yellow text-xs font-black flex items-center justify-center flex-shrink-0">3</span>
+                    <span class="w-8 h-8 rounded-lg bg-[#150f2e] text-[#f0c23a] text-xs font-black flex items-center justify-center flex-shrink-0">3</span>
                     <h2 class="text-xl font-black font-display text-[#111111]">Accounts & Access</h2>
                 </div>
                 <p class="mb-3"><strong class="text-[#111111]">Registration.</strong> You must provide accurate, complete, and current information when creating an account. You are responsible for maintaining the confidentiality of your credentials.</p>
                 <p class="mb-3"><strong class="text-[#111111]">Organizations.</strong> The Service supports multi-tenant organizations. The account owner (<strong class="text-[#111111]">"Organization Admin"</strong>) is responsible for all activity that occurs under their organization, including the actions of all members they invite.</p>
-                <p class="mb-3"><strong class="text-[#111111]">Security.</strong> You must notify us immediately at <a href="mailto:security@dotagents.com" class="text-brand-purple hover:underline">security@dotagents.com</a> upon becoming aware of any unauthorized access to your account.</p>
+                <p class="mb-3"><strong class="text-[#111111]">Security.</strong> You must notify us immediately at <a href="mailto:security@dotagents.com" class="text-[#453798] hover:underline">security@dotagents.com</a> upon becoming aware of any unauthorized access to your account.</p>
                 <p><strong class="text-[#111111]">Age.</strong> You must be at least 18 years old and have the legal capacity to enter into a binding contract to use the Service.</p>
             </div>
 
@@ -144,7 +144,7 @@
             {{-- 4 --}}
             <div id="acceptable-use" class="scroll-mt-24 mb-12">
                 <div class="flex items-center gap-3 mb-5">
-                    <span class="w-8 h-8 rounded-lg bg-[#1e1660] text-brand-yellow text-xs font-black flex items-center justify-center flex-shrink-0">4</span>
+                    <span class="w-8 h-8 rounded-lg bg-[#150f2e] text-[#f0c23a] text-xs font-black flex items-center justify-center flex-shrink-0">4</span>
                     <h2 class="text-xl font-black font-display text-[#111111]">Acceptable Use</h2>
                 </div>
                 <p class="mb-4">You agree not to use the Service to:</p>
@@ -177,7 +177,7 @@
             {{-- 5 --}}
             <div id="ai-governance" class="scroll-mt-24 mb-12">
                 <div class="flex items-center gap-3 mb-5">
-                    <span class="w-8 h-8 rounded-lg bg-[#1e1660] text-brand-yellow text-xs font-black flex items-center justify-center flex-shrink-0">5</span>
+                    <span class="w-8 h-8 rounded-lg bg-[#150f2e] text-[#f0c23a] text-xs font-black flex items-center justify-center flex-shrink-0">5</span>
                     <h2 class="text-xl font-black font-display text-[#111111]">AI Governance & Responsibility</h2>
                 </div>
                 <p class="mb-3"><strong class="text-[#111111]">AI Outputs.</strong> AI-generated outputs from agents deployed on the platform are provided for informational and operational assistance purposes. You are responsible for reviewing, validating, and making final decisions on any agent output, particularly in regulated industries (finance, healthcare, legal, etc.).</p>
@@ -192,14 +192,14 @@
             {{-- 6 --}}
             <div id="data" class="scroll-mt-24 mb-12">
                 <div class="flex items-center gap-3 mb-5">
-                    <span class="w-8 h-8 rounded-lg bg-[#1e1660] text-brand-yellow text-xs font-black flex items-center justify-center flex-shrink-0">6</span>
+                    <span class="w-8 h-8 rounded-lg bg-[#150f2e] text-[#f0c23a] text-xs font-black flex items-center justify-center flex-shrink-0">6</span>
                     <h2 class="text-xl font-black font-display text-[#111111]">Data & Privacy</h2>
                 </div>
                 <p class="mb-3"><strong class="text-[#111111]">Your Data.</strong> You retain ownership of all data you submit to the Service (<strong class="text-[#111111]">"Customer Data"</strong>). You grant us a limited, non-exclusive licence to process Customer Data solely to provide the Service.</p>
                 <p class="mb-3"><strong class="text-[#111111]">Data Isolation.</strong> The platform enforces strict multi-tenant data isolation. Customer Data is scoped to your organization and is not accessible by other organizations.</p>
                 <p class="mb-3"><strong class="text-[#111111]">AI Training.</strong> We do not use your Customer Data to train our base AI models without your explicit written consent.</p>
                 <p class="mb-3"><strong class="text-[#111111]">Retention.</strong> We retain Customer Data for the duration of your subscription and for a period of 90 days following termination, after which it is permanently deleted unless legal obligations require otherwise.</p>
-                <p>Our full data handling practices are described in our <a href="{{ route('policy.show') }}" class="text-brand-purple hover:underline">Privacy Policy</a>.</p>
+                <p>Our full data handling practices are described in our <a href="{{ route('policy.show') }}" class="text-[#453798] hover:underline">Privacy Policy</a>.</p>
             </div>
 
             <div class="border-b border-[#f3f3ef] mb-12"></div>
@@ -207,7 +207,7 @@
             {{-- 7 --}}
             <div id="ip" class="scroll-mt-24 mb-12">
                 <div class="flex items-center gap-3 mb-5">
-                    <span class="w-8 h-8 rounded-lg bg-[#1e1660] text-brand-yellow text-xs font-black flex items-center justify-center flex-shrink-0">7</span>
+                    <span class="w-8 h-8 rounded-lg bg-[#150f2e] text-[#f0c23a] text-xs font-black flex items-center justify-center flex-shrink-0">7</span>
                     <h2 class="text-xl font-black font-display text-[#111111]">Intellectual Property</h2>
                 </div>
                 <p class="mb-3"><strong class="text-[#111111]">Platform IP.</strong> The Dot.Agents platform, including its Enterprise Brain, Executive Council, Organizational Digital Twin, and all underlying technology, algorithms, interfaces, and documentation are the exclusive intellectual property of Dot.Agents and its licensors. Nothing in these Terms transfers ownership of platform IP to you.</p>
@@ -221,7 +221,7 @@
             {{-- 8 --}}
             <div id="billing" class="scroll-mt-24 mb-12">
                 <div class="flex items-center gap-3 mb-5">
-                    <span class="w-8 h-8 rounded-lg bg-[#1e1660] text-brand-yellow text-xs font-black flex items-center justify-center flex-shrink-0">8</span>
+                    <span class="w-8 h-8 rounded-lg bg-[#150f2e] text-[#f0c23a] text-xs font-black flex items-center justify-center flex-shrink-0">8</span>
                     <h2 class="text-xl font-black font-display text-[#111111]">Billing & Payments</h2>
                 </div>
                 <p class="mb-3"><strong class="text-[#111111]">Subscription Fees.</strong> Access to paid features is subject to payment of applicable subscription fees as specified in your chosen plan. All fees are stated in your local currency or USD and are exclusive of applicable taxes.</p>
@@ -236,7 +236,7 @@
             {{-- 9 --}}
             <div id="suspension" class="scroll-mt-24 mb-12">
                 <div class="flex items-center gap-3 mb-5">
-                    <span class="w-8 h-8 rounded-lg bg-[#1e1660] text-brand-yellow text-xs font-black flex items-center justify-center flex-shrink-0">9</span>
+                    <span class="w-8 h-8 rounded-lg bg-[#150f2e] text-[#f0c23a] text-xs font-black flex items-center justify-center flex-shrink-0">9</span>
                     <h2 class="text-xl font-black font-display text-[#111111]">Suspension & Termination</h2>
                 </div>
                 <p class="mb-3"><strong class="text-[#111111]">By You.</strong> You may cancel your subscription at any time through the billing settings. Cancellation takes effect at the end of the current billing period.</p>
@@ -250,7 +250,7 @@
             {{-- 10 --}}
             <div id="disclaimers" class="scroll-mt-24 mb-12">
                 <div class="flex items-center gap-3 mb-5">
-                    <span class="w-8 h-8 rounded-lg bg-[#1e1660] text-brand-yellow text-xs font-black flex items-center justify-center flex-shrink-0">10</span>
+                    <span class="w-8 h-8 rounded-lg bg-[#150f2e] text-[#f0c23a] text-xs font-black flex items-center justify-center flex-shrink-0">10</span>
                     <h2 class="text-xl font-black font-display text-[#111111]">Disclaimers & Warranties</h2>
                 </div>
                 <div class="bg-[#f9f9f7] border border-[#e8e8e2] rounded-xl p-5 mb-4">
@@ -266,7 +266,7 @@
             {{-- 11 --}}
             <div id="liability" class="scroll-mt-24 mb-12">
                 <div class="flex items-center gap-3 mb-5">
-                    <span class="w-8 h-8 rounded-lg bg-[#1e1660] text-brand-yellow text-xs font-black flex items-center justify-center flex-shrink-0">11</span>
+                    <span class="w-8 h-8 rounded-lg bg-[#150f2e] text-[#f0c23a] text-xs font-black flex items-center justify-center flex-shrink-0">11</span>
                     <h2 class="text-xl font-black font-display text-[#111111]">Limitation of Liability</h2>
                 </div>
                 <div class="bg-[#f9f9f7] border border-[#e8e8e2] rounded-xl p-5 mb-4">
@@ -281,7 +281,7 @@
             {{-- 12 --}}
             <div id="indemnification" class="scroll-mt-24 mb-12">
                 <div class="flex items-center gap-3 mb-5">
-                    <span class="w-8 h-8 rounded-lg bg-[#1e1660] text-brand-yellow text-xs font-black flex items-center justify-center flex-shrink-0">12</span>
+                    <span class="w-8 h-8 rounded-lg bg-[#150f2e] text-[#f0c23a] text-xs font-black flex items-center justify-center flex-shrink-0">12</span>
                     <h2 class="text-xl font-black font-display text-[#111111]">Indemnification</h2>
                 </div>
                 <p class="mb-3">You agree to indemnify, defend, and hold harmless Dot.Agents and its officers, directors, employees, and agents from and against any claims, liabilities, damages, losses, costs, and expenses (including reasonable legal fees) arising out of or in connection with:</p>
@@ -294,7 +294,7 @@
                         'Actions taken by AI agents you deploy on the platform',
                     ] as $item)
                         <li class="flex items-start gap-2">
-                            <span class="w-1.5 h-1.5 rounded-full bg-brand-purple mt-1.5 flex-shrink-0"></span>
+                            <span class="w-1.5 h-1.5 rounded-full bg-[#453798] mt-1.5 flex-shrink-0"></span>
                             <span>{{ $item }}</span>
                         </li>
                     @endforeach
@@ -306,7 +306,7 @@
             {{-- 13 --}}
             <div id="governing-law" class="scroll-mt-24 mb-12">
                 <div class="flex items-center gap-3 mb-5">
-                    <span class="w-8 h-8 rounded-lg bg-[#1e1660] text-brand-yellow text-xs font-black flex items-center justify-center flex-shrink-0">13</span>
+                    <span class="w-8 h-8 rounded-lg bg-[#150f2e] text-[#f0c23a] text-xs font-black flex items-center justify-center flex-shrink-0">13</span>
                     <h2 class="text-xl font-black font-display text-[#111111]">Governing Law & Disputes</h2>
                 </div>
                 <p class="mb-3">These Terms are governed by and construed in accordance with the laws of the Republic of South Africa, without regard to conflict of law principles.</p>
@@ -319,7 +319,7 @@
             {{-- 14 --}}
             <div id="changes" class="scroll-mt-24 mb-12">
                 <div class="flex items-center gap-3 mb-5">
-                    <span class="w-8 h-8 rounded-lg bg-[#1e1660] text-brand-yellow text-xs font-black flex items-center justify-center flex-shrink-0">14</span>
+                    <span class="w-8 h-8 rounded-lg bg-[#150f2e] text-[#f0c23a] text-xs font-black flex items-center justify-center flex-shrink-0">14</span>
                     <h2 class="text-xl font-black font-display text-[#111111]">Changes to Terms</h2>
                 </div>
                 <p class="mb-3">We may update these Terms from time to time. When we make material changes, we will notify you by email and display a notice within the platform at least 14 days before the changes take effect.</p>
@@ -331,7 +331,7 @@
             {{-- 15 --}}
             <div id="contact" class="scroll-mt-24 mb-12">
                 <div class="flex items-center gap-3 mb-5">
-                    <span class="w-8 h-8 rounded-lg bg-[#1e1660] text-brand-yellow text-xs font-black flex items-center justify-center flex-shrink-0">15</span>
+                    <span class="w-8 h-8 rounded-lg bg-[#150f2e] text-[#f0c23a] text-xs font-black flex items-center justify-center flex-shrink-0">15</span>
                     <h2 class="text-xl font-black font-display text-[#111111]">Contact</h2>
                 </div>
                 <p class="mb-5">If you have any questions about these Terms, please contact us:</p>
@@ -342,8 +342,8 @@
                         ['label' => 'Support',  'value' => 'support@dotagents.com'],
                     ] as $contact)
                         <div>
-                            <p class="text-xs font-semibold uppercase tracking-widest text-brand-purple mb-1">{{ $contact['label'] }}</p>
-                            <a href="mailto:{{ $contact['value'] }}" class="text-sm text-[#555550] hover:text-brand-purple transition-colors">{{ $contact['value'] }}</a>
+                            <p class="text-xs font-semibold uppercase tracking-widest text-[#453798] mb-1">{{ $contact['label'] }}</p>
+                            <a href="mailto:{{ $contact['value'] }}" class="text-sm text-[#555550] hover:text-[#453798] transition-colors">{{ $contact['value'] }}</a>
                         </div>
                     @endforeach
                 </div>
@@ -357,12 +357,12 @@
 <footer class="bg-[#f9f9f7] border-t border-[#e8e8e2] py-12 px-6">
     <div class="max-w-6xl mx-auto">
         <div class="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div class="flex items-center gap-2.5">
-                <img src="/dot.logos3.png" alt="Dot.Agents" class="h-7 w-auto">
+            <div class="flex items-center gap-3">
+                <img src="/dot.logos3.png" alt="Dot.Agents" class="h-11 w-auto">
                 <span class="font-semibold text-[#111111] font-display">Dot.Agents</span>
             </div>
             <div class="flex items-center gap-8">
-                <a href="{{ route('terms.show') }}" class="text-sm text-brand-purple font-medium">Terms</a>
+                <a href="{{ route('terms.show') }}" class="text-sm text-[#453798] font-medium">Terms</a>
                 @if (Route::has('policy.show'))
                     <a href="{{ route('policy.show') }}" class="text-sm text-[#909088] hover:text-[#111111] transition-colors">Privacy</a>
                 @endif
