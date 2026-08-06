@@ -267,7 +267,10 @@
      HERO — asymmetric, no centered block
 ════════════════════════════════════════════════ --}}
 <section class="relative min-h-[100dvh] flex items-end overflow-hidden" aria-label="Hero">
-    <div class="absolute inset-0" style="background: radial-gradient(120% 90% at 82% 12%, #241a52 0%, var(--ink) 55%);"></div>
+    <!-- Photo: control room viewed from above, by Patrick Konior, unsplash.com/photos/a-view-of-a-control-room-from-above-FwHJ6mJjVd4 -->
+    <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1737502483537-19b698ff7d00?q=80&w=2400&auto=format&fit=crop');"></div>
+    <div class="absolute inset-0" style="background: linear-gradient(100deg, var(--ink) 0%, var(--ink) 32%, rgba(21,15,46,0.55) 55%, rgba(21,15,46,0.3) 75%, rgba(21,15,46,0.15) 100%);"></div>
+    <div class="absolute inset-0" style="background: linear-gradient(180deg, rgba(21,15,46,0.25) 0%, transparent 30%, transparent 70%, var(--ink) 100%);"></div>
 
     {{-- Signature: line-art briefcase-in-circle + forward chevron, echoing the real Dot.Agents mark's icon --}}
     <svg class="hidden lg:block absolute right-[4%] top-[14%] h-[62%] w-auto opacity-[0.16] pointer-events-none" viewBox="0 0 420 420" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
