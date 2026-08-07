@@ -35,7 +35,7 @@
         {{-- Logo --}}
         <div class="relative z-10">
             <a href="{{ url('/') }}" class="inline-flex items-center gap-4 group">
-                <img src="/dot.logos3.png" alt="Dot.Agents" class="h-14 sm:h-[72px] w-auto">
+                <img src="/dot.logos3-light.png" alt="Dot.Agents" class="h-14 sm:h-[72px] w-auto">
                 <div>
                     <p class="text-white font-semibold text-base font-display leading-tight">Dot.Agents</p>
                     <p class="text-white/40 text-xs leading-tight">Workforce Platform</p>
@@ -85,7 +85,7 @@
         {{-- Mobile logo --}}
         <div class="lg:hidden mb-10">
             <a href="{{ url('/') }}" class="inline-flex items-center gap-3">
-                <img src="/dot.logos3.png" alt="Dot.Agents" class="h-11 w-auto">
+                <img src="/dot.logos3-light.png" alt="Dot.Agents" class="h-11 w-auto">
                 <span class="font-semibold text-[#111111] font-display">Dot.Agents</span>
             </a>
         </div>
