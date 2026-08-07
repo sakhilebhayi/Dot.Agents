@@ -213,7 +213,7 @@
 <header id="site-header" class="fixed top-0 left-0 right-0 z-50 border-b border-transparent transition-colors duration-300">
     <nav class="max-w-[1400px] mx-auto px-5 sm:px-8 py-3 flex items-center justify-between" aria-label="Main navigation">
         <a href="/" class="flex items-center press" aria-label="Dot.Agents — Home">
-            <img src="{{ asset('images/logo.png') }}" alt="Dot.Agents" class="h-14 sm:h-[72px] w-auto">
+            <img src="{{ asset('images/logo-light.png') }}" alt="Dot.Agents" class="h-14 sm:h-[72px] w-auto">
         </a>
 
         <div class="hidden md:flex items-center gap-8 font-mono text-[13px] tracking-wide uppercase text-[var(--slate)]">
@@ -487,7 +487,7 @@
 <footer class="py-14 px-5 sm:px-8 border-t border-[var(--line)]" aria-label="Site footer">
     <div class="max-w-[1400px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
         <a href="/" class="flex items-center" aria-label="Dot.Agents — Home">
-            <img src="{{ asset('images/logo.png') }}" alt="Dot.Agents" class="h-11 w-auto opacity-90">
+            <img src="{{ asset('images/logo-light.png') }}" alt="Dot.Agents" class="h-11 w-auto opacity-90">
         </a>
 
         <div class="flex items-center gap-8">
