@@ -4,6 +4,7 @@ namespace Tests\Feature\Livewire;
 
 use App\Livewire\Forms\ApprovalResponseForm;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Component;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
@@ -21,8 +22,8 @@ class ApprovalResponseFormTest extends TestCase
         // Livewire\Form requires a Component + propertyName injected by the framework
         // (see Livewire\Features\SupportFormObjects\Form::__construct). Stub out a
         // Component since the form's own logic under test doesn't touch it.
-        /** @var \Livewire\Component $component */
-        $component = $this->getMockBuilder(\Livewire\Component::class)
+        /** @var Component $component */
+        $component = $this->getMockBuilder(Component::class)
             ->disableOriginalConstructor()
             ->getMockForAbstractClass();
 
@@ -75,4 +76,3 @@ class ApprovalResponseFormTest extends TestCase
         $this->assertFalse($form->isApproval());
     }
 }
-

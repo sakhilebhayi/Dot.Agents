@@ -33,8 +33,9 @@ trait LogsActionErrors
      * capture the enriched log entry automatically.
      *
      * @template T
-     * @param callable(): T $callback
-     * @param array<string, mixed> $context Additional context to include in the log entry
+     *
+     * @param  callable(): T  $callback
+     * @param  array<string, mixed>  $context  Additional context to include in the log entry
      * @return T
      *
      * @throws Throwable
@@ -44,7 +45,7 @@ trait LogsActionErrors
         try {
             return $callback();
         } catch (Throwable $e) {
-            Log::error('[Action] Unhandled exception in ' . static::class, [
+            Log::error('[Action] Unhandled exception in '.static::class, [
                 'action' => static::class,
                 'message' => $e->getMessage(),
                 'file' => $e->getFile(),

@@ -43,7 +43,7 @@ interface AgentContract
      * Declare the capability identifiers this skill provides.
      * Used by the governance system to detect breaking capability contract changes.
      *
-     * @return string[]  e.g. ['read_crm', 'draft_email', 'qualify_lead']
+     * @return string[] e.g. ['read_crm', 'draft_email', 'qualify_lead']
      */
     public function getCapabilities(): array;
 
@@ -51,7 +51,7 @@ interface AgentContract
      * Declare the platform permission keys required before this skill may run.
      * The deployment authorization system enforces these before calling execute().
      *
-     * @return string[]  e.g. ['crm.read', 'email.send']
+     * @return string[] e.g. ['crm.read', 'email.send']
      */
     public function getRequiredPermissions(): array;
 

@@ -2,6 +2,7 @@
 
 namespace App\Actions\Security;
 
+use App\Actions\Concerns\LogsActionErrors;
 use App\Events\KillSwitchActivated;
 use App\Models\AgentDeployment;
 use App\Models\AgentWorkflow;
@@ -28,7 +29,8 @@ use Illuminate\Support\Facades\Log;
  */
 class EmergencyKillSwitchAction
 {
-    use \App\Actions\Concerns\LogsActionErrors;
+    use LogsActionErrors;
+
     public function __construct(
         private readonly AuditService $auditService,
     ) {}

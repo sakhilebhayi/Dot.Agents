@@ -3,7 +3,6 @@
 namespace Tests\Feature\Livewire;
 
 use App\Livewire\Dashboard\AgentDashboard;
-use App\Models\AgentApproval;
 use App\Models\AgentDeployment;
 use App\Models\AgentTask;
 use App\Models\Organization;

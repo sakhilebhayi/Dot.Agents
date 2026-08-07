@@ -40,8 +40,8 @@ class AuditLogViewer extends Component
         // No explicit organization_id filter needed: AuditLog's
         // HasOrganizationScope trait applies it automatically from the session.
         return AuditLog::when($this->search, fn ($q) => $q->where('description', 'like', "%{$this->search}%")
-                ->orWhere('event', 'like', "%{$this->search}%")
-            )
+            ->orWhere('event', 'like', "%{$this->search}%")
+        )
             ->when($this->filterCategory, fn ($q) => $q->where('event_category', $this->filterCategory))
             ->when($this->filterRisk, fn ($q) => $q->where('risk_level', $this->filterRisk))
             ->when($this->filterAgent, fn ($q) => $q->where('agent_deployment_id', $this->filterAgent))

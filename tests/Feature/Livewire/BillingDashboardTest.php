@@ -5,7 +5,6 @@ namespace Tests\Feature\Livewire;
 use App\Livewire\Billing\BillingDashboard;
 use App\Models\Invoice;
 use App\Models\Organization;
-use App\Models\OrganizationSubscription;
 use App\Models\SubscriptionPlan;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;

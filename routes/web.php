@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\Auth\EcosystemAuthController;
-
 use App\Http\Controllers\BillingController;
 use App\Http\Controllers\HealthCheckController;
 use App\Http\Controllers\SocialAccountController;
@@ -58,7 +57,6 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
                 ->with('success', 'Thank you for accepting the platform terms.');
         })->name('accept');
     });
-
 
 Route::middleware([
     'auth:sanctum',

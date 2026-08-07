@@ -5,7 +5,6 @@ namespace App\Livewire\Social;
 use App\Actions\Social\SaveSocialCredentialsAction;
 use App\Livewire\Concerns\ManagesOAuthFlow;
 use App\Livewire\Concerns\ResolvesCurrentOrganization;
-use App\Models\Organization;
 use App\Models\SocialAccount;
 use Livewire\Attributes\Computed;
 use Livewire\Component;

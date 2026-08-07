@@ -7,7 +7,6 @@ use App\Actions\Workflows\DeleteWorkflowAction;
 use App\DTOs\Workflows\CreateWorkflowData;
 use App\Livewire\Concerns\ResolvesCurrentOrganization;
 use App\Models\AgentWorkflow;
-use App\Models\Organization;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Validate;
 use Livewire\Component;

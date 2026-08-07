@@ -7,7 +7,6 @@ use App\Actions\Social\DisconnectSocialAccountAction;
 use App\DTOs\Organizations\SaveConnectionSettingsData;
 use App\DTOs\Social\DisconnectSocialAccountData;
 use App\Livewire\Concerns\ResolvesCurrentOrganization;
-use App\Models\Organization;
 use App\Models\SocialAccount;
 use Livewire\Attributes\Computed;
 use Livewire\Component;

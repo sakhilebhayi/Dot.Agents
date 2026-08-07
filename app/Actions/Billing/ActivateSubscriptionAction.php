@@ -2,6 +2,7 @@
 
 namespace App\Actions\Billing;
 
+use App\Actions\Concerns\LogsActionErrors;
 use App\DTOs\Billing\ActivateSubscriptionData;
 use App\Events\SubscriptionActivated;
 use App\Models\Organization;
@@ -11,7 +12,7 @@ use Illuminate\Support\Facades\Gate;
 
 class ActivateSubscriptionAction
 {
-    use \App\Actions\Concerns\LogsActionErrors;
+    use LogsActionErrors;
 
     public function execute(ActivateSubscriptionData $data): OrganizationSubscription
     {

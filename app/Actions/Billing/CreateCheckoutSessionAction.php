@@ -2,6 +2,7 @@
 
 namespace App\Actions\Billing;
 
+use App\Actions\Concerns\LogsActionErrors;
 use App\Events\CheckoutSessionCreated;
 use App\Models\Organization;
 use App\Models\SubscriptionPlan;
@@ -11,7 +12,7 @@ use Stripe\Checkout\Session;
 
 class CreateCheckoutSessionAction
 {
-    use \App\Actions\Concerns\LogsActionErrors;
+    use LogsActionErrors;
 
     public function __construct(
         private readonly StripeService $stripe,
