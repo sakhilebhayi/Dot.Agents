@@ -2,12 +2,6 @@
 
 use App\Jobs\GenerateMegaV2PlatformScorecard;
 use App\Jobs\RunDigitalImmuneSystemCheck;
-use App\Models\AgentMessage;
-use App\Models\AgentSession;
-use App\Models\AgentSkillExecution;
-use App\Models\AgentTask;
-use App\Models\AuditLog;
-use App\Models\PlatformMegaScorecard;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
@@ -25,17 +19,15 @@ Schedule::job(new RunDigitalImmuneSystemCheck)
     ->onOneServer()
     ->name('dis-health-check');
 
-// Prune old audit logs and agent messages older than 90 days — runs nightly at 02:00
-Schedule::command('model:prune', [
-    '--model' => [
-        AuditLog::class,
-        AgentMessage::class,
-        AgentTask::class,
-        AgentSession::class,
-        AgentSkillExecution::class,
-        PlatformMegaScorecard::class,
-    ],
-])->dailyAt('02:00')->onOneServer();
+// Detect models with rows past their retention window and raise a
+// RetentionPurgeProposal for platform_admin review — runs nightly at 02:00.
+// Replaces a former unattended `model:prune` schedule that permanently
+// deleted rows (including audit logs) with no human review; deletion now
+// only happens when a platform_admin approves a proposal via the
+// Retention Purge Queue (see ProcessRetentionPurgeAction).
+Schedule::command('retention:detect-purge-candidates')
+    ->dailyAt('02:00')
+    ->onOneServer();
 
 // Expire pending approvals past their deadline — runs every 30 minutes
 Schedule::command('approvals:expire-overdue')

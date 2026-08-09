@@ -110,6 +110,7 @@ Route::middleware([
         Route::get('/approvals', fn () => view('governance.approvals'))->name('approvals');
         Route::get('/audit', fn () => view('governance.audit'))->name('audit');
         Route::get('/decisions', fn () => view('governance.decisions'))->name('decisions');
+        Route::get('/retention-purges', fn () => view('governance.retention-purges'))->name('retention-purges');
     });
 
     // Security
