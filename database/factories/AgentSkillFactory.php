@@ -36,4 +36,18 @@ class AgentSkillFactory extends Factory
     {
         return $this->state(['is_active' => false]);
     }
+
+    /** An org-defined custom skill executed via webhook rather than a PHP class. */
+    public function webhook(int $organizationId): static
+    {
+        return $this->state([
+            'organization_id' => $organizationId,
+            'layer' => 'workforce',
+            'category' => 'custom',
+            'class' => null,
+            'webhook_url' => 'https://example.test/skills/'.$this->faker->slug(2),
+            'webhook_timeout_seconds' => 15,
+            'is_built_in' => false,
+        ]);
+    }
 }

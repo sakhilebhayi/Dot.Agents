@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Support\TaggableCache;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Cache;
 
@@ -13,6 +14,7 @@ class AgentSkill extends Model
     use HasFactory;
 
     protected $fillable = [
+        'organization_id',
         'key',
         'name',
         'description',
@@ -21,6 +23,9 @@ class AgentSkill extends Model
         'department',
         'agent_type',
         'class',
+        'webhook_url',
+        'webhook_headers',
+        'webhook_timeout_seconds',
         'manifest',
         'required_permissions',
         'required_data_sources',
@@ -39,6 +44,7 @@ class AgentSkill extends Model
     ];
 
     protected $casts = [
+        'webhook_headers' => 'array',
         'manifest' => 'array',
         'required_permissions' => 'array',
         'required_data_sources' => 'array',
@@ -108,7 +114,19 @@ class AgentSkill extends Model
         return $query->where('is_built_in', true);
     }
 
+    /** Skills visible to an organization: the shared platform catalog plus its own custom skills. */
+    public function scopeVisibleTo($query, int $organizationId)
+    {
+        return $query->where(fn ($q) => $q->whereNull('organization_id')->orWhere('organization_id', $organizationId));
+    }
+
     // ── Relationships ────────────────────────────────────
+
+    /** Null for platform-wide catalog skills -- see scopePlatformCatalog(). */
+    public function organization(): BelongsTo
+    {
+        return $this->belongsTo(Organization::class);
+    }
 
     public function assignments(): HasMany
     {
@@ -147,10 +165,16 @@ class AgentSkill extends Model
 
     // ── Helpers ──────────────────────────────────────────
 
-    /** True when this skill has a PHP implementation class. */
+    /** True when this skill has a PHP implementation class or a webhook to invoke. */
     public function hasImplementation(): bool
     {
-        return ! empty($this->class) && class_exists($this->class);
+        return (! empty($this->class) && class_exists($this->class)) || $this->isWebhookSkill();
+    }
+
+    /** True for an org-defined custom skill executed by calling out to its own endpoint. */
+    public function isWebhookSkill(): bool
+    {
+        return ! empty($this->webhook_url);
     }
 
     /** Whether this skill can execute given a risk level and approval state. */

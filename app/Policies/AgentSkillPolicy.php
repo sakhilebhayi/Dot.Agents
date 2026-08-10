@@ -13,13 +13,23 @@ class AgentSkillPolicy
         return auth()->check();
     }
 
-    /** Skills are platform-wide catalog — any authenticated user can view. */
+    /**
+     * Platform catalog skills (organization_id null) are visible to anyone.
+     * A custom skill is visible only within the organization that owns it.
+     */
     public function view(User $user, AgentSkill $skill): bool
     {
-        return auth()->check();
+        if ($skill->organization_id === null) {
+            return true;
+        }
+
+        return $user->organizations()->where('organizations.id', $skill->organization_id)->exists();
     }
 
-    /** Only platform admins (role = 'admin' in any org) can create skills. */
+    /**
+     * Any org owner/admin may create a custom skill for their own org.
+     * Platform admins additionally manage the shared catalog itself.
+     */
     public function create(User $user): bool
     {
         return $user->hasRole('admin') || $user->organizations()
@@ -27,16 +37,40 @@ class AgentSkillPolicy
             ->exists();
     }
 
+    /**
+     * A platform admin may edit any skill. An org owner/admin may edit only
+     * their own org's custom skills -- never the shared platform catalog,
+     * and never another org's custom skill.
+     */
     public function update(User $user, AgentSkill $skill): bool
     {
-        return $user->hasRole('admin') || $user->organizations()
-            ->wherePivotIn('role', ['owner', 'admin'])
-            ->exists();
+        if ($user->hasRole('admin')) {
+            return true;
+        }
+
+        return $skill->organization_id !== null
+            && $user->organizations()
+                ->where('organizations.id', $skill->organization_id)
+                ->wherePivotIn('role', ['owner', 'admin'])
+                ->exists();
     }
 
+    /**
+     * A platform admin may delete any skill. An org owner/admin may delete
+     * only their own org's custom skills -- the shared platform catalog is
+     * otherwise platform-admin-only, matching the pre-existing behavior.
+     */
     public function delete(User $user, AgentSkill $skill): bool
     {
-        return $user->hasRole('admin');
+        if ($user->hasRole('admin')) {
+            return true;
+        }
+
+        return $skill->organization_id !== null
+            && $user->organizations()
+                ->where('organizations.id', $skill->organization_id)
+                ->wherePivotIn('role', ['owner', 'admin'])
+                ->exists();
     }
 
     public function forceDelete(User $user, AgentSkill $skill): bool

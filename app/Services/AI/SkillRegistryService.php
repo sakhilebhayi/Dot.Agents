@@ -5,6 +5,7 @@ namespace App\Services\AI;
 use App\Models\AgentDeployment;
 use App\Models\AgentSkill;
 use App\Skills\Contracts\SkillContract;
+use App\Skills\WebhookSkill;
 use Illuminate\Support\Collection;
 
 /**
@@ -55,6 +56,12 @@ class SkillRegistryService
             return app($skill->class);
         }
 
+        // Org-defined custom skill -- no PHP class, executed via its own
+        // webhook instead. See App\Skills\WebhookSkill.
+        if ($skill && $skill->isWebhookSkill()) {
+            return new WebhookSkill($skill);
+        }
+
         throw new \RuntimeException("Skill [{$key}] not found or has no PHP implementation.");
     }
 
@@ -67,7 +74,7 @@ class SkillRegistryService
 
         $skill = AgentSkill::where('key', $key)->where('is_active', true)->first();
 
-        return $skill && $skill->class && class_exists($skill->class);
+        return (bool) $skill?->hasImplementation();
     }
 
     // ── Deployment-scoped queries ─────────────────────────

@@ -121,6 +121,7 @@ Route::middleware([
         Route::get('/departments', fn () => view('org.departments'))->name('departments');
         Route::get('/members', fn () => view('org.members'))->name('members');
         Route::get('/knowledge', fn () => view('org.knowledge'))->name('knowledge');
+        Route::get('/skills', fn () => view('org.skills'))->name('skills');
         Route::get('/settings', fn () => view('org.settings'))->name('settings');
     });
 
