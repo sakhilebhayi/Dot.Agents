@@ -2,12 +2,15 @@
 
 namespace Tests\Feature\Livewire;
 
+use App\Jobs\ProcessAgentMessage;
 use App\Livewire\Agents\AgentChat;
 use App\Models\AgentDeployment;
+use App\Models\AgentMessage;
 use App\Models\Organization;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Queue;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -103,5 +106,60 @@ class AgentChatTest extends TestCase
     {
         $this->get("/my-agents/{$this->deployment->id}/chat")
             ->assertRedirect();
+    }
+
+    // -----------------------------------------------------------------------
+    // Async processing on the 'ai' queue
+    // -----------------------------------------------------------------------
+
+    public function test_send_message_dispatches_processing_to_the_ai_queue_instead_of_running_inline(): void
+    {
+        Queue::fake();
+        $this->actingAs($this->user);
+
+        Livewire::actingAs($this->user)
+            ->test(AgentChat::class, ['deploymentId' => $this->deployment->id])
+            ->set('message', 'Hello agent!')
+            ->call('sendMessage')
+            ->assertSet('isTyping', true);
+
+        Queue::assertPushedOn('ai', ProcessAgentMessage::class);
+    }
+
+    public function test_send_message_persists_the_user_message_immediately_even_though_the_reply_is_queued(): void
+    {
+        Queue::fake();
+        $this->actingAs($this->user);
+
+        Livewire::actingAs($this->user)
+            ->test(AgentChat::class, ['deploymentId' => $this->deployment->id])
+            ->set('message', 'Hello agent!')
+            ->call('sendMessage');
+
+        $this->assertDatabaseHas('agent_messages', ['role' => 'user', 'content' => 'Hello agent!']);
+    }
+
+    public function test_poll_for_reply_clears_typing_state_once_an_assistant_message_arrives(): void
+    {
+        Queue::fake();
+        $this->actingAs($this->user);
+
+        $component = Livewire::actingAs($this->user)
+            ->test(AgentChat::class, ['deploymentId' => $this->deployment->id])
+            ->set('message', 'Hello agent!')
+            ->call('sendMessage')
+            ->assertSet('isTyping', true);
+
+        // Nothing has replied yet -- still typing.
+        $component->call('pollForReply')->assertSet('isTyping', true);
+
+        // Simulate the queued job completing.
+        AgentMessage::create([
+            'session_id' => $component->get('sessionId'),
+            'role' => 'assistant',
+            'content' => 'Hi there!',
+        ]);
+
+        $component->call('pollForReply')->assertSet('isTyping', false);
     }
 }

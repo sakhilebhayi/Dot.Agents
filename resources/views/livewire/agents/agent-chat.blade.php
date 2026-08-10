@@ -76,7 +76,7 @@
                 @endforeach
 
                 @if($isTyping)
-                    <div class="flex justify-start gap-3">
+                    <div wire:poll.1500ms="pollForReply" class="flex justify-start gap-3">
                         <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-purple-700 to-purple-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0 mt-1">AI</div>
                         <div class="bg-gray-100 dark:bg-gray-800 rounded-2xl rounded-tl-sm px-4 py-3">
                             <div class="flex gap-1 items-center h-4">

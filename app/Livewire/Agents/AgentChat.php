@@ -4,10 +4,10 @@ namespace App\Livewire\Agents;
 
 use App\Actions\Agents\StartAgentChatSessionAction;
 use App\DTOs\Agents\StartAgentChatSessionData;
+use App\Jobs\ProcessAgentMessage;
 use App\Models\AgentDeployment;
 use App\Models\AgentMessage;
 use App\Models\AgentSession;
-use App\Services\AI\AgentOrchestrationService;
 use App\Services\Governance\AuditService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
@@ -25,6 +25,13 @@ class AgentChat extends Component
     public bool $isTyping = false;
 
     public bool $showTaskPanel = false;
+
+    /**
+     * The id of the AgentMessage most recently sent to the queue -- while
+     * waiting, pollForReply() watches for any assistant message created
+     * after this row.
+     */
+    public ?int $pendingMessageId = null;
 
     public function mount(int $deploymentId): void
     {
@@ -84,20 +91,42 @@ class AgentChat extends Component
 
         // Store user message via Action
         $chatAction = app(StartAgentChatSessionAction::class);
-        $chatAction->storeUserMessage($session, $userMessage);
+        $storedUserMessage = $chatAction->storeUserMessage($session, $userMessage);
 
-        // Process through orchestration service
+        // Process through orchestration service on the 'ai' queue rather
+        // than inline -- a real model completion can take several seconds,
+        // too long to hold open this request. pollForReply() picks up the
+        // assistant's reply once the job finishes.
+        $this->pendingMessageId = $storedUserMessage->id;
         $this->isTyping = true;
 
-        try {
-            $orchestrator = app(AgentOrchestrationService::class);
-            $orchestrator->processMessage($deployment, $session, $userMessage);
-        } finally {
-            $this->isTyping = false;
-        }
+        ProcessAgentMessage::dispatch($deployment, $session, $userMessage);
 
         // Refresh messages
-        unset($this->messages);
+        unset($this->chatMessages);
+    }
+
+    /**
+     * Polled from the chat view (see resources/views/livewire/agents/agent-chat.blade.php)
+     * while isTyping is true. A no-op once the reply has arrived or there's
+     * nothing pending, so it's cheap to leave the poll running.
+     */
+    public function pollForReply(): void
+    {
+        if (! $this->isTyping || ! $this->pendingMessageId || ! $this->sessionId) {
+            return;
+        }
+
+        $hasReply = AgentMessage::where('session_id', $this->sessionId)
+            ->where('id', '>', $this->pendingMessageId)
+            ->where('role', 'assistant')
+            ->exists();
+
+        if ($hasReply) {
+            $this->isTyping = false;
+            $this->pendingMessageId = null;
+            unset($this->chatMessages);
+        }
     }
 
     public function newSession(): void
