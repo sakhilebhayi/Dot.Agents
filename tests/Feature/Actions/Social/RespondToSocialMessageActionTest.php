@@ -10,7 +10,6 @@ use App\Models\SocialConversation;
 use App\Models\SocialMessage;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Gate;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
@@ -29,6 +28,7 @@ class RespondToSocialMessageActionTest extends TestCase
         parent::setUp();
         $this->user = User::factory()->create();
         $this->organization = Organization::factory()->create(['owner_id' => $this->user->id]);
+        $this->user->organizations()->attach($this->organization->id, ['role' => 'owner']);
         $account = SocialAccount::factory()->create(['organization_id' => $this->organization->id]);
         $this->conversation = SocialConversation::factory()->create([
             'organization_id' => $this->organization->id,
@@ -37,7 +37,6 @@ class RespondToSocialMessageActionTest extends TestCase
             'first_response_at' => null,
         ]);
         $this->actingAs($this->user);
-        Gate::before(fn () => true);
     }
 
     #[Test]

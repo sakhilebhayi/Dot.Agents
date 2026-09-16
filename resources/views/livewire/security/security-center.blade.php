@@ -76,16 +76,21 @@
         <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-6">
             <h3 class="font-semibold text-gray-900 dark:text-white text-sm mb-4">
                 DIS Health Check Report
-                <span class="ml-2 text-xs text-gray-400">{{ count($disReport['alerts'] ?? []) }} alerts &middot; {{ count($disReport['actions_taken'] ?? []) }} actions taken</span>
+                <span class="ml-2 text-xs text-gray-400">{{ $disReport['total_agents'] ?? 0 }} agents checked &middot; {{ count($disReport['events'] ?? []) }} events</span>
             </h3>
 
-            @if(!empty($disReport['alerts']))
+            @if(!empty($disReport['events']))
                 <div class="space-y-2 mb-4">
-                    @foreach($disReport['alerts'] as $alert)
+                    @foreach($disReport['events'] as $event)
                         <div class="flex items-start gap-3 p-3 rounded-xl
-                            {{ str_contains($alert, 'CRITICAL') || str_contains($alert, 'critical') ? 'bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800' : 'bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-200 dark:border-yellow-800' }}">
-                            <span class="text-sm">{{ str_contains($alert, 'CRITICAL') ? '🔴' : '⚠️' }}</span>
-                            <p class="text-xs text-gray-700 dark:text-gray-300">{{ $alert }}</p>
+                            {{ in_array($event['severity'] ?? '', ['critical', 'error']) ? 'bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800' : 'bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-200 dark:border-yellow-800' }}">
+                            <span class="text-sm">{{ ($event['severity'] ?? '') === 'critical' ? '🔴' : '⚠️' }}</span>
+                            <div>
+                                <p class="text-xs text-gray-700 dark:text-gray-300">{{ $event['message'] ?? ucwords(str_replace('_', ' ', $event['type'] ?? 'Unknown issue')) }}</p>
+                                @if(!empty($event['recommendation']))
+                                    <p class="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{{ $event['recommendation'] }}</p>
+                                @endif
+                            </div>
                         </div>
                     @endforeach
                 </div>
@@ -96,12 +101,9 @@
                 </div>
             @endif
 
-            @if(!empty($disReport['actions_taken']))
-                <div>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Automated Actions:</p>
-                    @foreach($disReport['actions_taken'] as $action)
-                        <div class="text-xs text-purple-700 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/20 rounded-lg px-3 py-2 mb-1">⚡ {{ $action }}</div>
-                    @endforeach
+            @if(($disReport['quarantined'] ?? 0) > 0)
+                <div class="text-xs text-purple-700 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/20 rounded-lg px-3 py-2">
+                    ⚡ {{ $disReport['quarantined'] }} agent(s) automatically quarantined.
                 </div>
             @endif
         </div>

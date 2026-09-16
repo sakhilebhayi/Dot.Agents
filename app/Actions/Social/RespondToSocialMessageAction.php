@@ -27,12 +27,13 @@ class RespondToSocialMessageAction
      */
     public function execute(SocialMessageResponseData $data, int $actorId): SocialMessage
     {
-        Gate::authorize('update', [SocialConversation::class, $data->organizationId]);
+        $conversation = SocialConversation::findOrFail($data->socialConversationId);
+
+        Gate::authorize('update', $conversation);
 
         $message = SocialMessage::create($data->toArray());
 
         // Update first-response time if this is the first reply
-        $conversation = SocialConversation::find($data->socialConversationId);
         if (! $conversation->first_response_at) {
             $responseTimeSecs = now()->diffInSeconds($conversation->created_at);
             $conversation->update([

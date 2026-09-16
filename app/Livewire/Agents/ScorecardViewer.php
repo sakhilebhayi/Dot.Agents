@@ -46,11 +46,13 @@ class ScorecardViewer extends Component
 
     public function recalculate(): void
     {
-        app(ScorecardService::class)->calculatePeriodScorecard(
-            $this->deployment,
-            now()->subDays((int) $this->period)->startOfDay(),
-            now()->endOfDay()
-        );
+        $period = match ($this->period) {
+            '7d' => 'weekly',
+            '90d' => 'quarterly',
+            default => 'monthly',
+        };
+
+        app(ScorecardService::class)->calculatePeriodScorecard($this->deployment, $period);
 
         // Invalidate caches after recalculation
         Cache::forget("scorecard_deployment_{$this->deploymentId}");

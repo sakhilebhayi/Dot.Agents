@@ -35,4 +35,12 @@ class OrganizationPolicy
             ->wherePivot('role', 'owner')
             ->exists();
     }
+
+    public function manageBilling(User $user, Organization $organization): bool
+    {
+        return $user->organizations()
+            ->where('organizations.id', $organization->id)
+            ->wherePivotIn('role', ['owner', 'admin'])
+            ->exists();
+    }
 }

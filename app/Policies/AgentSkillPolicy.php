@@ -27,12 +27,13 @@ class AgentSkillPolicy
     }
 
     /**
-     * Any org owner/admin may create a custom skill for their own org.
-     * Platform admins additionally manage the shared catalog itself.
+     * Any owner/admin of the SPECIFIC organization may create a custom skill
+     * for it. Platform admins additionally manage the shared catalog itself.
      */
-    public function create(User $user): bool
+    public function create(User $user, int $organizationId): bool
     {
         return $user->hasRole('admin') || $user->organizations()
+            ->where('organizations.id', $organizationId)
             ->wherePivotIn('role', ['owner', 'admin'])
             ->exists();
     }

@@ -10,6 +10,7 @@ use App\Services\Billing\StripeService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Stripe\Exception\SignatureVerificationException;
 
@@ -57,6 +58,8 @@ class BillingController extends Controller
         $orgId = session('current_organization_id');
         abort_if(! $orgId, 403, 'No active organization context.');
         $organization = Organization::findOrFail($orgId);
+
+        Gate::authorize('manageBilling', $organization);
 
         $session = $this->stripe->createBillingPortalSession(
             organization: $organization,

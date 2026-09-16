@@ -22,6 +22,7 @@ class Invoice extends Model
         'subtotal' => 'decimal:2',
         'tax' => 'decimal:2',
         'total' => 'decimal:2',
+        'invoice_date' => 'date',
         'due_at' => 'datetime',
         'paid_at' => 'datetime',
         'voided_at' => 'datetime',

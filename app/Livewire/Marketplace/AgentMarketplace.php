@@ -7,6 +7,7 @@ use App\Livewire\Forms\DeployAgentForm;
 use App\Models\Agent;
 use App\Models\AgentCategory;
 use App\Models\AgentDepartment;
+use App\Models\Department;
 use Illuminate\Support\Facades\Cache;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Lazy;
@@ -147,6 +148,15 @@ class AgentMarketplace extends Component
     {
         return Cache::remember('marketplace_departments', 600, fn () => AgentDepartment::where('is_active', true)->orderBy('sort_order')->get()
         );
+    }
+
+    #[Computed]
+    public function orgDepartments()
+    {
+        // Department's HasOrganizationScope trait scopes this to the
+        // current organization automatically; not cached because it is
+        // per-organization, unlike the marketplace catalog above.
+        return Department::where('is_active', true)->orderBy('name')->get();
     }
 
     #[Computed]

@@ -134,15 +134,15 @@ class ModelRouterService
     {
         return match ($provider) {
             'openai' => [
-                'api_key' => config('openai.api_key'),
+                'api_key' => config('prism.providers.openai.api_key'),
                 'base_url' => 'https://api.openai.com/v1',
             ],
             'anthropic' => [
-                'api_key' => config('services.anthropic.key'),
+                'api_key' => config('prism.providers.anthropic.api_key'),
                 'base_url' => 'https://api.anthropic.com/v1',
             ],
             'google' => [
-                'api_key' => config('services.gemini.key'),
+                'api_key' => config('prism.providers.gemini.api_key'),
                 'base_url' => 'https://generativelanguage.googleapis.com/v1beta',
             ],
             'ollama' => [

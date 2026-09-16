@@ -35,7 +35,7 @@ class OrganizationSubscription extends Model
 
     public function plan(): BelongsTo
     {
-        return $this->belongsTo(SubscriptionPlan::class, 'subscription_plan_id');
+        return $this->belongsTo(SubscriptionPlan::class, 'plan_id');
     }
 
     public function invoices(): HasMany

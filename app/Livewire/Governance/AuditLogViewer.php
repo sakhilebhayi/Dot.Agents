@@ -29,6 +29,11 @@ class AuditLogViewer extends Component
 
     public bool $showFlagged = false;
 
+    public function mount(): void
+    {
+        $this->authorize('viewAny', AuditLog::class);
+    }
+
     public function updatingSearch(): void
     {
         $this->resetPage();

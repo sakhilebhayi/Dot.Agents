@@ -6,10 +6,12 @@ use App\Livewire\Marketplace\AgentMarketplace;
 use App\Models\Agent;
 use App\Models\AgentCategory;
 use App\Models\AgentDepartment;
+use App\Models\Department;
 use App\Models\Organization;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Event;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -107,5 +109,73 @@ class AgentMarketplaceTest extends TestCase
 
         $this->assertNotNull($component->get('previewAgent'));
         $this->assertSame($agent->id, $component->get('previewAgent')['id']);
+    }
+
+    public function test_deploy_dropdown_lists_only_the_current_organizations_own_departments(): void
+    {
+        $this->actingAs($this->user);
+
+        $ownDepartment = Department::create([
+            'organization_id' => $this->organization->id,
+            'name' => 'Finance',
+            'slug' => 'finance',
+            'type' => 'operational',
+            'is_active' => true,
+        ]);
+
+        $otherOrg = Organization::factory()->create();
+        Department::create([
+            'organization_id' => $otherOrg->id,
+            'name' => 'Legal',
+            'slug' => 'legal',
+            'type' => 'operational',
+            'is_active' => true,
+        ]);
+
+        AgentDepartment::factory()->create(['name' => 'Marketing Catalog', 'is_active' => true]);
+
+        $component = Livewire::actingAs($this->user)
+            ->test(AgentMarketplace::class);
+
+        $orgDepartments = $component->get('orgDepartments');
+
+        $this->assertCount(1, $orgDepartments);
+        $this->assertSame($ownDepartment->id, $orgDepartments->first()->id);
+        $this->assertInstanceOf(Department::class, $orgDepartments->first());
+    }
+
+    public function test_deploy_persists_the_selected_organization_department(): void
+    {
+        Event::fake();
+        $this->actingAs($this->user);
+        $this->organization->users()->attach($this->user->id, [
+            'role' => 'owner',
+            'is_primary' => true,
+            'joined_at' => now(),
+        ]);
+
+        $department = Department::create([
+            'organization_id' => $this->organization->id,
+            'name' => 'Finance',
+            'slug' => 'finance',
+            'type' => 'operational',
+            'is_active' => true,
+        ]);
+
+        $agent = Agent::factory()->create(['status' => 'active']);
+
+        $component = Livewire::actingAs($this->user)
+            ->test(AgentMarketplace::class)
+            ->call('startDeploy', $agent->id)
+            ->set('deployForm.department_id', $department->id)
+            ->call('deploy');
+
+        $component->assertHasNoErrors();
+
+        $this->assertDatabaseHas('agent_deployments', [
+            'agent_id' => $agent->id,
+            'organization_id' => $this->organization->id,
+            'department_id' => $department->id,
+        ]);
     }
 }

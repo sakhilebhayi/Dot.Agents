@@ -27,6 +27,14 @@ class SocialSentimentScorePolicy
         return false; // System-managed
     }
 
+    public function markHandled(User $user, SocialSentimentScore $score): bool
+    {
+        return $user->organizations()
+            ->where('organizations.id', $score->organization_id)
+            ->wherePivotIn('role', ['owner', 'admin'])
+            ->exists();
+    }
+
     public function delete(User $user, SocialSentimentScore $score): bool
     {
         return $user->hasRole('super-admin');

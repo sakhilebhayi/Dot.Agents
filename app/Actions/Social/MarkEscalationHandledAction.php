@@ -19,7 +19,7 @@ class MarkEscalationHandledAction
         $score = SocialSentimentScore::where('organization_id', $data->organizationId)
             ->findOrFail($data->scoreId);
 
-        Gate::authorize('update', $score);
+        Gate::authorize('markHandled', $score);
 
         $score->update(['escalation_handled' => true]);
 

@@ -91,10 +91,10 @@
         {{-- Activity Metrics --}}
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
             @foreach([
-                ['Total Tasks', number_format($this->scorecard->total_tasks ?? 0), 'blue'],
-                ['Completed', number_format($this->scorecard->completed_tasks ?? 0), 'emerald'],
-                ['High-Risk Decisions', number_format($this->scorecard->high_risk_decisions ?? 0), 'orange'],
-                ['Est. Savings', '$' . number_format($this->scorecard->estimated_cost_savings ?? 0, 0), 'purple'],
+                ['Total Tasks', number_format(($this->scorecard->tasks_completed ?? 0) + ($this->scorecard->tasks_failed ?? 0)), 'blue'],
+                ['Completed', number_format($this->scorecard->tasks_completed ?? 0), 'emerald'],
+                ['High-Risk Decisions', number_format($this->scorecard->hallucinations_detected ?? 0), 'orange'],
+                ['Est. Savings', '$' . number_format($this->scorecard->estimated_savings ?? 0, 0), 'purple'],
             ] as [$label, $value, $color])
                 <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-4 text-center">
                     <p class="text-2xl font-bold text-{{ $color }}-600 dark:text-{{ $color }}-400">{{ $value }}</p>

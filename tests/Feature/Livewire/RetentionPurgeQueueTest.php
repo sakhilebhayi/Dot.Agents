@@ -80,12 +80,14 @@ class RetentionPurgeQueueTest extends TestCase
 
     public function test_a_regular_user_is_forbidden(): void
     {
-        $proposal = $this->eligibleTaskProposal();
+        // The queue is platform-wide, cross-organization data, so a regular
+        // user is now denied at mount -- before they could even reach the
+        // approve/reject actions the write path already restricted.
+        $this->eligibleTaskProposal();
         $regularUser = User::factory()->create();
 
         Livewire::actingAs($regularUser)
             ->test(RetentionPurgeQueue::class)
-            ->call('approve', $proposal->id)
             ->assertForbidden();
     }
 

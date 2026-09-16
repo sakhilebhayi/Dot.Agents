@@ -12,9 +12,16 @@ class RetentionPurgeQueue extends Component
 {
     public string $reviewerNotes = '';
 
+    /**
+     * RetentionPurgeProposal is platform-wide, cross-organization data --
+     * only platform_admin may even view the queue, matching the review()
+     * restriction ProcessRetentionPurgeAction already enforces on the write path.
+     */
     #[Computed]
     public function proposals()
     {
+        abort_unless(auth()->user()->hasAnyRole(['platform_admin']), 403);
+
         return RetentionPurgeProposal::where('status', 'pending')
             ->orderBy('created_at')
             ->paginate(15);
@@ -23,6 +30,8 @@ class RetentionPurgeQueue extends Component
     #[Computed]
     public function pendingCount(): int
     {
+        abort_unless(auth()->user()->hasAnyRole(['platform_admin']), 403);
+
         return RetentionPurgeProposal::where('status', 'pending')->count();
     }
 

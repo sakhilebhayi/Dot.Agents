@@ -9,6 +9,7 @@ use App\Models\AgentDeployment;
 use App\Models\Organization;
 use App\Models\SecurityEvent;
 use App\Services\Governance\DigitalImmuneSystem;
+use Illuminate\Support\Facades\Gate;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Lazy;
 use Livewire\Attributes\Validate;
@@ -31,6 +32,11 @@ class SecurityCenter extends Component
     /** Confirmation string required before executing org-level kill switch. */
     #[Validate('nullable|string|max:100')]
     public string $killSwitchConfirmation = '';
+
+    public function mount(): void
+    {
+        Gate::authorize('viewAny', SecurityEvent::class);
+    }
 
     #[Computed]
     public function organizationId(): ?int
@@ -66,11 +72,12 @@ class SecurityCenter extends Component
 
     public function runDISCheck(): void
     {
-        $this->runningDIS = true;
         $org = Organization::find($this->organizationId);
-        if ($org) {
-            $this->disReport = app(DigitalImmuneSystem::class)->runHealthCheck($org->id);
-        }
+        abort_if(! $org, 403);
+        Gate::authorize('update', $org);
+
+        $this->runningDIS = true;
+        $this->disReport = app(DigitalImmuneSystem::class)->runHealthCheck($org->id);
         $this->runningDIS = false;
     }
 

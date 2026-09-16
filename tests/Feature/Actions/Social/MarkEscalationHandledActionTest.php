@@ -8,7 +8,6 @@ use App\Models\Organization;
 use App\Models\SocialSentimentScore;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Gate;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
@@ -25,8 +24,8 @@ class MarkEscalationHandledActionTest extends TestCase
         parent::setUp();
         $this->user = User::factory()->create();
         $this->organization = Organization::factory()->create(['owner_id' => $this->user->id]);
+        $this->user->organizations()->attach($this->organization->id, ['role' => 'owner']);
         $this->actingAs($this->user);
-        Gate::before(fn () => true);
     }
 
     #[Test]

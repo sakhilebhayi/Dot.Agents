@@ -210,6 +210,7 @@ document.addEventListener('alpine:init', () => {
         updateNodeLabel(label) {
             const idx = this.nodes.findIndex(n => n.id === this.selectedNode);
             if (idx !== -1) this.nodes[idx].label = label;
+            if (this.selectedNode) this.$wire.updateNodeLabel(this.selectedNode, label);
         },
 
         // ── Port centre helpers (canvas-relative coordinates) ──

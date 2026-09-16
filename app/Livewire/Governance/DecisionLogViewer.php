@@ -35,7 +35,9 @@ class DecisionLogViewer extends Component
         // No explicit organization_id filter needed: DecisionLog's
         // HasOrganizationScope trait applies it automatically from the session.
         return DecisionLog::where('created_at', '>=', $since)
-            ->when($this->filterRisk, fn ($q) => $q->where('risk_score', $this->filterRisk === 'high' ? '>=' : ($this->filterRisk === 'medium' ? '>=' : '<'), $this->filterRisk === 'high' ? 70 : ($this->filterRisk === 'medium' ? 40 : 40)))
+            ->when($this->filterRisk === 'high', fn ($q) => $q->where('risk_score', '>=', 70))
+            ->when($this->filterRisk === 'medium', fn ($q) => $q->where('risk_score', '>=', 40)->where('risk_score', '<', 70))
+            ->when($this->filterRisk === 'low', fn ($q) => $q->where('risk_score', '<', 40))
             ->when($this->filterDeployment, fn ($q) => $q->where('agent_deployment_id', $this->filterDeployment))
             ->when($this->filterReviewRequired === '1', fn ($q) => $q->where('requires_human_review', true))
             ->when($this->filterReviewRequired === '0', fn ($q) => $q->where('requires_human_review', false))

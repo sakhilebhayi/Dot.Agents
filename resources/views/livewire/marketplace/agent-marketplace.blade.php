@@ -435,7 +435,7 @@
                     <select id="deploy-dept" wire:model="deployForm.department_id"
                             class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 bg-white dark:bg-gray-800 dark:text-gray-200">
                         <option value="">— No specific department —</option>
-                        @foreach($this->departments as $dept)
+                        @foreach($this->orgDepartments as $dept)
                         <option value="{{ $dept->id }}">{{ $dept->name }}</option>
                         @endforeach
                     </select>

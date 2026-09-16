@@ -73,6 +73,21 @@ trait ManagesWorkflowCanvas
     }
 
     /**
+     * Update a node's label from the Node Properties panel.
+     */
+    public function updateNodeLabel(string $nodeId, string $label): void
+    {
+        foreach ($this->nodes as &$node) {
+            if ($node['id'] === $nodeId) {
+                $node['label'] = $label;
+                break;
+            }
+        }
+
+        $this->syncCanvas();
+    }
+
+    /**
      * Remove a node and all its associated connections.
      */
     public function removeNode(string $nodeId): void

@@ -89,9 +89,9 @@
                             Current Plan
                         </div>
                     @else
-                        <button class="w-full py-2 text-center text-sm font-medium {{ $plan->is_featured ? 'bg-purple-600 hover:bg-purple-700 text-white' : 'border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800' }} rounded-xl transition-colors">
+                        <a href="{{ route('billing.plans') }}" wire:navigate class="block w-full py-2 text-center text-sm font-medium {{ $plan->is_featured ? 'bg-purple-600 hover:bg-purple-700 text-white' : 'border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800' }} rounded-xl transition-colors">
                             {{ ($this->subscription && $plan->price_monthly > ($this->subscription->plan?->price_monthly ?? 0)) ? 'Upgrade' : 'Switch' }}
-                        </button>
+                        </a>
                     @endif
                 </div>
             @endforeach
@@ -118,15 +118,19 @@
                 @foreach($this->invoices as $invoice)
                     <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/30">
                         <td class="px-5 py-3 text-xs font-mono text-gray-600 dark:text-gray-400">{{ $invoice->invoice_number }}</td>
-                        <td class="px-5 py-3 text-xs text-gray-600 dark:text-gray-400">{{ $invoice->issued_date?->format('M j, Y') }}</td>
-                        <td class="px-5 py-3 text-xs text-right font-semibold text-gray-900 dark:text-white">${{ number_format($invoice->total_amount, 2) }}</td>
+                        <td class="px-5 py-3 text-xs text-gray-600 dark:text-gray-400">{{ $invoice->invoice_date?->format('M j, Y') }}</td>
+                        <td class="px-5 py-3 text-xs text-right font-semibold text-gray-900 dark:text-white">${{ number_format($invoice->total, 2) }}</td>
                         <td class="px-5 py-3 text-center">
                             <span class="inline-flex px-2 py-0.5 rounded-full text-xs font-medium {{ $invoice->isPaid() ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' }}">
                                 {{ ucfirst($invoice->status) }}
                             </span>
                         </td>
                         <td class="px-5 py-3">
-                            <a href="#" class="text-xs text-purple-600 dark:text-purple-400 hover:underline">Download PDF</a>
+                            @if($invoice->pdf_url)
+                                <a href="{{ $invoice->pdf_url }}" target="_blank" rel="noopener" class="text-xs text-purple-600 dark:text-purple-400 hover:underline">Download PDF</a>
+                            @else
+                                <span class="text-xs text-gray-400 dark:text-gray-600 cursor-not-allowed" title="PDF not available yet">Download PDF</span>
+                            @endif
                         </td>
                     </tr>
                 @endforeach

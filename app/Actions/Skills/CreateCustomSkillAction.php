@@ -18,7 +18,7 @@ class CreateCustomSkillAction
      */
     public function execute(CreateCustomSkillData $data): AgentSkill
     {
-        Gate::authorize('create', AgentSkill::class);
+        Gate::authorize('create', [AgentSkill::class, $data->organizationId]);
 
         return AgentSkill::create([
             'organization_id' => $data->organizationId,

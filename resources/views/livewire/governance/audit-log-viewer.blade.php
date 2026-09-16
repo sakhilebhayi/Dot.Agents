@@ -47,6 +47,16 @@
                 class="text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-purple-600">
             <input wire:model.live="dateTo" type="date"
                 class="text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-purple-600">
+            <div class="flex items-center gap-2 ml-auto">
+                <button type="button" wire:click="export('csv')"
+                    class="text-sm font-medium rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-3 py-1.5 hover:bg-gray-50 dark:hover:bg-gray-700">
+                    Export CSV
+                </button>
+                <button type="button" wire:click="export('json')"
+                    class="text-sm font-medium rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-3 py-1.5 hover:bg-gray-50 dark:hover:bg-gray-700">
+                    Export JSON
+                </button>
+            </div>
         </div>
     </div>
 
@@ -92,15 +102,20 @@
                                 @endif
                             </td>
                             <td class="px-5 py-3 text-xs text-gray-600 dark:text-gray-400">
-                                @if($log->causer_type === 'App\\Models\\AgentDeployment')
+                                @if($log->agent_deployment_id)
                                     <span class="inline-flex items-center gap-1">
                                         <span class="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
-                                        Agent
+                                        {{ $log->deployment?->display_name ?? 'Agent' }}
+                                    </span>
+                                @elseif($log->user_id)
+                                    <span class="inline-flex items-center gap-1">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                                        {{ $log->user?->name ?? 'User' }}
                                     </span>
                                 @else
                                     <span class="inline-flex items-center gap-1">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
-                                        User
+                                        <span class="w-1.5 h-1.5 rounded-full bg-gray-400"></span>
+                                        System
                                     </span>
                                 @endif
                             </td>
@@ -116,8 +131,8 @@
                             </td>
                             <td class="px-5 py-3">
                                 <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium
-                                    {{ $log->is_success ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' }}">
-                                    {{ $log->is_success ? 'Success' : 'Failed' }}
+                                    {{ $log->flagged ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' : 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' }}">
+                                    {{ $log->flagged ? 'Flagged' : 'Normal' }}
                                 </span>
                             </td>
                         </tr>

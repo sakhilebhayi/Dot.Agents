@@ -97,6 +97,28 @@ class ModelRouterServiceTest extends TestCase
         $this->assertSame('anthropic', $config['provider']);
     }
 
+    public function test_failover_chain_includes_anthropic_and_google_when_their_api_keys_are_configured(): void
+    {
+        config([
+            'prism.providers.anthropic.api_key' => 'test-anthropic-key',
+            'prism.providers.gemini.api_key' => 'test-gemini-key',
+        ]);
+
+        $deployment = $this->makeDeployment('gpt-4o');
+
+        $chain = $this->router->buildFailoverChain($deployment);
+        $providers = array_column($chain, 'provider');
+
+        $this->assertContains('anthropic', $providers);
+        $this->assertContains('google', $providers);
+
+        $anthropicLeg = $chain[array_search('anthropic', $providers, true)];
+        $googleLeg = $chain[array_search('google', $providers, true)];
+
+        $this->assertSame('test-anthropic-key', $anthropicLeg['api_key']);
+        $this->assertSame('test-gemini-key', $googleLeg['api_key']);
+    }
+
     /**
      * Build a minimal AgentDeployment mock (not persisted) with the given model.
      */
