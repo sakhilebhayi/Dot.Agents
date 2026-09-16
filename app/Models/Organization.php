@@ -19,7 +19,7 @@ class Organization extends Model
         'name', 'slug', 'domain', 'logo', 'industry', 'size',
         'country', 'timezone', 'currency', 'plan', 'status',
         'settings', 'billing_address', 'trial_ends_at',
-        'subscription_ends_at', 'owner_id',
+        'subscription_ends_at', 'owner_id', 'stripe_customer_id',
     ];
 
     protected $casts = [

@@ -74,7 +74,7 @@ class SocialCommerceService
         $conversionMetrics = SocialConversion::withoutGlobalScope('organization')
             ->where('organization_id', $organizationId)
             ->where('converted_at', '>=', $since)
-            ->selectRaw('COUNT(*) as total, SUM(revenue) as total_revenue, SUM(CASE WHEN conversion_type = "upsell" THEN 1 ELSE 0 END) as upsell_count')
+            ->selectRaw("COUNT(*) as total, SUM(revenue) as total_revenue, SUM(CASE WHEN conversion_type = 'upsell' THEN 1 ELSE 0 END) as upsell_count")
             ->first();
 
         $sentimentAvg = DB::table('social_sentiment_scores')

@@ -96,12 +96,12 @@ class AgentReputationService
     {
         $tasks = AgentTask::where('agent_deployment_id', $deploymentId)
             ->where('organization_id', $organizationId)
-            ->selectRaw('
+            ->selectRaw("
                 COUNT(*) as total,
-                SUM(CASE WHEN status = "completed" THEN 1 ELSE 0 END) as completed,
-                SUM(CASE WHEN status = "failed" THEN 1 ELSE 0 END) as failed,
+                SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as completed,
+                SUM(CASE WHEN status = 'failed' THEN 1 ELSE 0 END) as failed,
                 AVG(user_rating) as avg_rating
-            ')
+            ")
             ->first();
 
         $total = (int) ($tasks?->total ?? 0);
@@ -142,10 +142,10 @@ class AgentReputationService
     {
         $stats = AgentSkillApproval::where('agent_deployment_id', $deploymentId)
             ->where('organization_id', $organizationId)
-            ->selectRaw('
+            ->selectRaw("
                 COUNT(*) as total,
-                SUM(CASE WHEN status = "approved" THEN 1 ELSE 0 END) as approved
-            ')
+                SUM(CASE WHEN status = 'approved' THEN 1 ELSE 0 END) as approved
+            ")
             ->first();
 
         $total = (int) ($stats?->total ?? 0);

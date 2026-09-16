@@ -41,15 +41,15 @@
             <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md transition-all">
                 {{-- Header --}}
                 <div class="flex items-start justify-between mb-3">
-                    <div class="flex items-center gap-3">
+                    <a href="{{ route('agents.show', $dep) }}" class="flex items-center gap-3 min-w-0 group">
                         <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-700 to-purple-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
                             {{ substr($dep->agent?->name ?? 'AI', 0, 2) }}
                         </div>
-                        <div>
-                            <h4 class="font-semibold text-gray-900 dark:text-white text-sm">{{ $dep->display_name }}</h4>
+                        <div class="min-w-0">
+                            <h4 class="font-semibold text-gray-900 dark:text-white text-sm truncate group-hover:text-purple-600 dark:group-hover:text-purple-400">{{ $dep->display_name }}</h4>
                             <p class="text-xs text-gray-500 dark:text-gray-400">{{ $dep->agent?->agentDepartment?->name }}</p>
                         </div>
-                    </div>
+                    </a>
                     <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-{{ $statusColor }}-100 text-{{ $statusColor }}-700 dark:bg-{{ $statusColor }}-900/30 dark:text-{{ $statusColor }}-400">
                         {{ ucfirst($dep->status) }}
                     </span>

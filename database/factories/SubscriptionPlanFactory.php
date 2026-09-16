@@ -28,6 +28,7 @@ class SubscriptionPlanFactory extends Factory
             'monthly_token_quota' => 1000000,
             'features' => ['feature_a', 'feature_b'],
             'is_active' => true,
+            'is_public' => true,
             'sort_order' => $this->faker->numberBetween(1, 10),
         ];
     }

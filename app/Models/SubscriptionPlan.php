@@ -14,7 +14,7 @@ class SubscriptionPlan extends Model
         'name', 'slug', 'description', 'billing_cycle', 'price', 'yearly_price',
         'max_agents', 'max_users', 'max_departments', 'max_workflows',
         'monthly_token_quota', 'features', 'limits', 'is_active', 'is_featured',
-        'sort_order', 'stripe_price_id', 'stripe_product_id', 'trial_days',
+        'is_public', 'sort_order', 'stripe_price_id', 'stripe_product_id', 'trial_days',
     ];
 
     protected $casts = [
@@ -30,6 +30,11 @@ class SubscriptionPlan extends Model
         'sort_order' => 'integer',
         'metadata' => 'array',
     ];
+
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
+    }
 
     public function subscriptions(): HasMany
     {

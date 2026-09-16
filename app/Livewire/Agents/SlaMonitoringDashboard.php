@@ -15,6 +15,16 @@ use Livewire\Component;
 #[Lazy]
 class SlaMonitoringDashboard extends Component
 {
+    /**
+     * Whitelist of DB-driver-aware date expressions for daily grouping.
+     * Values are static SQL literals — never derived from user input.
+     */
+    private const DATE_EXPR_BY_DRIVER = [
+        'sqlite' => "strftime('%Y-%m-%d', created_at)",
+        'mysql' => "DATE_FORMAT(created_at, '%Y-%m-%d')",
+        'pgsql' => "TO_CHAR(created_at, 'YYYY-MM-DD')",
+    ];
+
     public string $timeframe = '7d';
 
     public ?int $deploymentId = null;
@@ -93,7 +103,7 @@ class SlaMonitoringDashboard extends Component
             ->whereNotNull('actual_duration_minutes')
             ->when($this->deploymentId, fn ($q) => $q->where('agent_deployment_id', $this->deploymentId))
             ->select(
-                DB::raw("strftime('%Y-%m-%d', created_at) as date"),
+                DB::raw(self::dateExpr().' as date'),
                 DB::raw('AVG(actual_duration_minutes) as avg_minutes'),
                 DB::raw('COUNT(*) as task_count'),
                 DB::raw('AVG(confidence_score) as avg_confidence'),
@@ -153,5 +163,13 @@ class SlaMonitoringDashboard extends Component
     public function render()
     {
         return view('livewire.agents.sla-monitoring-dashboard');
+    }
+
+    private static function dateExpr(): string
+    {
+        $driver = DB::getDriverName();
+
+        return self::DATE_EXPR_BY_DRIVER[$driver]
+            ?? throw new \RuntimeException("Unsupported DB driver '{$driver}' for SlaMonitoringDashboard.");
     }
 }

@@ -103,7 +103,7 @@ class EnterpriseBrainService
         // Aggregate task performance by agent deployment
         $taskStats = AgentTask::whereHas('deployment', fn ($q) => $q->where('organization_id', $organizationId))
             ->where('created_at', '>=', $since)
-            ->selectRaw('agent_deployment_id, COUNT(*) as task_count, AVG(latency_ms) as avg_latency, SUM(CASE WHEN status = "failed" THEN 1 ELSE 0 END) as failures')
+            ->selectRaw("agent_deployment_id, COUNT(*) as task_count, AVG(latency_ms) as avg_latency, SUM(CASE WHEN status = 'failed' THEN 1 ELSE 0 END) as failures")
             ->groupBy('agent_deployment_id')
             ->get();
 
