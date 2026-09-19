@@ -15,7 +15,7 @@
                             Renews {{ $this->subscription->current_period_end?->format('M j, Y') }}
                         </p>
                         <div class="flex gap-3 mt-3">
-                            <span class="text-xs bg-white/10 rounded-full px-3 py-1">{{ $this->subscription->plan?->max_agents === 0 ? 'Unlimited' : $this->subscription->plan?->max_agents }} Agents</span>
+                            <span class="text-xs bg-white/10 rounded-full px-3 py-1">{{ ($this->subscription->plan?->max_agents ?? 0) < 0 ? 'Unlimited' : $this->subscription->plan?->max_agents }} Agents</span>
                             <span class="text-xs bg-white/10 rounded-full px-3 py-1">{{ number_format(($this->subscription->plan?->monthly_token_quota ?? 0) / 1000) }}K Tokens/mo</span>
                         </div>
                     @else
@@ -74,10 +74,10 @@
                     </div>
                     <ul class="space-y-2 mb-5">
                         @foreach([
-                            ($plan->max_agents === 0 ? 'Unlimited' : $plan->max_agents) . ' AI Agents',
-                            ($plan->max_users === 0 ? 'Unlimited' : $plan->max_users) . ' Users',
+                            ($plan->max_agents < 0 ? 'Unlimited' : $plan->max_agents) . ' AI Agents',
+                            ($plan->max_users < 0 ? 'Unlimited' : $plan->max_users) . ' Users',
                             number_format(($plan->monthly_token_quota ?? 0) / 1000) . 'K Tokens/month',
-                            ($plan->max_workflows === 0 ? 'Unlimited' : $plan->max_workflows) . ' Workflows',
+                            ($plan->max_workflows < 0 ? 'Unlimited' : $plan->max_workflows) . ' Workflows',
                         ] as $feature)
                             <li class="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-2">
                                 <span class="text-emerald-500">✓</span> {{ $feature }}

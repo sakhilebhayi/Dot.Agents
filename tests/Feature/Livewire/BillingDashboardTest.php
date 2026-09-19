@@ -131,4 +131,36 @@ class BillingDashboardTest extends TestCase
             ->test(BillingDashboard::class)
             ->assertSee('$253');
     }
+
+    /**
+     * Regression: this codebase's real convention for "unlimited" plan limits
+     * is -1 (see database/seeders/AgentPlatformSeeder.php's enterprise plan,
+     * AgentDeploymentPolicy::create(), AgentQuotaGuard) — but this view checked
+     * for === 0, so an unlimited (-1) plan rendered the literal "-1 AI Agents"
+     * instead of "Unlimited".
+     */
+    #[Test]
+    public function unlimited_plan_limits_render_as_unlimited_not_negative_one(): void
+    {
+        $this->actingAs($this->user);
+
+        $plan = SubscriptionPlan::factory()->create([
+            'is_active' => true,
+            'max_agents' => -1,
+            'max_users' => -1,
+            'max_workflows' => -1,
+        ]);
+        OrganizationSubscription::factory()->create([
+            'organization_id' => $this->organization->id,
+            'plan_id' => $plan->id,
+        ]);
+
+        $rendered = Livewire::actingAs($this->user)
+            ->test(BillingDashboard::class)
+            ->assertSee('Unlimited');
+
+        $rendered->assertDontSee('-1 AI Agents')
+            ->assertDontSee('-1 Users')
+            ->assertDontSee('-1 Workflows');
+    }
 }
