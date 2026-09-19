@@ -2,6 +2,7 @@
 
 namespace App\Services\AI;
 
+use App\Events\AgentRunContractBreach;
 use App\Models\AgentDeployment;
 use App\Models\AgentMessage;
 use App\Models\AgentSession;
@@ -9,9 +10,13 @@ use App\Models\AgentTask;
 use App\Models\AgentWorkflow;
 use App\Models\DecisionLog;
 use App\Models\Organization;
+use App\Services\Governance\AgentCharterLoader;
 use App\Services\Governance\AuditService;
 use App\Services\Governance\DelusionDetectionService;
+use App\Services\Governance\DigitalImmuneSystem;
+use App\Services\Memory\DotMemoryClient;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 /**
@@ -36,6 +41,9 @@ class AgentOrchestrationService
         private readonly ResponseProcessorService $responseProcessor,
         private readonly AgentModelCaller $modelCaller,
         private readonly AgentQuotaGuard $quotaGuard,
+        private readonly DotMemoryClient $dotMemoryClient,
+        private readonly AgentCharterLoader $charterLoader,
+        private readonly DigitalImmuneSystem $digitalImmuneSystem,
     ) {}
 
     /**
@@ -129,7 +137,17 @@ class AgentOrchestrationService
 
         $task->update(['status' => 'in_progress', 'started_at' => now()]);
 
+        $loopId = (string) Str::uuid();
+
         try {
+            // context() never throws (its own contract) — null is the load-bearing
+            // "degraded" signal this callsite must surface, not swallow.
+            $dotMemoryContext = $this->dotMemoryClient->context('agent_deployment', (string) $deployment->id);
+            $dotMemoryContextDegraded = $dotMemoryContext === null;
+
+            $charter = $this->charterLoader->charterFor($deployment->agent->slug);
+            $isProvisional = ! $charter['chartered'];
+
             $taskPrompt = $this->promptBuilder->buildTaskPrompt($deployment, $task);
 
             $persona = $deployment->agent->defaultPersona;
@@ -149,6 +167,32 @@ class AgentOrchestrationService
             );
             $durationMs = (int) ((microtime(true) - $startTime) * 1000);
 
+            // "runc:provisional" colony runtime contract: an uncharted agent's
+            // resource use is bounded; a chartered agent has no such bound today.
+            if ($isProvisional) {
+                $breachReasons = [];
+
+                $wallClockLimitMs = (float) config('services.dot_brain.provisional_wall_clock_ms', 60000);
+                if ($durationMs > $wallClockLimitMs) {
+                    event(new AgentRunContractBreach($deployment, $task, 'wall_clock', (float) $durationMs, $wallClockLimitMs));
+                    $breachReasons[] = "wall_clock {$durationMs}ms exceeded {$wallClockLimitMs}ms limit";
+                }
+
+                $toolCallCount = count($response['tool_calls'] ?? []);
+                $toolCallLimit = (int) config('services.dot_brain.provisional_max_tool_calls', 5);
+                if ($toolCallCount > $toolCallLimit) {
+                    event(new AgentRunContractBreach($deployment, $task, 'tool_calls', (float) $toolCallCount, (float) $toolCallLimit));
+                    $breachReasons[] = "tool_calls {$toolCallCount} exceeded {$toolCallLimit} limit";
+                }
+
+                if ($breachReasons !== []) {
+                    $this->digitalImmuneSystem->quarantineDeployment(
+                        $deployment,
+                        'Provisional runtime contract breach: '.implode('; ', $breachReasons)
+                    );
+                }
+            }
+
             $output = $this->responseProcessor->parseTaskOutput($response['content']);
 
             $delusionAnalysis = $this->delusionDetector->analyze(
@@ -158,8 +202,17 @@ class AgentOrchestrationService
             );
 
             $confidenceScore = $output['confidence'] ?? 75.0;
+
+            // Charter probation rule: below the charter's own trust floor, a
+            // chartered agent still escalates every recommendation.
+            $belowTrustFloor = $charter['chartered']
+                && $charter['trust_score_floor'] !== null
+                && ($confidenceScore / 100) < $charter['trust_score_floor'];
+
             $requiresApproval = $deployment->requiresApprovalFor($confidenceScore)
-                || $delusionAnalysis['risk_score'] >= 60;
+                || $delusionAnalysis['risk_score'] >= 60
+                || $isProvisional
+                || $belowTrustFloor;
 
             $task->update([
                 'status' => $requiresApproval ? 'awaiting_approval' : 'completed',
@@ -173,6 +226,9 @@ class AgentOrchestrationService
                 'token_count' => $response['usage']['total_tokens'] ?? 0,
                 'cost' => $response['cost'] ?? 0,
                 'completed_at' => $requiresApproval ? null : now(),
+                'metadata' => array_merge($task->metadata ?? [], [
+                    'dot_memory_context_degraded' => $dotMemoryContextDegraded,
+                ]),
             ]);
 
             $decisionLog = DecisionLog::create([
@@ -198,6 +254,33 @@ class AgentOrchestrationService
                 'delusion_analysis' => $delusionAnalysis['analysis'],
                 'requires_human_review' => $requiresApproval,
             ]);
+
+            try {
+                $this->dotMemoryClient->recordDecision(
+                    $loopId,
+                    'agent_task',
+                    (string) $task->id,
+                    $confidenceScore / 100,
+                    $delusionAnalysis['risk_score'] / 100,
+                    $this->mapDeploymentModeToAutonomyLevel($deployment->deployment_mode),
+                    ['requires_approval' => $requiresApproval]
+                );
+
+                $this->dotMemoryClient->recordAction(
+                    $loopId,
+                    'agent_task',
+                    (string) $task->id,
+                    $task->task_type,
+                    $task->status === 'completed' ? 'succeeded' : 'pending'
+                );
+            } catch (\Throwable $e) {
+                // DotMemoryClient already fails closed internally; this is belt-and-braces
+                // so a telemetry-layer bug can never surface as a broken task execution.
+                Log::warning('AgentOrchestrationService: Dot.Memory decision/action recording failed', [
+                    'task_id' => $task->id,
+                    'exception' => $e->getMessage(),
+                ]);
+            }
 
             if ($requiresApproval) {
                 $this->responseProcessor->createApprovalRequest($deployment, $task, $decisionLog, $delusionAnalysis);
@@ -232,6 +315,27 @@ class AgentOrchestrationService
     }
 
     /**
+     * Maps this platform's deployment_mode (advisory / semi-autonomous /
+     * autonomous / executive_approval) onto Dot.Memory's autonomy_level enum
+     * (observe / recommend / approve / execute / autonomous). The two scales
+     * don't line up 1:1: 'executive_approval' maps to 'approve' and
+     * 'autonomous' maps to itself on name alone, 'advisory' (no execution
+     * authority) maps to the most conservative 'observe', and the remaining
+     * 'semi-autonomous' middle ground maps to 'recommend'. 'execute' is
+     * intentionally unused by this mapping today.
+     */
+    private function mapDeploymentModeToAutonomyLevel(string $deploymentMode): string
+    {
+        return match ($deploymentMode) {
+            'advisory' => 'observe',
+            'semi-autonomous' => 'recommend',
+            'executive_approval' => 'approve',
+            'autonomous' => 'autonomous',
+            default => 'recommend',
+        };
+    }
+
+    /**
      * Execute a single graph node via agent key.
      * Used by GraphWorkflowEngineService to drive workflow node execution.
      *
@@ -248,7 +352,7 @@ class AgentOrchestrationService
             : null;
 
         $deployment = AgentDeployment::whereHas(
-            'agent', fn ($q) => $q->where('key', $agentKey)
+            'agent', fn ($q) => $q->where('slug', $agentKey)
         )
             ->when($organizationId, fn ($q) => $q->where('organization_id', $organizationId))
             ->where('status', 'active')

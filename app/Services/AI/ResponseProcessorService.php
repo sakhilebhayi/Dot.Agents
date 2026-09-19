@@ -86,7 +86,7 @@ class ResponseProcessorService
         DecisionLog $decisionLog,
         array $delusionAnalysis
     ): void {
-        AgentApproval::create([
+        $approval = AgentApproval::create([
             'task_id' => $task->id,
             'agent_deployment_id' => $deployment->id,
             'organization_id' => $deployment->organization_id,

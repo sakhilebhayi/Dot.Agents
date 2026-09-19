@@ -3,12 +3,14 @@
 namespace App\Providers;
 
 use App\Events\AgentCapabilityContractChanged;
+use App\Events\AgentCharterDriftDetected;
 use App\Events\AgentChatStarted;
 use App\Events\AgentDecommissioned;
 use App\Events\AgentDeployed;
 use App\Events\AgentDriftDetected;
 use App\Events\AgentPaused;
 use App\Events\AgentResumed;
+use App\Events\AgentRunContractBreach;
 use App\Events\AgentTaskCompleted;
 use App\Events\AgentTaskFailed;
 use App\Events\AgentTaskRated;
@@ -27,10 +29,12 @@ use App\Events\WorkflowStatusUpdated;
 use App\Listeners\AuditSkillExecution;
 use App\Listeners\HandleAgentTaskFailed;
 use App\Listeners\HandleSkillApprovalRequested;
+use App\Listeners\LogAgentCharterDriftDetectedAudit;
 use App\Listeners\LogAgentChatStarted;
 use App\Listeners\LogAgentDecommissionedAudit;
 use App\Listeners\LogAgentPausedAudit;
 use App\Listeners\LogAgentResumedAudit;
+use App\Listeners\LogAgentRunContractBreachAudit;
 use App\Listeners\LogAgentTaskRated;
 use App\Listeners\LogAgentUpdatedAudit;
 use App\Listeners\LogDeploymentAudit;
@@ -104,6 +108,14 @@ class AgentEventServiceProvider extends ServiceProvider
 
         AgentDriftDetected::class => [
             NotifyOnAgentDrift::class,
+        ],
+
+        AgentRunContractBreach::class => [
+            LogAgentRunContractBreachAudit::class,
+        ],
+
+        AgentCharterDriftDetected::class => [
+            LogAgentCharterDriftDetectedAudit::class,
         ],
 
         ApprovalRequested::class => [

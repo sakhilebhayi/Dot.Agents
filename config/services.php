@@ -114,4 +114,22 @@ return [
         'redirect' => env('TWITCH_REDIRECT_URI', '/social/auth/twitch/callback'),
     ],
 
+    'dot_memory' => [
+        'base_url' => env('DOT_MEMORY_API_URL'),
+        'token' => env('DOT_MEMORY_API_TOKEN'),
+    ],
+
+    'dot_brain' => [
+        // Local-monorepo assumption: Dot.Brain has no live API today, so charters
+        // are read straight off the sibling checkout's filesystem. A real
+        // multi-host deployment would need this to be a periodic git sync or a
+        // fetched API instead.
+        'charters_path' => env('DOT_BRAIN_CHARTERS_PATH', base_path('../Dot.Brain/agents')),
+
+        // Provisional colony runtime contract bounds ("runc:provisional") applied
+        // to every uncharted agent run — see AgentOrchestrationService::executeTask().
+        'provisional_wall_clock_ms' => env('DOT_BRAIN_PROVISIONAL_WALL_CLOCK_MS', 60000),
+        'provisional_max_tool_calls' => env('DOT_BRAIN_PROVISIONAL_MAX_TOOL_CALLS', 5),
+    ],
+
 ];

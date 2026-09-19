@@ -21,10 +21,13 @@ use App\Services\AI\ToolPermissionService;
 use App\Services\AI\VectorMemoryService;
 use App\Services\AI\Workflow\WorkflowGraphResolver;
 use App\Services\AI\WorkflowRiskScoringService;
+use App\Services\Governance\AgentCharterLoader;
 use App\Services\Governance\AuditService;
 use App\Services\Governance\DelusionDetectionService;
+use App\Services\Governance\DigitalImmuneSystem;
 use App\Services\Governance\EnterpriseConstitutionService;
 use App\Services\Governance\ScorecardService;
+use App\Services\Memory\DotMemoryClient;
 use App\Skills\Governance\AuditLoggingSkill;
 use Illuminate\Support\ServiceProvider;
 
@@ -55,6 +58,9 @@ class AgentServiceProvider extends ServiceProvider
                 $app->make(ResponseProcessorService::class),
                 $app->make(AgentModelCaller::class),
                 $app->make(AgentQuotaGuard::class),
+                $app->make(DotMemoryClient::class),
+                $app->make(AgentCharterLoader::class),
+                $app->make(DigitalImmuneSystem::class),
             );
         });
 
