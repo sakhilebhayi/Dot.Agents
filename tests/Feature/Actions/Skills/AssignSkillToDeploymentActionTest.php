@@ -78,6 +78,58 @@ class AssignSkillToDeploymentActionTest extends TestCase
     }
 
     #[Test]
+    public function test_aborts_when_skill_belongs_to_another_organization(): void
+    {
+        $otherOrg = Organization::factory()->create();
+        $othersSkill = AgentSkill::factory()->webhook($otherOrg->id)->create(['is_active' => true]);
+
+        $data = new AssignSkillData(
+            skillId: $othersSkill->id,
+            agentDeploymentId: $this->deployment->id,
+            organizationId: $this->organization->id,
+        );
+
+        $this->expectException(HttpException::class);
+        app(AssignSkillToDeploymentAction::class)->execute($data);
+    }
+
+    #[Test]
+    public function test_assigns_a_platform_wide_skill_regardless_of_organization(): void
+    {
+        Event::fake([SkillAssigned::class]);
+
+        $platformSkill = AgentSkill::factory()->create(['is_active' => true]); // organization_id null
+
+        $data = new AssignSkillData(
+            skillId: $platformSkill->id,
+            agentDeploymentId: $this->deployment->id,
+            organizationId: $this->organization->id,
+        );
+
+        $result = app(AssignSkillToDeploymentAction::class)->execute($data);
+
+        $this->assertInstanceOf(AgentSkillAssignment::class, $result);
+    }
+
+    #[Test]
+    public function test_assigns_the_organizations_own_custom_skill(): void
+    {
+        Event::fake([SkillAssigned::class]);
+
+        $ownSkill = AgentSkill::factory()->webhook($this->organization->id)->create(['is_active' => true]);
+
+        $data = new AssignSkillData(
+            skillId: $ownSkill->id,
+            agentDeploymentId: $this->deployment->id,
+            organizationId: $this->organization->id,
+        );
+
+        $result = app(AssignSkillToDeploymentAction::class)->execute($data);
+
+        $this->assertInstanceOf(AgentSkillAssignment::class, $result);
+    }
+
+    #[Test]
     public function test_is_idempotent_on_reassignment(): void
     {
         Event::fake();

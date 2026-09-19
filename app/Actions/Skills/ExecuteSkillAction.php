@@ -11,6 +11,7 @@ use App\Models\AgentSkill;
 use App\Models\AgentSkillApproval;
 use App\Models\AgentSkillAudit;
 use App\Models\AgentSkillExecution;
+use App\Models\Scopes\SkillOrganizationScope;
 use App\Services\Skills\SkillExecutionValidator;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
@@ -29,7 +30,10 @@ class ExecuteSkillAction
      */
     public function execute(ExecuteSkillData $data): AgentSkillExecution
     {
-        $skill = AgentSkill::findOrFail($data->skillId);
+        // Fetched explicitly with its real organization_id regardless of
+        // session context — AgentSkillPolicy::execute() is the source of
+        // truth for whether this org may use this skill, not this fetch.
+        $skill = AgentSkill::withoutGlobalScope(SkillOrganizationScope::class)->findOrFail($data->skillId);
         $deployment = AgentDeployment::findOrFail($data->agentDeploymentId);
 
         Gate::authorize('execute', [$skill, $deployment]);

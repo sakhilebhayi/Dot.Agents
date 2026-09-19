@@ -80,12 +80,18 @@ class AgentSkillPolicy
     }
 
     /**
-     * Authorize skill execution: user must belong to the deployment's org
-     * and the deployment must be in an active state.
+     * Authorize skill execution: user must belong to the deployment's org,
+     * the deployment must be active, and the skill itself must actually be
+     * available to that org (platform-wide, or that org's own custom skill
+     * — never another org's private custom skill).
      */
     public function execute(User $user, AgentSkill $skill, AgentDeployment $deployment): bool
     {
         if ($deployment->status !== 'active') {
+            return false;
+        }
+
+        if ($skill->organization_id !== null && $skill->organization_id !== $deployment->organization_id) {
             return false;
         }
 

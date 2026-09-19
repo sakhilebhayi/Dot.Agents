@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Policies;
 
+use App\Models\AgentDeployment;
 use App\Models\AgentSkill;
 use App\Models\Organization;
 use App\Models\User;
@@ -104,5 +105,36 @@ class AgentSkillPolicyCustomSkillTest extends TestCase
         $adminOfB = $this->memberOf($orgB, 'admin');
 
         $this->assertFalse($this->policy->delete($adminOfB, $skill));
+    }
+
+    public function test_a_deployment_can_execute_its_own_orgs_custom_skill(): void
+    {
+        $org = Organization::factory()->create();
+        $skill = AgentSkill::factory()->webhook($org->id)->create();
+        $deployment = AgentDeployment::factory()->create(['organization_id' => $org->id, 'status' => 'active']);
+        $member = $this->memberOf($org);
+
+        $this->assertTrue($this->policy->execute($member, $skill, $deployment));
+    }
+
+    public function test_a_deployment_cannot_execute_another_orgs_custom_skill(): void
+    {
+        $orgA = Organization::factory()->create();
+        $orgB = Organization::factory()->create();
+        $skill = AgentSkill::factory()->webhook($orgA->id)->create();
+        $deploymentInB = AgentDeployment::factory()->create(['organization_id' => $orgB->id, 'status' => 'active']);
+        $memberOfB = $this->memberOf($orgB);
+
+        $this->assertFalse($this->policy->execute($memberOfB, $skill, $deploymentInB));
+    }
+
+    public function test_any_deployment_can_execute_a_platform_catalog_skill(): void
+    {
+        $org = Organization::factory()->create();
+        $platformSkill = AgentSkill::factory()->create(); // organization_id null
+        $deployment = AgentDeployment::factory()->create(['organization_id' => $org->id, 'status' => 'active']);
+        $member = $this->memberOf($org);
+
+        $this->assertTrue($this->policy->execute($member, $platformSkill, $deployment));
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Scopes\SkillOrganizationScope;
 use App\Support\TaggableCache;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -12,6 +13,11 @@ use Illuminate\Support\Facades\Cache;
 class AgentSkill extends Model
 {
     use HasFactory;
+
+    protected static function booted(): void
+    {
+        static::addGlobalScope(new SkillOrganizationScope);
+    }
 
     protected $fillable = [
         'organization_id',
