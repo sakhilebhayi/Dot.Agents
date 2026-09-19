@@ -136,7 +136,7 @@
                             <td class="px-4 py-2.5 text-center font-bold {{ $sc->overall_health_score >= 80 ? 'text-emerald-600' : ($sc->overall_health_score >= 60 ? 'text-yellow-600' : 'text-red-600') }}">{{ round($sc->overall_health_score ?? 0) }}%</td>
                             <td class="px-4 py-2.5 text-center text-gray-600 dark:text-gray-400">{{ round($sc->accuracy_score ?? 0) }}%</td>
                             <td class="px-4 py-2.5 text-center text-gray-600 dark:text-gray-400">{{ round($sc->compliance_score ?? 0) }}%</td>
-                            <td class="px-4 py-2.5 text-center text-gray-600 dark:text-gray-400">{{ number_format($sc->total_tasks ?? 0) }}</td>
+                            <td class="px-4 py-2.5 text-center text-gray-600 dark:text-gray-400">{{ number_format($sc->tasks_completed ?? 0) }}</td>
                         </tr>
                     @endforeach
                 </tbody>

@@ -177,8 +177,54 @@ class DigitalImmuneSystemTest extends TestCase
         $this->dis->checkDeployment($deployment);
         $status = $this->dis->checkDeployment($deployment);
 
-        $this->assertSame('critical', $status['health']);
+        $this->assertSame('quarantined', $status['health']);
         $this->assertSame('suspended', $deployment->fresh()->status);
+    }
+
+    public function test_check_deployment_returns_quarantined_status_when_autonomy_violation_detected(): void
+    {
+        $deployment = AgentDeployment::factory()->create([
+            'organization_id' => $this->org->id,
+            'status' => 'active',
+            'deployment_mode' => 'advisory',
+            'requires_human_approval' => false,
+        ]);
+
+        AgentTask::factory()->create([
+            'agent_deployment_id' => $deployment->id,
+            'organization_id' => $this->org->id,
+            'task_type' => 'action',
+            'status' => 'completed',
+            'created_at' => now()->subMinutes(10),
+        ]);
+
+        $status = $this->dis->checkDeployment($deployment);
+
+        $this->assertSame('quarantined', $status['health']);
+        $this->assertSame('suspended', $deployment->fresh()->status);
+    }
+
+    public function test_health_check_increments_quarantined_bucket_when_a_deployment_is_quarantined(): void
+    {
+        $deployment = AgentDeployment::factory()->create([
+            'organization_id' => $this->org->id,
+            'status' => 'active',
+            'deployment_mode' => 'advisory',
+            'requires_human_approval' => false,
+        ]);
+
+        AgentTask::factory()->create([
+            'agent_deployment_id' => $deployment->id,
+            'organization_id' => $this->org->id,
+            'task_type' => 'action',
+            'status' => 'completed',
+            'created_at' => now()->subMinutes(10),
+        ]);
+
+        $report = $this->dis->runHealthCheck($this->org->id);
+
+        $this->assertSame(1, $report['quarantined']);
+        $this->assertSame(0, $report['critical']);
     }
 
     public function test_dis_does_not_check_deployments_from_other_orgs(): void

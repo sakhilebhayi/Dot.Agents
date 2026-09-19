@@ -9,9 +9,7 @@ use App\Models\AgentScorecard;
 use App\Models\AgentTask;
 use App\Models\EnterpriseHealthScore;
 use App\Models\OrganizationTwin;
-use App\Services\Governance\AuditService;
 use App\Services\Governance\EnterpriseConstitutionService;
-use App\Services\Governance\ScorecardService;
 use Illuminate\Container\Container;
 use Illuminate\Support\Facades\Cache;
 
@@ -33,8 +31,6 @@ class EnterpriseBrainService
 {
     public function __construct(
         private readonly EnterpriseConstitutionService $constitutionService,
-        private readonly AuditService $auditService,
-        private readonly ScorecardService $scorecardService,
         private readonly EnterpriseBrainScorer $scorer,
     ) {}
 

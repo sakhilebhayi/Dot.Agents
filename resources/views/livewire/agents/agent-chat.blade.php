@@ -159,7 +159,7 @@
                 </div>
                 <div class="flex justify-between">
                     <dt class="text-gray-500">Session Cost</dt>
-                    <dd class="font-semibold text-gray-700 dark:text-gray-300">${{ number_format($sess?->total_cost ?? 0, 4) }}</dd>
+                    <dd class="font-semibold text-gray-700 dark:text-gray-300">${{ number_format($sess?->cost ?? 0, 4) }}</dd>
                 </div>
             </dl>
             <button wire:click="endSession"

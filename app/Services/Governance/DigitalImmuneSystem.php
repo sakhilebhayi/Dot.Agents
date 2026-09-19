@@ -96,7 +96,7 @@ class DigitalImmuneSystem
         if ($usageResult['detected']) {
             $events[] = $usageResult;
             if ($usageResult['severity'] === 'critical') {
-                $health = 'critical';
+                $health = 'quarantined';
                 $this->quarantineDeployment($deployment, $usageResult['reason']);
             } else {
                 $health = $health === 'healthy' ? 'warnings' : $health;
@@ -107,7 +107,7 @@ class DigitalImmuneSystem
         $autonomyResult = $this->checkAutonomyViolations($deployment);
         if ($autonomyResult['detected']) {
             $events[] = $autonomyResult;
-            $health = 'critical';
+            $health = 'quarantined';
             $this->quarantineDeployment($deployment, $autonomyResult['reason']);
         }
 

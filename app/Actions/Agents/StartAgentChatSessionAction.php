@@ -7,21 +7,18 @@ use App\Events\AgentChatStarted;
 use App\Models\AgentDeployment;
 use App\Models\AgentMessage;
 use App\Models\AgentSession;
-use App\Services\Governance\AuditService;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 
 class StartAgentChatSessionAction
 {
-    public function __construct(private readonly AuditService $auditService) {}
-
     /**
      * Create a new interactive chat session for the given deployment.
      *
      * Persists the AgentSession, optionally seeds a system-prompt message,
-     * logs the session start via AuditService, and fires AgentChatStarted
-     * so analytics listeners can record the engagement metric.
+     * and fires AgentChatStarted, which the LogAgentChatStarted listener
+     * uses to record the audit trail entry via AuditService.
      *
      * @param  AgentDeployment  $deployment  The deployment hosting the chat session.
      * @param  StartAgentChatSessionData  $data  DTO carrying user ID, title, and org context.

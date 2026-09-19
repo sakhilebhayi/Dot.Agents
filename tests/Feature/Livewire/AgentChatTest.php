@@ -6,6 +6,7 @@ use App\Jobs\ProcessAgentMessage;
 use App\Livewire\Agents\AgentChat;
 use App\Models\AgentDeployment;
 use App\Models\AgentMessage;
+use App\Models\AgentSession;
 use App\Models\Organization;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -161,5 +162,19 @@ class AgentChatTest extends TestCase
         ]);
 
         $component->call('pollForReply')->assertSet('isTyping', false);
+    }
+
+    public function test_session_cost_displays_the_sessions_real_cost_column(): void
+    {
+        $this->actingAs($this->user);
+
+        $component = Livewire::actingAs($this->user)
+            ->test(AgentChat::class, ['deploymentId' => $this->deployment->id]);
+
+        // agent_sessions.cost is decimal(10,6) — must stay within that precision
+        AgentSession::whereKey($component->get('sessionId'))->update(['cost' => 123.4567]);
+
+        $component->call('pollForReply')
+            ->assertSee(number_format(123.4567, 4));
     }
 }

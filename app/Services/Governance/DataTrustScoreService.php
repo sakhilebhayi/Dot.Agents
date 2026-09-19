@@ -17,7 +17,6 @@ class DataTrustScoreService
     private const CACHE_TTL = 1800;
 
     public function __construct(
-        private readonly AuditService $auditService,
         private readonly DataQualityScorer $qualityScorer,
         private readonly DataGovernanceScorer $governanceScorer,
     ) {}

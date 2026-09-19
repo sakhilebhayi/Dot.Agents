@@ -13,6 +13,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use PHPUnit\Framework\Attributes\Test;
+use ReflectionClass;
 use Tests\TestCase;
 
 class StartAgentChatSessionActionTest extends TestCase
@@ -111,5 +112,16 @@ class StartAgentChatSessionActionTest extends TestCase
 
         $this->assertEquals('completed', $session->fresh()->status);
         $this->assertNotNull($session->fresh()->ended_at);
+    }
+
+    #[Test]
+    public function test_constructor_does_not_inject_the_unused_audit_service(): void
+    {
+        // Audit logging for chat session start happens in the LogAgentChatStarted
+        // listener (bound to AgentChatStarted), not in this action — its own
+        // AuditService dependency was never called (phpstan property.onlyWritten).
+        $constructor = (new ReflectionClass(StartAgentChatSessionAction::class))->getConstructor();
+
+        $this->assertTrue($constructor === null || $constructor->getNumberOfParameters() === 0);
     }
 }

@@ -6,6 +6,7 @@ use App\Services\Governance\AuditService;
 use App\Services\Governance\DelusionDetectionService;
 use App\Services\Infrastructure\ObservabilityService;
 use App\Services\Resilience\CircuitBreakerService;
+use App\Services\Social\ContinuationContentGenerator;
 use App\Services\Social\ConversationContinuationService;
 use App\Services\Social\LeadQualificationService;
 use App\Services\Social\ReputationMonitoringService;
@@ -36,6 +37,7 @@ class SocialServiceProvider extends ServiceProvider
             return new ConversationContinuationService(
                 $app->make(AuditService::class),
                 $app->make(DelusionDetectionService::class),
+                $app->make(ContinuationContentGenerator::class),
             );
         });
     }
