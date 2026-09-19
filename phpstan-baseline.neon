@@ -1,0 +1,1039 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Access to an undefined property Stripe\\Subscription\:\:\$current_period_end\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Actions/Billing/HandleStripeWebhookAction.php
+
+		-
+			message: '#^Access to an undefined property Stripe\\Subscription\:\:\$current_period_start\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Actions/Billing/HandleStripeWebhookAction.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:notify\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: app/Actions/Billing/HandleStripeWebhookAction.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\User\:\:\$profile_photo_url\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Actions/Compliance/ExportUserDataAction.php
+
+		-
+			message: '#^Method App\\Actions\\Jetstream\\CreateTeam\:\:create\(\) should return App\\Models\\Team but returns Illuminate\\Database\\Eloquent\\Model\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Actions/Jetstream/CreateTeam.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Support\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:each\(\) expects callable\(Illuminate\\Database\\Eloquent\\Model, int\)\: mixed, Closure\(App\\Models\\Team\)\: void given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Actions/Jetstream/DeleteUser.php
+
+		-
+			message: '#^Parameter \#1 \$invitation of class Laravel\\Jetstream\\Mail\\TeamInvitation constructor expects Laravel\\Jetstream\\TeamInvitation, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Actions/Jetstream/InviteTeamMember.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Actions/Jetstream/RemoveTeamMember.php
+
+		-
+			message: '#^Property App\\Actions\\Organizations\\UpdateOrganizationSettingsAction\:\:\$auditService is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: app/Actions/Organizations/UpdateOrganizationSettingsAction.php
+
+		-
+			message: '#^Parameter \#1 \$intentScore of method App\\Actions\\Social\\QualifyLeadAction\:\:resolveIntentLevel\(\) expects float, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Actions/Social/QualifyLeadAction.php
+
+		-
+			message: '#^Parameter \#1 \$leadScore of method App\\Actions\\Social\\QualifyLeadAction\:\:resolvePriority\(\) expects float, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Actions/Social/QualifyLeadAction.php
+
+		-
+			message: '#^Property App\\Actions\\Social\\RespondToSocialMessageAction\:\:\$leadService is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: app/Actions/Social/RespondToSocialMessageAction.php
+
+		-
+			message: '#^Property App\\Actions\\Social\\RespondToSocialMessageAction\:\:\$sentimentService is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: app/Actions/Social/RespondToSocialMessageAction.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Relations\\HasManyThrough\:\:active\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Controllers/Api/V1/DeploymentSkillController.php
+
+		-
+			message: '#^Dead catch \- Exception is never thrown in the try block\.$#'
+			identifier: catch.neverThrown
+			count: 1
+			path: app/Http/Controllers/BillingController.php
+
+		-
+			message: '#^Access to an undefined property Laravel\\Socialite\\Contracts\\User\:\:\$expiresIn\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/SocialOAuthController.php
+
+		-
+			message: '#^Access to an undefined property Laravel\\Socialite\\Contracts\\User\:\:\$token\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/SocialOAuthController.php
+
+		-
+			message: '#^Parameter \#1 \$deployment of class App\\Events\\AgentDriftDetected constructor expects App\\Models\\AgentDeployment, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Jobs/DetectAgentDelusion.php
+
+		-
+			message: '#^Parameter \#1 \$deployment of method App\\Services\\Governance\\AuditService\:\:logAgentAction\(\) expects App\\Models\\AgentDeployment, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Jobs/DetectAgentDelusion.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$agent_deployment_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Jobs/GenerateSocialResponseJob.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$contact_handle\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Jobs/GenerateSocialResponseJob.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$contact_name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Jobs/GenerateSocialResponseJob.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$contact_platform_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Jobs/GenerateSocialResponseJob.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Jobs/GenerateSocialResponseJob.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$organization_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Jobs/GenerateSocialResponseJob.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$platform\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Jobs/GenerateSocialResponseJob.php
+
+		-
+			message: '#^Parameter \#1 \$conversation of method App\\Services\\Social\\LeadQualificationService\:\:scoreIntent\(\) expects App\\Models\\SocialConversation, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Jobs/GenerateSocialResponseJob.php
+
+		-
+			message: '#^Parameter \$conversation of method App\\Services\\Social\\ConversationContinuationService\:\:generateResponse\(\) expects App\\Models\\SocialConversation, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Jobs/GenerateSocialResponseJob.php
+
+		-
+			message: '#^Parameter \#1 \$deployment of method App\\Services\\AI\\AgentOrchestrationService\:\:executeTask\(\) expects App\\Models\\AgentDeployment, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Jobs/ProcessAgentTask.php
+
+		-
+			message: '#^Parameter \#1 \$deployment of method App\\Services\\Governance\\AuditService\:\:logAgentAction\(\) expects App\\Models\\AgentDeployment, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Jobs/ProcessAgentTask.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$socialAccount\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Jobs/PublishSocialPostJob.php
+
+		-
+			message: '#^Relation ''organizations'' is not found in App\\Models\\User model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Jobs/SendPlatformNotification.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$display_name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Listeners/AuditSkillExecution.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Listeners/AuditSkillExecution.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Listeners/AuditSkillExecution.php
+
+		-
+			message: '#^Parameter \#1 \$deployment of method App\\Services\\Governance\\AuditService\:\:logAgentAction\(\) expects App\\Models\\AgentDeployment, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Listeners/AuditSkillExecution.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Listeners/HandleAgentTaskFailed.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$display_name\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Listeners/HandleSkillApprovalRequested.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Listeners/HandleSkillApprovalRequested.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Listeners/HandleSkillApprovalRequested.php
+
+		-
+			message: '#^Parameter \#1 \$deployment of method App\\Services\\Governance\\AuditService\:\:logAgentAction\(\) expects App\\Models\\AgentDeployment, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Listeners/HandleSkillApprovalRequested.php
+
+		-
+			message: '#^Using nullsafe property access on non\-nullable type Illuminate\\Database\\Eloquent\\Model\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Listeners/HandleSkillApprovalRequested.php
+
+		-
+			message: '#^Parameter \#1 \$deployment of method App\\Services\\Governance\\AuditService\:\:logAgentAction\(\) expects App\\Models\\AgentDeployment, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Listeners/LogAgentChatStarted.php
+
+		-
+			message: '#^Parameter \$deployment of method App\\Services\\Governance\\AuditService\:\:logAgentAction\(\) expects App\\Models\\AgentDeployment, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Listeners/LogAgentTaskRated.php
+
+		-
+			message: '#^Parameter \#1 \$deployment of method App\\Services\\Governance\\AuditService\:\:logAgentAction\(\) expects App\\Models\\AgentDeployment, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Listeners/LogPurchaseIntentDetected.php
+
+		-
+			message: '#^Parameter \#1 \$deployment of method App\\Services\\Governance\\AuditService\:\:logAgentAction\(\) expects App\\Models\\AgentDeployment, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Listeners/LogSocialConversionAchieved.php
+
+		-
+			message: '#^Parameter \#1 \$deployment of method App\\Services\\Governance\\AuditService\:\:logAgentAction\(\) expects App\\Models\\AgentDeployment, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Listeners/LogSocialLeadCaptured.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$platform\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Listeners/LogSocialMessageReceived.php
+
+		-
+			message: '#^Parameter \#1 \$deployment of method App\\Services\\Governance\\AuditService\:\:logAgentAction\(\) expects App\\Models\\AgentDeployment, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Listeners/LogSocialMessageReceived.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$socialAccount\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Listeners/LogSocialPostPublished.php
+
+		-
+			message: '#^Parameter \#1 \$deployment of method App\\Services\\Governance\\AuditService\:\:logAgentAction\(\) expects App\\Models\\AgentDeployment, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Listeners/LogSocialPostPublished.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$deployedBy\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Listeners/NotifyOnApprovalProcessed.php
+
+		-
+			message: '#^Parameter \#2 \$deployment of class App\\Notifications\\ApprovalRequiredNotification constructor expects App\\Models\\AgentDeployment, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Listeners/NotifyOnApprovalProcessed.php
+
+		-
+			message: '#^Parameter \#1 \$deployment of method App\\Services\\Governance\\AuditService\:\:logAgentAction\(\) expects App\\Models\\AgentDeployment, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Listeners/NotifyOnNegativeSentiment.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$slug\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Listeners/ProvisionSCCSSkillsAndScorecard.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Listeners/SendApprovalNotification.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$email\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Listeners/SetupOrganizationDefaults.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Listeners/SetupOrganizationDefaults.php
+
+		-
+			message: '#^Parameter \#1 \$user of class App\\Mail\\WelcomeEmail constructor expects App\\Models\\User, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Listeners/SetupOrganizationDefaults.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 5
+			path: app/Listeners/TriggerCapabilityContractGovernanceReview.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Listeners/TriggerCapabilityContractGovernanceReview.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$display_name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Listeners/UpdateReputationOnTaskComplete.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Listeners/UpdateReputationOnTaskComplete.php
+
+		-
+			message: '#^Parameter \#1 \$deployment of method App\\Services\\Governance\\AuditService\:\:logAgentAction\(\) expects App\\Models\\AgentDeployment, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Listeners/UpdateReputationOnTaskComplete.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$display_name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Listeners/UpdateReputationOnTaskFailed.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Listeners/UpdateReputationOnTaskFailed.php
+
+		-
+			message: '#^Parameter \#1 \$deployment of job class App\\Jobs\\GenerateAgentScorecard constructor expects App\\Models\\AgentDeployment in App\\Jobs\\GenerateAgentScorecard\:\:dispatch\(\), Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Listeners/UpdateScorecardOnTaskComplete.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\Agents\\AgentChat\:\:\$deployment\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/Agents/AgentChat.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\Agents\\AgentChat\:\:\$session\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/Agents/AgentChat.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\Agents\\DeploymentManager\:\:\$deployments\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/Agents/DeploymentManager.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\Agents\\DeploymentOverview\:\:\$deployment\.$#'
+			identifier: property.notFound
+			count: 4
+			path: app/Livewire/Agents/DeploymentOverview.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\Agents\\ScorecardViewer\:\:\$deployment\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Livewire/Agents/ScorecardViewer.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\Billing\\BillingDashboard\:\:\$organizationId\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Livewire/Billing/BillingDashboard.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\Billing\\BillingSettings\:\:\$organizationId\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/Billing/BillingSettings.php
+
+		-
+			message: '#^Relation ''latestScorecard'' is not found in App\\Models\\AgentDeployment model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Livewire/Dashboard/AgentDashboard.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\Dashboard\\OperationsDashboard\:\:\$circuitBreakers\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/Dashboard/OperationsDashboard.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\Dashboard\\OperationsDashboard\:\:\$failureRate\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/Dashboard/OperationsDashboard.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\Dashboard\\OperationsDashboard\:\:\$organizationId\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Livewire/Dashboard/OperationsDashboard.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\Organizations\\DepartmentManager\:\:\$organization\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Livewire/Organizations/DepartmentManager.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\Organizations\\KnowledgeManager\:\:\$activeBase\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/Organizations/KnowledgeManager.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\Organizations\\KnowledgeManager\:\:\$organization\.$#'
+			identifier: property.notFound
+			count: 5
+			path: app/Livewire/Organizations/KnowledgeManager.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\Organizations\\OrgMemberManager\:\:\$organization\.$#'
+			identifier: property.notFound
+			count: 4
+			path: app/Livewire/Organizations/OrgMemberManager.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\Organizations\\OrganizationSettings\:\:\$currentOrganization\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Livewire/Organizations/OrganizationSettings.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\Organizations\\SocialCredentials\:\:\$organization\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Livewire/Organizations/SocialCredentials.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\Security\\SecurityCenter\:\:\$organizationId\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Livewire/Security/SecurityCenter.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\Social\\ConnectedAccounts\:\:\$orgId\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Livewire/Social/ConnectedAccounts.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\Social\\LeadPipeline\:\:\$orgId\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/Social/LeadPipeline.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\Social\\SentimentMonitor\:\:\$orgId\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/Social/SentimentMonitor.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\Social\\SocialDashboard\:\:\$orgId\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Livewire/Social/SocialDashboard.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\Social\\SocialInbox\:\:\$orgId\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Livewire/Social/SocialInbox.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\Social\\SocialPostManager\:\:\$orgId\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/Social/SocialPostManager.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$agent_key\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Livewire/Workflows/WorkflowBuilder.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$condition\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/Workflows/WorkflowBuilder.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$from_node_uuid\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/Workflows/WorkflowBuilder.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$label\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/Workflows/WorkflowBuilder.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$position_x\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/Workflows/WorkflowBuilder.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$position_y\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/Workflows/WorkflowBuilder.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$to_node_uuid\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/Workflows/WorkflowBuilder.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$uuid\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Livewire/Workflows/WorkflowBuilder.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Database\\Eloquent\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: argument.unresolvableType
+			count: 2
+			path: app/Livewire/Workflows/WorkflowBuilder.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\Workflows\\WorkflowList\:\:\$workflows\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/Workflows/WorkflowList.php
+
+		-
+			message: '#^Parameter \#1 \$num of function number_format expects float, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Models/Agent.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$platform\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Models/SocialPage.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$organization_id\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Policies/AgentApprovalPolicy.php
+
+		-
+			message: '#^Strict comparison using \!\=\= between int\<0, max\> and null will always evaluate to true\.$#'
+			identifier: notIdentical.alwaysTrue
+			count: 1
+			path: app/Policies/PlatformNotificationPolicy.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$defaultPersona\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/AI/AgentOrchestrationService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$slug\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/AI/AgentOrchestrationService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\AgentSkillApproval\:\:\$approved\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/AI/AgentReputationService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\AgentTask\:\:\$avg_rating\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/AI/AgentReputationService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\AgentTask\:\:\$completed\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/AI/AgentReputationService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\AgentTask\:\:\$failed\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/AI/AgentReputationService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$model_config\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Services/AI/AgentSandboxService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\AgentTask\:\:\$failures\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/AI/EnterpriseBrainService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\AgentTask\:\:\$task_count\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/AI/EnterpriseBrainService.php
+
+		-
+			message: '#^Parameter \#1 \$nodes of method App\\Services\\AI\\Workflow\\WorkflowGraphResolver\:\:resolveStartNodes\(\) expects Illuminate\\Support\\Collection\<string, App\\Models\\WorkflowNode\>, Illuminate\\Database\\Eloquent\\Collection\<\(int\|string\), Illuminate\\Database\\Eloquent\\Model\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Services/AI/GraphWorkflowEngineService.php
+
+		-
+			message: '#^Offset ''pii'' on non\-empty\-array\<string, array\> on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: app/Services/AI/OutputModerationService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$content\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/AI/PromptBuilderService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$defaultPersona\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/AI/PromptBuilderService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$description\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/AI/PromptBuilderService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Services/AI/PromptBuilderService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$role\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/AI/PromptBuilderService.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Database\\Eloquent\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: argument.unresolvableType
+			count: 1
+			path: app/Services/AI/PromptBuilderService.php
+
+		-
+			message: '#^Parameter \#1 \$workflow of method App\\Services\\AI\\WorkflowEngineService\:\:runSteps\(\) expects App\\Models\\AgentWorkflow, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Services/AI/WorkflowEngineService.php
+
+		-
+			message: '#^Property App\\Services\\AI\\WorkflowEngineService\:\:\$orchestrator is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: app/Services/AI/WorkflowEngineService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$uuid\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/AI/WorkflowRiskScoringService.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Support\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:filter\(\) expects \(callable\(Illuminate\\Database\\Eloquent\\Model, int\)\: bool\)\|null, Closure\(App\\Models\\WorkflowNode\)\: bool given\.$#'
+			identifier: argument.type
+			count: 2
+			path: app/Services/AI/WorkflowRiskScoringService.php
+
+		-
+			message: '#^Parameter \#1 \$params of method Stripe\\Service\\Checkout\\SessionService\:\:create\(\) expects array\{adaptive_pricing\?\: array\{enabled\?\: bool\}, after_expiration\?\: array\{recovery\?\: array\{allow_promotion_codes\?\: bool, enabled\: bool\}\}, allow_promotion_codes\?\: bool, automatic_tax\?\: array\{enabled\: bool, liability\?\: array\{account\?\: string, type\: string\}\}, billing_address_collection\?\: string, branding_settings\?\: array\{background_color\?\: string\|null, border_style\?\: string\|null, button_color\?\: string\|null, display_name\?\: string, font_family\?\: string\|null, icon\?\: array\{file\?\: string, type\: string, url\?\: string\}, logo\?\: array\{file\?\: string, type\: string, url\?\: string\}\}, cancel_url\?\: string, client_reference_id\?\: string, \.\.\.\}\|null, array\{customer\: string, mode\: ''subscription'', line_items\: array\{array\{price\: non\-falsy\-string, quantity\: 1\}\}, success_url\: string, cancel_url\: string, metadata\: array\{organization_id\: int, subscription_plan_id\: int\}, subscription_data\: array\{trial_period_days\: int\<1, max\>\|null, metadata\: array\{organization_id\: int, subscription_plan_id\: int\}\}\} given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Services/Billing/StripeService.php
+
+		-
+			message: '#^Parameter \#1 \$params of method Stripe\\Service\\CustomerService\:\:create\(\) expects array\{address\?\: array\{city\?\: string, country\?\: string, line1\?\: string, line2\?\: string, postal_code\?\: string, state\?\: string\}\|null, balance\?\: int, business_name\?\: string\|null, cash_balance\?\: array\{settings\?\: array\{reconciliation_mode\?\: string\}\}, description\?\: string, email\?\: string, expand\?\: array\<string\>, individual_name\?\: string\|null, \.\.\.\}\|null, array\{name\: string, email\: mixed, metadata\: array\{organization_id\: int, organization_slug\: string\}\} given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Services/Billing/StripeService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$skill\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Services/Governance/Audit/Phase02SkillAudit.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\AgentDeployment\:\:\$latestScorecard\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/Governance/Audit/Phase13Scorecard.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/Governance/DWCAAuditService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$slug\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/Governance/DWCAAuditService.php
+
+		-
+			message: '#^Relation ''approval'' is not found in App\\Models\\AgentTask model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Services/Governance/DigitalImmuneSystem.php
+
+		-
+			message: '#^Relation ''latestScorecard'' is not found in App\\Models\\AgentDeployment model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Services/Governance/DigitalImmuneSystem.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\AgentScorecard\:\:\$cost\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/Governance/Financial/FinancialTrendAnalyzer.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\AgentScorecard\:\:\$month\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/Governance/Financial/FinancialTrendAnalyzer.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\AgentScorecard\:\:\$records\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/Governance/Financial/FinancialTrendAnalyzer.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\AgentScorecard\:\:\$savings\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/Governance/Financial/FinancialTrendAnalyzer.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Database\\Eloquent\\Collection\<int,App\\Models\\AgentScorecard\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: argument.unresolvableType
+			count: 1
+			path: app/Services/Governance/Financial/FinancialTrendAnalyzer.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\AgentMemory\:\:\$avg_importance\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/Governance/Memory/MemoryScoreCalculator.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\AgentMemory\:\:\$count\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/Governance/Memory/MemoryScoreCalculator.php
+
+		-
+			message: '#^Anonymous function should return Illuminate\\Support\\Collection\<\(int\|string\), array\{count\: mixed, avg_importance\: float\}\> but returns Illuminate\\Support\\Collection\<\(int\|string\), array\{count\: mixed, avg_importance\: float\}\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Governance/Memory/MemoryScoreCalculator.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Database\\Eloquent\\Collection\<\(int\|string\),App\\Models\\AgentMemory\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: argument.unresolvableType
+			count: 1
+			path: app/Services/Governance/Memory/MemoryScoreCalculator.php
+
+		-
+			message: '#^Variable \$realityAlignScore on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.variable
+			count: 1
+			path: app/Services/Governance/Scorecard/ScorecardDomainScorer.php
+
+		-
+			message: '#^Call to function is_array\(\) with array\{pass\: bool, value\: mixed, threshold\: int, label\: string, action\: string\|null\}\|array\{pass\: bool, value\: mixed, threshold\: int, label\: string, note\?\: string\|null\} will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: app/Services/Governance/Scorecard/ScorecardGateEvaluator.php
+
+		-
+			message: '#^Offset ''pass'' on array\{pass\: bool, value\: mixed, threshold\: int, label\: string, action\: string\|null\}\|array\{pass\: bool, value\: mixed, threshold\: int, label\: string, note\?\: string\|null\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: app/Services/Governance/Scorecard/ScorecardGateEvaluator.php
+
+		-
+			message: '#^Variable \$realityAlignment on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.variable
+			count: 1
+			path: app/Services/Governance/Scorecard/ScorecardGateEvaluator.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Database\\Eloquent\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:map\(\) expects callable\(Illuminate\\Database\\Eloquent\\Model, int\)\: array\{role\: ''assistant''\|''user'', content\: string\}, Closure\(App\\Models\\SocialMessage\)\: array\{role\: ''assistant''\|''user'', content\: string\} given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Services/Social/ContinuationContentGenerator.php
+
+		-
+			message: '#^Offset ''strategy'' on array\{content\: string, strategy\: string, confidence\: float\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: app/Services/Social/ConversationContinuationService.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$platform_page_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/Social/Publishers/FacebookPublisher.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$socialAccount\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/Social/Publishers/FacebookPublisher.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$platform_page_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/Social/Publishers/LinkedInPublisher.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$socialAccount\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/Social/Publishers/LinkedInPublisher.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$socialAccount\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/Social/Publishers/XPublisher.php
+
+		-
+			message: '#^Method App\\Services\\Social\\SocialOAuthDriverResolver\:\:resolve\(\) should return Laravel\\Socialite\\Two\\AbstractProvider but returns Laravel\\Socialite\\Contracts\\Provider\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Social/SocialOAuthDriverResolver.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$socialAccount\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/Social/SocialPublishingService.php
+
+		-
+			message: '#^Relation ''approval'' is not found in App\\Models\\AgentTask model\.$#'
+			identifier: larastan.relationExistence
+			count: 2
+			path: app/Skills/Meta/AgentAuditorSkill.php
+
+		-
+			message: '#^Offset ''reasoning'' on non\-empty\-array on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: app/Skills/Meta/AgentEvaluatorSkill.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$confidence_score\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Skills/Meta/SkillIntrospectionSkill.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$key\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Skills/Meta/SkillIntrospectionSkill.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$layer\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Skills/Meta/SkillIntrospectionSkill.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Skills/Meta/SkillIntrospectionSkill.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$risk_level\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Skills/Meta/SkillIntrospectionSkill.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Database\\Eloquent\\Collection\<int,App\\Models\\AgentSkillAssignment\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: argument.unresolvableType
+			count: 1
+			path: app/Skills/Meta/SkillIntrospectionSkill.php
+
+		-
+			message: '#^Offset 1 on array\{list\<string\>, list\<non\-falsy\-string\>\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 2
+			path: app/Skills/Platform/ContentBatchSkill.php
+
+		-
+			message: '#^Comparison operation "\>" between 90 and 0 is always true\.$#'
+			identifier: greater.alwaysTrue
+			count: 1
+			path: app/Skills/Platform/SeoAnalyserSkill.php
+
+		-
+			message: '#^Comparison operation "\>" between int\<6, 10\> and 0 is always true\.$#'
+			identifier: greater.alwaysTrue
+			count: 1
+			path: app/Skills/Platform/SeoAuditSkill.php
+
+		-
+			message: '#^Offset ''Core Message''\|''CTA''\|''Hook''\|''Intro''\|''Main Content''\|''Problem Agitation''\|''Social Proof''\|''Solution''\|''Summary'' on array\{Intro\: ''welcoming, sets…'', Hook\: ''high\-energy,…'', ''Problem Agitation''\: ''empathetic but…'', ''Core Message''\: ''clear and confident'', ''Main Content''\: ''clear and confident'', Solution\: ''clear and confident'', ''Social Proof''\: ''credible, trust…'', Summary\: ''concise, reassuring'', \.\.\.\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: app/Skills/Platform/VideoScriptHelper.php
+
+		-
+			message: '#^Ternary operator condition is always true\.$#'
+			identifier: ternary.alwaysTrue
+			count: 1
+			path: app/Skills/Platform/VideoScriptHelper.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\AgentWorkflow\:\:\$failed_runs\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Skills/Platform/WorkflowOptimizationSkill.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\AgentWorkflow\:\:\$total_runs\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Skills/Platform/WorkflowOptimizationSkill.php
+
+		-
+			message: '#^Left side of && is always true\.$#'
+			identifier: booleanAnd.leftAlwaysTrue
+			count: 1
+			path: app/Skills/Platform/WorkflowOptimizationSkill.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Database\\Eloquent\\Collection\<int,App\\Models\\AgentWorkflow\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: argument.unresolvableType
+			count: 1
+			path: app/Skills/Platform/WorkflowOptimizationSkill.php

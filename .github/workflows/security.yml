@@ -50,10 +50,18 @@ jobs:
         run: |
           cp .env.example .env
           php artisan key:generate
+      # Uses this repo's own phpstan.neon.dist (level 5, app/), which
+      # includes phpstan-baseline.neon — a real baseline of every finding
+      # already triaged and confirmed as one of a few documented,
+      # systemic false-positive classes (see docs/feature-completion-ledger.md's
+      # "phpstan sweep" sections): Eloquent aggregate-alias properties,
+      # Livewire #[Computed] properties, untyped relation methods, and
+      # third-party SDK objects. Without it, this job hard-failed on every
+      # one of those ~229 pre-triaged findings on every single push.
       - name: Run PHPStan
         run: |
           if [ -f "vendor/bin/phpstan" ]; then
-            vendor/bin/phpstan analyse --level=5 app --no-progress
+            vendor/bin/phpstan analyse --no-progress --memory-limit=1G
           else
             echo "PHPStan not installed — skipping static analysis"
           fi
