@@ -25,7 +25,7 @@
 
             <div class="mt-4 flex items-center gap-2">
                 <input type="text" wire:model="reviewerNotes" placeholder="Reviewer notes (optional)"
-                    class="flex-1 rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm shadow-sm focus:border-purple-500 focus:ring-purple-500" />
+                    class="flex-1 rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm shadow-sm focus:border-brand-purple-light focus:ring-brand-purple-light" />
                 <button wire:click="approve({{ $proposal->id }})" wire:confirm="Permanently delete {{ $proposal->eligible_count }} {{ class_basename($proposal->model_class) }} row(s)?"
                     class="rounded-xl bg-green-600 px-3 py-2 text-sm font-medium text-white hover:bg-green-700">
                     Approve Purge

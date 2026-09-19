@@ -9,7 +9,7 @@
             @foreach(["24h" => "24h", "7d" => "7 Days", "30d" => "30 Days", "90d" => "90 Days"] as $key => $label)
                 <button wire:click="setTimeframe('{{ $key }}')"
                     wire:loading.attr="disabled"
-                    class="px-3 py-1.5 text-xs font-medium rounded-lg transition {{ $timeframe === $key ? 'bg-purple-600 text-white' : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700' }}">
+                    class="px-3 py-1.5 text-xs font-medium rounded-lg transition {{ $timeframe === $key ? 'bg-brand-purple-mid text-white' : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700' }}">
                     {{ $label }}
                 </button>
             @endforeach
@@ -46,12 +46,12 @@
         <div class="lg:col-span-2 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800">
             <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-800">
                 <h3 class="font-semibold text-gray-900 dark:text-white">Deployed Agents</h3>
-                <a href="{{ route("agents.deployments") }}" class="text-xs text-purple-600 dark:text-purple-400 hover:underline">View all</a>
+                <a href="{{ route("agents.deployments") }}" class="text-xs text-brand-purple-mid dark:text-brand-purple-light hover:underline">View all</a>
             </div>
             <div class="divide-y divide-gray-100 dark:divide-gray-800">
                 @forelse($this->activeAgents as $deployment)
                     <div class="flex items-center gap-4 px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition">
-                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-purple-light to-brand-purple flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
                             {{ strtoupper(substr($deployment->display_name, 0, 2)) }}
                         </div>
                         <div class="flex-1 min-w-0">
@@ -71,7 +71,7 @@
                 @empty
                     <div class="px-6 py-12 text-center">
                         <p class="text-gray-500 text-sm">No agents deployed yet.</p>
-                        <a href="{{ route("marketplace") }}" class="text-purple-600 text-sm hover:underline mt-1 inline-block">Browse Marketplace &rarr;</a>
+                        <a href="{{ route("marketplace") }}" class="text-brand-purple-mid text-sm hover:underline mt-1 inline-block">Browse Marketplace &rarr;</a>
                     </div>
                 @endforelse
             </div>
@@ -109,7 +109,7 @@
                 </div>
                 @if(count($this->pendingApprovals) > 0)
                 <div class="px-5 py-3 border-t border-gray-100 dark:border-gray-800">
-                    <a href="{{ route("governance.approvals") }}" class="text-xs text-purple-600 hover:underline">Review all &rarr;</a>
+                    <a href="{{ route("governance.approvals") }}" class="text-xs text-brand-purple-mid hover:underline">Review all &rarr;</a>
                 </div>
                 @endif
             </div>

@@ -10,7 +10,7 @@
                 <div class="relative">
                     <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                     <input wire:model.live.debounce.300ms="search" type="search" placeholder="Search agents…" aria-label="Search agents"
-                           class="w-full pl-9 pr-3 py-2 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 dark:text-gray-200">
+                           class="w-full pl-9 pr-3 py-2 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-purple-light dark:text-gray-200">
                 </div>
             </div>
 
@@ -18,7 +18,7 @@
             <div>
                 <h3 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Sort By</h3>
                 <select wire:model.live="sortBy" aria-label="Sort agents by"
-                        class="w-full text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:text-gray-200">
+                        class="w-full text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-purple-light dark:text-gray-200">
                     <option value="featured">Featured</option>
                     <option value="rating">Top Rated</option>
                     <option value="popular">Most Deployed</option>
@@ -35,7 +35,7 @@
                 <div class="space-y-1">
                     @foreach(['active' => 'Available', 'deployed' => 'Deployed', 'draft' => 'Draft', 'disabled' => 'Disabled'] as $val => $label)
                     <label class="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer">
-                        <input type="radio" wire:model.live="statusFilter" value="{{ $val }}" class="text-purple-600 focus:ring-purple-500">
+                        <input type="radio" wire:model.live="statusFilter" value="{{ $val }}" class="text-brand-purple-mid focus:ring-brand-purple-light">
                         <span class="text-sm text-gray-700 dark:text-gray-300">{{ $label }}</span>
                     </label>
                     @endforeach
@@ -47,12 +47,12 @@
                 <h3 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Department</h3>
                 <div class="space-y-1">
                     <button wire:click="setDepartment('')"
-                            class="w-full text-left px-3 py-2 text-sm rounded-lg transition {{ !$selectedDepartment ? 'bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 font-medium' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800' }}">
+                            class="w-full text-left px-3 py-2 text-sm rounded-lg transition {{ !$selectedDepartment ? 'bg-brand-purple-pale dark:bg-brand-purple-deeper/30 text-brand-purple dark:text-brand-purple-light font-medium' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800' }}">
                         All Departments
                     </button>
                     @foreach($this->departments as $dept)
                     <button wire:click="setDepartment('{{ $dept->slug }}')"
-                            class="w-full text-left px-3 py-2 text-sm rounded-lg transition {{ $selectedDepartment === $dept->slug ? 'bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 font-medium' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800' }}">
+                            class="w-full text-left px-3 py-2 text-sm rounded-lg transition {{ $selectedDepartment === $dept->slug ? 'bg-brand-purple-pale dark:bg-brand-purple-deeper/30 text-brand-purple dark:text-brand-purple-light font-medium' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800' }}">
                         {{ $dept->name }}
                     </button>
                     @endforeach
@@ -65,7 +65,7 @@
                 <div class="space-y-1">
                     @foreach(['' => 'Any Cost', 'free' => 'Free', 'low' => 'Low ($1–$99)', 'medium' => 'Medium ($100–$249)', 'high' => 'High ($250+)'] as $val => $label)
                     <label class="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer">
-                        <input type="radio" wire:model.live="costTier" value="{{ $val }}" class="text-purple-600 focus:ring-purple-500">
+                        <input type="radio" wire:model.live="costTier" value="{{ $val }}" class="text-brand-purple-mid focus:ring-brand-purple-light">
                         <span class="text-sm text-gray-700 dark:text-gray-300">{{ $label }}</span>
                     </label>
                     @endforeach
@@ -75,10 +75,10 @@
             {{-- Trust Score --}}
             <div>
                 <h3 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
-                    Min. Trust Score <span class="font-bold text-purple-600">{{ $trustScoreMin }}+</span>
+                    Min. Trust Score <span class="font-bold text-brand-purple-mid">{{ $trustScoreMin }}+</span>
                 </h3>
                 <input type="range" wire:model.live="trustScoreMin" min="0" max="100" step="5"
-                       aria-label="Minimum trust score filter" class="w-full accent-purple-600">
+                       aria-label="Minimum trust score filter" class="w-full accent-brand-purple-mid">
                 <div class="flex justify-between text-xs text-gray-400 mt-1">
                     <span>0</span><span>50</span><span>100</span>
                 </div>
@@ -91,7 +91,7 @@
                 <div class="flex flex-wrap gap-1.5">
                     @foreach(array_slice($this->availableSkills, 0, 15) as $skill)
                     <button wire:click="setSkill('{{ $skill }}')"
-                            class="px-2 py-1 text-xs rounded-full border transition {{ $selectedSkill === $skill ? 'bg-purple-600 text-white border-purple-600' : 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:border-purple-400' }}">
+                            class="px-2 py-1 text-xs rounded-full border transition {{ $selectedSkill === $skill ? 'bg-brand-purple-mid text-white border-brand-purple-mid' : 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:border-brand-purple-light' }}">
                         {{ $skill }}
                     </button>
                     @endforeach
@@ -125,14 +125,14 @@
                 <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
                     {{ $this->agents->total() }} agent{{ $this->agents->total() !== 1 ? 's' : '' }} available
                     @if($search || $selectedDepartment || $costTier || $trustScoreMin > 0 || $selectedSkill)
-                    <span class="ml-1 text-purple-600 dark:text-purple-400">(filtered)</span>
+                    <span class="ml-1 text-brand-purple-mid dark:text-brand-purple-light">(filtered)</span>
                     @endif
                 </p>
             </div>
             <div class="flex flex-wrap gap-2">
                 @foreach($this->categories as $cat)
                 <button wire:click="$set('selectedCategory', '{{ $selectedCategory === $cat->slug ? '' : $cat->slug }}')"
-                        class="px-3 py-1.5 text-xs font-medium rounded-full border transition {{ $selectedCategory === $cat->slug ? 'bg-purple-600 text-white border-purple-600' : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:border-purple-400' }}">
+                        class="px-3 py-1.5 text-xs font-medium rounded-full border transition {{ $selectedCategory === $cat->slug ? 'bg-brand-purple-mid text-white border-brand-purple-mid' : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:border-brand-purple-light' }}">
                     {{ $cat->name }}
                 </button>
                 @endforeach
@@ -142,10 +142,10 @@
         {{-- Agent Grid --}}
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5" wire:loading.class="opacity-60">
             @forelse($this->agents as $agent)
-            <article class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden hover:shadow-lg hover:border-purple-200 dark:hover:border-purple-800 transition-all flex flex-col"
+            <article class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden hover:shadow-lg hover:border-brand-purple-pale dark:hover:border-brand-purple-dark transition-all flex flex-col"
                      aria-label="{{ $agent->name }}">
 
-                <div class="bg-gradient-to-br from-purple-700 to-purple-900 p-4 relative">
+                <div class="bg-gradient-to-br from-brand-purple to-brand-purple-deeper p-4 relative">
                     <div class="absolute top-3 right-3 flex flex-col items-end gap-1">
                         @if($agent->is_featured)<span class="px-2 py-0.5 bg-yellow-400 text-yellow-900 text-xs font-bold rounded-full">⭐ Featured</span>@endif
                         @if($agent->is_beta)<span class="px-2 py-0.5 bg-blue-400 text-blue-900 text-xs font-bold rounded-full">Beta</span>@endif
@@ -172,7 +172,7 @@
                     <div class="flex items-start justify-between gap-2 mb-1.5">
                         <div class="min-w-0">
                             <h3 class="font-semibold text-gray-900 dark:text-white truncate">{{ $agent->name }}</h3>
-                            <p class="text-xs text-purple-600 dark:text-purple-400">{{ $agent->agentDepartment?->name }}</p>
+                            <p class="text-xs text-brand-purple-mid dark:text-brand-purple-light">{{ $agent->agentDepartment?->name }}</p>
                         </div>
                         <p class="text-sm font-bold text-gray-900 dark:text-white whitespace-nowrap flex-shrink-0">{{ $agent->formatted_price }}</p>
                     </div>
@@ -186,7 +186,7 @@
                             <span class="font-medium text-gray-700 dark:text-gray-300">{{ number_format($agent->performance_score, 0) }}/100</span>
                         </div>
                         <div class="h-1.5 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
-                            <div class="h-full rounded-full bg-gradient-to-r from-purple-500 to-purple-700" :style="{ width: '{{ min(100, $agent->performance_score) }}%' }"></div>
+                            <div class="h-full rounded-full bg-gradient-to-r from-brand-purple-light to-brand-purple" :style="{ width: '{{ min(100, $agent->performance_score) }}%' }"></div>
                         </div>
                     </div>
                     @endif
@@ -204,7 +204,7 @@
                     @if($agent->skills && count($agent->skills) > 0)
                     <div class="flex flex-wrap gap-1.5 mb-4">
                         @foreach(array_slice($agent->skills, 0, 3) as $skill)
-                        <span class="px-2 py-0.5 bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 text-xs rounded-full">{{ $skill }}</span>
+                        <span class="px-2 py-0.5 bg-brand-purple-pale dark:bg-brand-purple-deeper/30 text-brand-purple dark:text-brand-purple-light text-xs rounded-full">{{ $skill }}</span>
                         @endforeach
                         @if(count($agent->skills) > 3)
                         <span class="px-2 py-0.5 bg-gray-100 dark:bg-gray-800 text-gray-500 text-xs rounded-full">+{{ count($agent->skills) - 3 }}</span>
@@ -220,11 +220,11 @@
 
                     <div class="mt-auto flex items-center gap-2 pt-3 border-t border-gray-100 dark:border-gray-800">
                         <button wire:click="openPreview({{ $agent->id }})" aria-label="Preview {{ $agent->name }}"
-                                class="flex-1 px-3 py-2 text-sm font-medium text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-800 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/20 transition">
+                                class="flex-1 px-3 py-2 text-sm font-medium text-brand-purple-mid dark:text-brand-purple-light border border-brand-purple-pale dark:border-brand-purple-dark rounded-lg hover:bg-brand-purple-pale dark:hover:bg-brand-purple-deeper/20 transition">
                             Preview
                         </button>
                         <button wire:click="startDeploy({{ $agent->id }})" aria-label="Deploy {{ $agent->name }}"
-                                class="flex-1 px-3 py-2 text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 rounded-lg transition">
+                                class="flex-1 px-3 py-2 text-sm font-medium text-white bg-brand-purple-mid hover:bg-brand-purple rounded-lg transition">
                             Deploy
                         </button>
                     </div>
@@ -238,7 +238,7 @@
                 </div>
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">No agents found</h3>
                 <p class="text-sm text-gray-500 dark:text-gray-400 max-w-xs mb-4">Try adjusting your filters or search query.</p>
-                <button wire:click="clearFilters" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg transition">
+                <button wire:click="clearFilters" class="px-4 py-2 bg-brand-purple-mid hover:bg-brand-purple text-white text-sm font-medium rounded-lg transition">
                     Clear Filters
                 </button>
             </div>
@@ -257,7 +257,7 @@
          role="dialog" aria-modal="true" aria-labelledby="preview-title" wire:click.self="closePreview">
         <div class="bg-white dark:bg-gray-900 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl">
 
-            <div class="bg-gradient-to-br from-purple-700 to-purple-900 p-6 rounded-t-2xl">
+            <div class="bg-gradient-to-br from-brand-purple to-brand-purple-deeper p-6 rounded-t-2xl">
                 <div class="flex items-start justify-between">
                     <div class="flex items-center gap-4">
                         <div class="w-16 h-16 rounded-2xl bg-white/20 flex items-center justify-center text-white font-bold text-2xl">
@@ -265,7 +265,7 @@
                         </div>
                         <div class="text-white">
                             <h2 id="preview-title" class="text-xl font-bold">{{ $previewAgent->name }}</h2>
-                            <p class="text-purple-200 text-sm">{{ $previewAgent->agentDepartment?->name }} · {{ $previewAgent->category?->name }}</p>
+                            <p class="text-brand-purple-pale text-sm">{{ $previewAgent->agentDepartment?->name }} · {{ $previewAgent->category?->name }}</p>
                             <div class="flex items-center gap-2 mt-2">
                                 @if($previewAgent->is_verified)<span class="px-2 py-0.5 bg-green-400/90 text-green-900 text-xs font-bold rounded-full">✓ Verified</span>@endif
                                 @if($previewAgent->is_featured)<span class="px-2 py-0.5 bg-yellow-400/90 text-yellow-900 text-xs font-bold rounded-full">⭐ Featured</span>@endif
@@ -298,8 +298,8 @@
                 </div>
 
                 {{-- Governance --}}
-                <div class="bg-purple-50 dark:bg-purple-900/20 rounded-xl p-4">
-                    <h4 class="font-semibold text-purple-900 dark:text-purple-300 mb-3 flex items-center gap-2">
+                <div class="bg-brand-purple-pale dark:bg-brand-purple-deeper/20 rounded-xl p-4">
+                    <h4 class="font-semibold text-brand-purple-deeper dark:text-brand-purple-light mb-3 flex items-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
                         Governance &amp; Trust
                     </h4>
@@ -334,7 +334,7 @@
                     <h4 class="font-semibold text-gray-900 dark:text-white mb-3">Skills</h4>
                     <div class="flex flex-wrap gap-2">
                         @foreach($previewAgent->skills as $skill)
-                        <span class="px-3 py-1 bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 text-sm rounded-full">{{ $skill }}</span>
+                        <span class="px-3 py-1 bg-brand-purple-pale dark:bg-brand-purple-deeper/30 text-brand-purple dark:text-brand-purple-light text-sm rounded-full">{{ $skill }}</span>
                         @endforeach
                     </div>
                 </div>
@@ -348,7 +348,7 @@
                         <div class="flex items-center justify-between px-3 py-2 bg-gray-50 dark:bg-gray-800 rounded-lg text-sm">
                             <span class="text-gray-700 dark:text-gray-300">{{ is_array($comp) ? ($comp['area'] ?? $comp) : $comp }}</span>
                             @if(is_array($comp) && !empty($comp['level']))
-                            <span class="text-xs font-medium px-2 py-0.5 rounded-full {{ $comp['level'] === 'expert' ? 'bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300' : ($comp['level'] === 'advanced' ? 'bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400') }}">
+                            <span class="text-xs font-medium px-2 py-0.5 rounded-full {{ $comp['level'] === 'expert' ? 'bg-brand-purple-pale dark:bg-brand-purple-deeper/50 text-brand-purple dark:text-brand-purple-light' : ($comp['level'] === 'advanced' ? 'bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400') }}">
                                 {{ ucfirst($comp['level']) }}
                             </span>
                             @endif
@@ -364,7 +364,7 @@
                     <ul class="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
                         @foreach($previewAgent->capabilities as $cap)
                         <li class="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
-                            <span class="w-1.5 h-1.5 bg-purple-500 rounded-full mt-1.5 flex-shrink-0"></span>{{ $cap }}
+                            <span class="w-1.5 h-1.5 bg-brand-purple-light rounded-full mt-1.5 flex-shrink-0"></span>{{ $cap }}
                         </li>
                         @endforeach
                     </ul>
@@ -377,7 +377,7 @@
                         <p class="text-xs text-gray-500 dark:text-gray-400">{{ number_format($previewAgent->total_deployments) }} active deployments</p>
                     </div>
                     <button wire:click="startDeploy({{ $previewAgent->id }})"
-                            class="px-6 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-xl transition shadow-md shadow-purple-500/20">
+                            class="px-6 py-2.5 bg-brand-purple-mid hover:bg-brand-purple text-white font-semibold rounded-xl transition shadow-md shadow-brand-purple-light/20">
                         Deploy Agent →
                     </button>
                 </div>
@@ -410,7 +410,7 @@
                     </label>
                     <input id="deploy-name" wire:model="deployForm.deployment_name" type="text"
                            placeholder="e.g. Finance Agent – Q4 Reporting"
-                           class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-800 dark:text-gray-200">
+                           class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-brand-purple-light focus:border-transparent bg-white dark:bg-gray-800 dark:text-gray-200">
                     @error('deployForm.deployment_name')<p class="text-red-500 dark:text-red-400 text-xs mt-1" role="alert">{{ $message }}</p>@enderror
                 </div>
 
@@ -419,7 +419,7 @@
                         Deployment Mode <span class="text-red-500" aria-hidden="true">*</span>
                     </label>
                     <select id="deploy-mode" wire:model="deployForm.deployment_mode"
-                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 bg-white dark:bg-gray-800 dark:text-gray-200">
+                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-brand-purple-light bg-white dark:bg-gray-800 dark:text-gray-200">
                         <option value="advisory">Advisory — Recommends only, no actions</option>
                         <option value="semi-autonomous">Semi-Autonomous — Actions need approval</option>
                         <option value="autonomous">Autonomous — Acts independently</option>
@@ -433,7 +433,7 @@
                         Department <span class="text-gray-400 font-normal">(Optional)</span>
                     </label>
                     <select id="deploy-dept" wire:model="deployForm.department_id"
-                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 bg-white dark:bg-gray-800 dark:text-gray-200">
+                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-brand-purple-light bg-white dark:bg-gray-800 dark:text-gray-200">
                         <option value="">— No specific department —</option>
                         @foreach($this->orgDepartments as $dept)
                         <option value="{{ $dept->id }}">{{ $dept->name }}</option>
@@ -443,12 +443,12 @@
 
                 <div>
                     <label for="deploy-confidence" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                        Confidence Threshold: <span class="font-bold text-purple-600">{{ $deployForm->confidence_threshold ?? 75 }}%</span>
+                        Confidence Threshold: <span class="font-bold text-brand-purple-mid">{{ $deployForm->confidence_threshold ?? 75 }}%</span>
                         <span class="text-xs text-gray-400 font-normal">— below this, human approval required</span>
                     </label>
                     <input id="deploy-confidence" wire:model.live="deployForm.confidence_threshold"
                            type="range" min="0" max="100" step="5"
-                           aria-label="Confidence threshold" class="w-full accent-purple-600">
+                           aria-label="Confidence threshold" class="w-full accent-brand-purple-mid">
                     <div class="flex justify-between text-xs text-gray-400 mt-1"><span>0%</span><span>50%</span><span>100%</span></div>
                 </div>
 
@@ -458,7 +458,7 @@
                     </label>
                     <textarea id="deploy-instructions" wire:model="deployForm.custom_instructions" rows="3"
                               placeholder="Add specific instructions or constraints for this deployment…"
-                              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 bg-white dark:bg-gray-800 dark:text-gray-200 resize-none"></textarea>
+                              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-brand-purple-light bg-white dark:bg-gray-800 dark:text-gray-200 resize-none"></textarea>
                     @error('deployForm.custom_instructions')<p class="text-red-500 dark:text-red-400 text-xs mt-1" role="alert">{{ $message }}</p>@enderror
                 </div>
             </div>
@@ -469,7 +469,7 @@
                     Cancel
                 </button>
                 <button wire:click="deploy" wire:loading.attr="disabled" wire:loading.class="opacity-75 cursor-not-allowed"
-                        class="px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-semibold rounded-lg transition shadow-md shadow-purple-500/20">
+                        class="px-6 py-2 bg-brand-purple-mid hover:bg-brand-purple text-white text-sm font-semibold rounded-lg transition shadow-md shadow-brand-purple-light/20">
                     <span wire:loading.remove wire:target="deploy">Deploy Agent</span>
                     <span wire:loading wire:target="deploy" aria-live="polite">Deploying…</span>
                 </button>

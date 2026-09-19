@@ -1,6 +1,6 @@
 <div class="space-y-6" wire:poll.30s="refresh">
     {{-- Loading indicator --}}
-    <div wire:loading class="fixed top-0 inset-x-0 h-0.5 bg-purple-600 z-50 animate-pulse" role="status" aria-label="Loading"></div>
+    <div wire:loading class="fixed top-0 inset-x-0 h-0.5 bg-brand-purple-mid z-50 animate-pulse" role="status" aria-label="Loading"></div>
 
     {{-- Platform Health Banner --}}
     @php
@@ -23,7 +23,7 @@
         {{-- Active Deployments --}}
         <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-800">
             <p class="text-sm text-gray-500 dark:text-gray-400">Active Agents</p>
-            <p class="mt-1 text-3xl font-bold text-brand-purple dark:text-purple-400">{{ $this->activeDeployments }}</p>
+            <p class="mt-1 text-3xl font-bold text-brand-purple dark:text-brand-purple-light">{{ $this->activeDeployments }}</p>
         </div>
 
         {{-- Executions 24h --}}

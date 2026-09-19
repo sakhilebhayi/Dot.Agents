@@ -9,7 +9,7 @@
             @foreach(['24h' => '24h', '7d' => '7 Days', '30d' => '30 Days', '90d' => '90 Days'] as $key => $label)
             <button wire:click="$set('timeframe', '{{ $key }}')"
                 wire:loading.attr="disabled"
-                class="px-3 py-1.5 text-xs font-medium rounded-lg transition-colors {{ $timeframe === $key ? 'bg-purple-600 text-white' : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700' }}">
+                class="px-3 py-1.5 text-xs font-medium rounded-lg transition-colors {{ $timeframe === $key ? 'bg-brand-purple-mid text-white' : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700' }}">
                 {{ $label }}
             </button>
             @endforeach
@@ -19,21 +19,21 @@
     {{-- Filters row --}}
     <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 px-4 py-3 flex flex-wrap gap-3">
         <select wire:model.live="filterRisk"
-            class="text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-purple-600">
+            class="text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-brand-purple-mid">
             <option value="">All Risk Levels</option>
             <option value="high">High Risk (≥70)</option>
             <option value="medium">Medium Risk (40-69)</option>
             <option value="low">Low Risk (&lt;40)</option>
         </select>
         <select wire:model.live="filterDeployment"
-            class="text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-purple-600">
+            class="text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-brand-purple-mid">
             <option value="">All Agents</option>
             @foreach($this->deployments as $dep)
                 <option value="{{ $dep->id }}">{{ $dep->name }}</option>
             @endforeach
         </select>
         <select wire:model.live="filterReviewRequired"
-            class="text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-purple-600">
+            class="text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-brand-purple-mid">
             <option value="">All Decisions</option>
             <option value="1">Requires Human Review</option>
             <option value="0">Auto-processed</option>
@@ -137,7 +137,7 @@
                     </td>
                     <td class="px-4 py-4 text-gray-500 text-xs whitespace-nowrap">{{ $decision->created_at->format('d M Y H:i') }}</td>
                     <td class="px-4 py-4">
-                        <button wire:click="view({{ $decision->id }})" class="text-xs text-purple-600 hover:text-purple-700 font-medium whitespace-nowrap">View →</button>
+                        <button wire:click="view({{ $decision->id }})" class="text-xs text-brand-purple-mid hover:text-brand-purple font-medium whitespace-nowrap">View →</button>
                     </td>
                 </tr>
                 @empty

@@ -25,7 +25,7 @@
     {{-- Filters --}}
     <div class="flex flex-wrap items-center gap-3">
         <select wire:model.live="intentLevel"
-            class="text-sm border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500">
+            class="text-sm border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg px-3 py-2 focus:ring-2 focus:ring-brand-purple-light">
             <option value="all">All Intent Levels</option>
             <option value="high_intent">High Intent</option>
             <option value="ready_to_buy">Ready to Buy</option>
@@ -34,7 +34,7 @@
             <option value="browsing">Browsing</option>
         </select>
         <select wire:model.live="platform"
-            class="text-sm border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500">
+            class="text-sm border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg px-3 py-2 focus:ring-2 focus:ring-brand-purple-light">
             <option value="all">All Platforms</option>
             <option value="facebook">Facebook</option>
             <option value="instagram">Instagram</option>
@@ -43,7 +43,7 @@
             <option value="whatsapp">WhatsApp</option>
         </select>
         <select wire:model.live="sortBy"
-            class="text-sm border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500">
+            class="text-sm border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg px-3 py-2 focus:ring-2 focus:ring-brand-purple-light">
             <option value="lead_score">Sort by Lead Score</option>
             <option value="intent_score">Sort by Intent Score</option>
             <option value="last_touch_at">Sort by Last Touch</option>
@@ -80,7 +80,7 @@
                         </td>
                         <td class="px-6 py-4">
                             @php
-                                $intentColors = ['high_intent' => 'bg-green-100 text-green-700', 'ready_to_buy' => 'bg-teal-100 text-teal-700', 'considering' => 'bg-blue-100 text-blue-700', 'interested' => 'bg-purple-100 text-purple-700', 'browsing' => 'bg-gray-100 text-gray-500'];
+                                $intentColors = ['high_intent' => 'bg-green-100 text-green-700', 'ready_to_buy' => 'bg-teal-100 text-teal-700', 'considering' => 'bg-blue-100 text-blue-700', 'interested' => 'bg-brand-purple-pale text-brand-purple', 'browsing' => 'bg-gray-100 text-gray-500'];
                                 $color = $intentColors[$lead->intent_level] ?? 'bg-gray-100 text-gray-500';
                             @endphp
                             <span class="px-2.5 py-1 rounded-full text-xs font-medium {{ $color }}">
@@ -109,7 +109,7 @@
                         </td>
                         <td class="px-6 py-4">
                             @foreach(array_slice($lead->recommended_actions ?? [], 0, 2) as $action)
-                                <span class="inline-block mr-1 px-2 py-0.5 rounded bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 text-xs">
+                                <span class="inline-block mr-1 px-2 py-0.5 rounded bg-brand-purple-pale dark:bg-brand-purple-deeper/30 text-brand-purple dark:text-brand-purple-light text-xs">
                                     {{ str_replace('_', ' ', $action) }}
                                 </span>
                             @endforeach
@@ -118,7 +118,7 @@
                             @if($lead->status === 'new')
                                 <button wire:click="qualify({{ $lead->id }})"
                                     wire:loading.attr="disabled"
-                                    class="text-xs font-medium text-purple-600 hover:text-purple-800 dark:text-purple-400">
+                                    class="text-xs font-medium text-brand-purple-mid hover:text-brand-purple-dark dark:text-brand-purple-light">
                                     Qualify →
                                 </button>
                             @endif

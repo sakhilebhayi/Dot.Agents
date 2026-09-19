@@ -8,11 +8,11 @@
     {{-- Tab nav --}}
     <div class="flex gap-1 border-b border-gray-200 dark:border-gray-700">
         <button wire:click="$set('tab','general')"
-                class="px-4 py-2 text-sm font-medium border-b-2 transition {{ $tab === 'general' ? 'border-purple-600 text-purple-600 dark:text-purple-400' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200' }}">
+                class="px-4 py-2 text-sm font-medium border-b-2 transition {{ $tab === 'general' ? 'border-brand-purple-mid text-brand-purple-mid dark:text-brand-purple-light' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200' }}">
             General
         </button>
         <button wire:click="$set('tab','social')"
-                class="px-4 py-2 text-sm font-medium border-b-2 transition {{ $tab === 'social' ? 'border-purple-600 text-purple-600 dark:text-purple-400' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200' }}">
+                class="px-4 py-2 text-sm font-medium border-b-2 transition {{ $tab === 'social' ? 'border-brand-purple-mid text-brand-purple-mid dark:text-brand-purple-light' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200' }}">
             Social Platform Credentials
         </button>
     </div>
@@ -34,18 +34,18 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div>
                     <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Organization Name <span class="text-red-500">*</span></label>
-                    <input wire:model="name" type="text" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-purple-600 focus:border-purple-600" placeholder="Acme Corp">
+                    <input wire:model="name" type="text" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid focus:border-brand-purple-mid" placeholder="Acme Corp">
                     @error('name') <p class="mt-1 text-xs text-red-500">{{ $message }}</p> @enderror
                 </div>
 
                 <div>
                     <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Domain</label>
-                    <input wire:model="domain" type="text" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-purple-600 focus:border-purple-600" placeholder="acme.com">
+                    <input wire:model="domain" type="text" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid focus:border-brand-purple-mid" placeholder="acme.com">
                 </div>
 
                 <div>
                     <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Industry</label>
-                    <select wire:model="industry" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-purple-600">
+                    <select wire:model="industry" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid">
                         <option value="">Select industry</option>
                         @foreach(['Technology','Finance','Healthcare','Retail','Manufacturing','Education','Legal','Marketing','Real Estate','Other'] as $ind)
                             <option value="{{ $ind }}">{{ $ind }}</option>
@@ -55,7 +55,7 @@
 
                 <div>
                     <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Company Size</label>
-                    <select wire:model="size" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-purple-600">
+                    <select wire:model="size" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid">
                         <option value="">Select size</option>
                         <option value="1-10">1–10 employees</option>
                         <option value="11-50">11–50 employees</option>
@@ -74,15 +74,15 @@
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
                 <div>
                     <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Country</label>
-                    <input wire:model="country" type="text" maxlength="2" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-purple-600" placeholder="ZA">
+                    <input wire:model="country" type="text" maxlength="2" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid" placeholder="ZA">
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Timezone</label>
-                    <input wire:model="timezone" type="text" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-purple-600" placeholder="Africa/Johannesburg">
+                    <input wire:model="timezone" type="text" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid" placeholder="Africa/Johannesburg">
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Currency</label>
-                    <select wire:model="currency" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-purple-600">
+                    <select wire:model="currency" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid">
                         <option value="USD">USD – US Dollar</option>
                         <option value="EUR">EUR – Euro</option>
                         <option value="GBP">GBP – British Pound</option>
@@ -96,7 +96,7 @@
 
         <div class="flex justify-end">
             <button type="submit"
-                class="inline-flex items-center gap-2 px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-xl transition-colors" wire:loading.attr="disabled">
+                class="inline-flex items-center gap-2 px-5 py-2.5 bg-brand-purple-mid hover:bg-brand-purple text-white text-sm font-medium rounded-xl transition-colors" wire:loading.attr="disabled">
                 <span wire:loading.remove>Save Settings</span>
                 <span wire:loading>Saving…</span>
             </button>

@@ -1,6 +1,6 @@
 <div class="space-y-5">
     {{-- Loading indicator --}}
-    <div wire:loading class="fixed top-0 inset-x-0 h-0.5 bg-purple-600 z-50 animate-pulse" role="status" aria-label="Loading"></div>
+    <div wire:loading class="fixed top-0 inset-x-0 h-0.5 bg-brand-purple-mid z-50 animate-pulse" role="status" aria-label="Loading"></div>
 
     {{-- Filters bar --}}
     <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-4 sm:p-5">
@@ -8,10 +8,10 @@
             <div class="flex-1 min-w-48">
                 <input wire:model.live.debounce.300ms="search" type="search"
                     placeholder="Search logs..."
-                    class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-purple-600">
+                    class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-brand-purple-mid">
             </div>
             <select wire:model.live="filterCategory"
-                class="text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-purple-600">
+                class="text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-brand-purple-mid">
                 <option value="">All Categories</option>
                 <option value="agent_action">Agent Actions</option>
                 <option value="user_action">User Actions</option>
@@ -20,7 +20,7 @@
                 <option value="governance">Governance</option>
             </select>
             <select wire:model.live="filterRisk"
-                class="text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-purple-600">
+                class="text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-brand-purple-mid">
                 <option value="">All Risk Levels</option>
                 <option value="critical">Critical</option>
                 <option value="high">High</option>
@@ -29,7 +29,7 @@
                 <option value="info">Info</option>
             </select>
             <select wire:model.live="filterAgent"
-                class="text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-purple-600">
+                class="text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-brand-purple-mid">
                 <option value="">All Agents</option>
                 @foreach($this->deployments as $dep)
                     <option value="{{ $dep->id }}">{{ $dep->display_name }}</option>
@@ -37,16 +37,16 @@
             </select>
             <label class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 cursor-pointer">
                 <input wire:model.live="showFlagged" type="checkbox"
-                    class="rounded border-gray-300 dark:border-gray-600 text-purple-600 focus:ring-purple-600">
+                    class="rounded border-gray-300 dark:border-gray-600 text-brand-purple-mid focus:ring-brand-purple-mid">
                 Flagged only
                 @if($this->flaggedCount > 0)
                     <span class="bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 text-xs font-bold rounded-full px-2">{{ $this->flaggedCount }}</span>
                 @endif
             </label>
             <input wire:model.live="dateFrom" type="date"
-                class="text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-purple-600">
+                class="text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-brand-purple-mid">
             <input wire:model.live="dateTo" type="date"
-                class="text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-purple-600">
+                class="text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-brand-purple-mid">
             <div class="flex items-center gap-2 ml-auto">
                 <button type="button" wire:click="export('csv')"
                     class="text-sm font-medium rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-3 py-1.5 hover:bg-gray-50 dark:hover:bg-gray-700">
@@ -104,7 +104,7 @@
                             <td class="px-5 py-3 text-xs text-gray-600 dark:text-gray-400">
                                 @if($log->agent_deployment_id)
                                     <span class="inline-flex items-center gap-1">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
+                                        <span class="w-1.5 h-1.5 rounded-full bg-brand-purple-light"></span>
                                         {{ $log->deployment?->display_name ?? 'Agent' }}
                                     </span>
                                 @elseif($log->user_id)

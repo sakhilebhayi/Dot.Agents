@@ -1,16 +1,16 @@
 <div class="space-y-6">
     {{-- Loading indicator --}}
-    <div wire:loading class="fixed top-0 inset-x-0 h-0.5 bg-purple-600 z-50 animate-pulse" role="status" aria-label="Loading"></div>
+    <div wire:loading class="fixed top-0 inset-x-0 h-0.5 bg-brand-purple-mid z-50 animate-pulse" role="status" aria-label="Loading"></div>
 
     {{-- Current Plan --}}
     <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-        <div class="md:col-span-2 bg-gradient-to-br from-purple-700 to-purple-900 rounded-2xl p-6 text-white">
+        <div class="md:col-span-2 bg-gradient-to-br from-brand-purple to-brand-purple-deeper rounded-2xl p-6 text-white">
             <div class="flex items-start justify-between">
                 <div>
-                    <p class="text-purple-200 text-sm font-medium mb-1">Current Plan</p>
+                    <p class="text-brand-purple-pale text-sm font-medium mb-1">Current Plan</p>
                     @if($this->subscription)
                         <h2 class="text-2xl font-bold">{{ $this->subscription->plan?->name }}</h2>
-                        <p class="text-purple-200 text-sm mt-1">
+                        <p class="text-brand-purple-pale text-sm mt-1">
                             ${{ number_format($this->subscription->plan?->price, 0) }}/month &middot;
                             Renews {{ $this->subscription->current_period_end?->format('M j, Y') }}
                         </p>
@@ -20,7 +20,7 @@
                         </div>
                     @else
                         <h2 class="text-2xl font-bold">No Active Subscription</h2>
-                        <p class="text-purple-200 text-sm mt-1">Choose a plan to get started</p>
+                        <p class="text-brand-purple-pale text-sm mt-1">Choose a plan to get started</p>
                     @endif
                 </div>
                 <div class="text-right">
@@ -63,7 +63,7 @@
         <h3 class="font-semibold text-gray-900 dark:text-white mb-4">Available Plans</h3>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
             @foreach($this->plans as $plan)
-                <div class="bg-white dark:bg-gray-900 rounded-2xl border {{ $plan->is_featured ? 'border-purple-400 ring-2 ring-purple-200 dark:ring-purple-800' : 'border-gray-200 dark:border-gray-700' }} p-6 relative">
+                <div class="bg-white dark:bg-gray-900 rounded-2xl border {{ $plan->is_featured ? 'border-brand-purple-light ring-2 ring-brand-purple-pale dark:ring-brand-purple-dark' : 'border-gray-200 dark:border-gray-700' }} p-6 relative">
                     @if($plan->is_featured)
                         <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-yellow-400 text-gray-900 text-xs font-bold px-3 py-1 rounded-full">Most Popular</div>
                     @endif
@@ -89,7 +89,7 @@
                             Current Plan
                         </div>
                     @else
-                        <a href="{{ route('billing.plans') }}" wire:navigate class="block w-full py-2 text-center text-sm font-medium {{ $plan->is_featured ? 'bg-purple-600 hover:bg-purple-700 text-white' : 'border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800' }} rounded-xl transition-colors">
+                        <a href="{{ route('billing.plans') }}" wire:navigate class="block w-full py-2 text-center text-sm font-medium {{ $plan->is_featured ? 'bg-brand-purple-mid hover:bg-brand-purple text-white' : 'border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800' }} rounded-xl transition-colors">
                             {{ ($this->subscription && $plan->price > ($this->subscription->plan?->price ?? 0)) ? 'Upgrade' : 'Switch' }}
                         </a>
                     @endif
@@ -127,7 +127,7 @@
                         </td>
                         <td class="px-5 py-3">
                             @if($invoice->pdf_url)
-                                <a href="{{ $invoice->pdf_url }}" target="_blank" rel="noopener" class="text-xs text-purple-600 dark:text-purple-400 hover:underline">Download PDF</a>
+                                <a href="{{ $invoice->pdf_url }}" target="_blank" rel="noopener" class="text-xs text-brand-purple-mid dark:text-brand-purple-light hover:underline">Download PDF</a>
                             @else
                                 <span class="text-xs text-gray-400 dark:text-gray-600 cursor-not-allowed" title="PDF not available yet">Download PDF</span>
                             @endif

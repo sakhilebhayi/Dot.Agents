@@ -1,6 +1,6 @@
 <div class="space-y-6">
     {{-- Loading indicator --}}
-    <div wire:loading class="fixed top-0 inset-x-0 h-0.5 bg-purple-600 z-50 animate-pulse" role="status" aria-label="Loading"></div>
+    <div wire:loading class="fixed top-0 inset-x-0 h-0.5 bg-brand-purple-mid z-50 animate-pulse" role="status" aria-label="Loading"></div>
 
     {{-- Header --}}
     <div class="text-center py-6">
@@ -11,9 +11,9 @@
     {{-- Plans Grid --}}
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
         @forelse($this->plans as $plan)
-            <div class="bg-white dark:bg-gray-900 rounded-2xl border {{ $plan->is_featured ? 'border-purple-400 ring-2 ring-purple-200 dark:ring-purple-800' : 'border-gray-200 dark:border-gray-700' }} p-6 flex flex-col relative">
+            <div class="bg-white dark:bg-gray-900 rounded-2xl border {{ $plan->is_featured ? 'border-brand-purple-light ring-2 ring-brand-purple-pale dark:ring-brand-purple-dark' : 'border-gray-200 dark:border-gray-700' }} p-6 flex flex-col relative">
                 @if($plan->is_featured)
-                    <span class="absolute -top-3 left-1/2 -translate-x-1/2 inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400">
+                    <span class="absolute -top-3 left-1/2 -translate-x-1/2 inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-brand-purple-pale text-brand-purple dark:bg-brand-purple-deeper/30 dark:text-brand-purple-light">
                         Most Popular
                     </span>
                 @endif
@@ -50,7 +50,7 @@
                 @else
                     <form method="POST" action="{{ route('billing.checkout', $plan) }}">
                         @csrf
-                        <button type="submit" class="w-full py-2 text-sm font-medium rounded-xl transition-colors {{ $plan->is_featured ? 'bg-purple-600 hover:bg-purple-700 text-white' : 'border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800' }}">
+                        <button type="submit" class="w-full py-2 text-sm font-medium rounded-xl transition-colors {{ $plan->is_featured ? 'bg-brand-purple-mid hover:bg-brand-purple text-white' : 'border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800' }}">
                             {{ $this->currentSubscription && $plan->price > ($this->currentSubscription->plan?->price ?? 0) ? 'Upgrade to '.$plan->name : 'Get Started' }}
                         </button>
                     </form>
@@ -66,7 +66,7 @@
     {{-- Footer --}}
     <div class="max-w-2xl mx-auto pt-6">
         <p class="text-xs text-center text-gray-500 dark:text-gray-400">
-            <a href="{{ route('billing.index') }}" class="text-purple-600 dark:text-purple-400 hover:underline">Manage current subscription &rarr;</a>
+            <a href="{{ route('billing.index') }}" class="text-brand-purple-mid dark:text-brand-purple-light hover:underline">Manage current subscription &rarr;</a>
         </p>
     </div>
 </div>

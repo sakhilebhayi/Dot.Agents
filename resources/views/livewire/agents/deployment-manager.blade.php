@@ -18,10 +18,10 @@
         <div class="flex-1 min-w-48">
             <input wire:model.live.debounce.300ms="search" type="search"
                 placeholder="Search deployments..."
-                class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-purple-600">
+                class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-brand-purple-mid">
         </div>
         <select wire:model.live="filterStatus"
-            class="text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-purple-600">
+            class="text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-brand-purple-mid">
             <option value="">All Statuses</option>
             <option value="active">Active</option>
             <option value="paused">Paused</option>
@@ -42,11 +42,11 @@
                 {{-- Header --}}
                 <div class="flex items-start justify-between mb-3">
                     <a href="{{ route('agents.show', $dep) }}" class="flex items-center gap-3 min-w-0 group">
-                        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-700 to-purple-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-purple to-brand-purple-light flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
                             {{ substr($dep->agent?->name ?? 'AI', 0, 2) }}
                         </div>
                         <div class="min-w-0">
-                            <h4 class="font-semibold text-gray-900 dark:text-white text-sm truncate group-hover:text-purple-600 dark:group-hover:text-purple-400">{{ $dep->display_name }}</h4>
+                            <h4 class="font-semibold text-gray-900 dark:text-white text-sm truncate group-hover:text-brand-purple-mid dark:group-hover:text-brand-purple-light">{{ $dep->display_name }}</h4>
                             <p class="text-xs text-gray-500 dark:text-gray-400">{{ $dep->agent?->agentDepartment?->name }}</p>
                         </div>
                     </a>
@@ -77,7 +77,7 @@
                 <div class="flex gap-2">
                     @if($dep->status === 'active')
                         <a href="{{ route('agents.chat', $dep) }}"
-                            class="flex-1 py-1.5 text-xs font-medium text-center bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors">
+                            class="flex-1 py-1.5 text-xs font-medium text-center bg-brand-purple-mid hover:bg-brand-purple text-white rounded-lg transition-colors">
                             Chat
                         </a>
                     @else
@@ -115,7 +115,7 @@
         @empty
             <div class="md:col-span-2 xl:col-span-3 bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-12 text-center">
                 <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">No agents deployed yet.</p>
-                <a href="{{ route('marketplace') }}" class="inline-flex items-center gap-2 text-sm text-purple-600 hover:text-purple-700 font-medium">
+                <a href="{{ route('marketplace') }}" class="inline-flex items-center gap-2 text-sm text-brand-purple-mid hover:text-brand-purple font-medium">
                     Browse the Marketplace →
                 </a>
             </div>

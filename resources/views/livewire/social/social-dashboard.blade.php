@@ -13,7 +13,7 @@
             @foreach(['7d' => '7 Days', '30d' => '30 Days', '90d' => '90 Days'] as $key => $label)
                 <button wire:click="setTimeframe('{{ $key }}')"
                     wire:loading.attr="disabled"
-                    class="px-3 py-1.5 text-xs font-medium rounded-lg transition {{ $timeframe === $key ? 'bg-purple-600 text-white' : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700' }}">
+                    class="px-3 py-1.5 text-xs font-medium rounded-lg transition {{ $timeframe === $key ? 'bg-brand-purple-mid text-white' : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700' }}">
                     {{ $label }}
                 </button>
             @endforeach
@@ -63,7 +63,7 @@
         <div class="lg:col-span-2 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800">
             <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-800">
                 <h3 class="font-semibold text-gray-900 dark:text-white">Needs Attention</h3>
-                <a href="{{ route('social.inbox') }}" class="text-xs text-purple-600 dark:text-purple-400 hover:underline">Open Inbox →</a>
+                <a href="{{ route('social.inbox') }}" class="text-xs text-brand-purple-mid dark:text-brand-purple-light hover:underline">Open Inbox →</a>
             </div>
             <div class="divide-y divide-gray-100 dark:divide-gray-800">
                 @forelse($this->urgentConversations as $conv)
@@ -121,7 +121,7 @@
             <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800">
                 <div class="flex items-center justify-between px-5 py-3.5 border-b border-gray-200 dark:border-gray-800">
                     <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Hot Leads 🔥</h3>
-                    <a href="{{ route('social.leads') }}" class="text-xs text-purple-600 hover:underline">View all</a>
+                    <a href="{{ route('social.leads') }}" class="text-xs text-brand-purple-mid hover:underline">View all</a>
                 </div>
                 <div class="divide-y divide-gray-100 dark:divide-gray-800">
                     @forelse($this->hotLeads as $lead)
@@ -144,7 +144,7 @@
                 <p class="text-xs font-bold text-yellow-700 dark:text-yellow-400 uppercase tracking-wide mb-2">
                     {{ $this->pendingPosts->count() }} Post{{ $this->pendingPosts->count() > 1 ? 's' : '' }} Need Approval
                 </p>
-                <a href="{{ route('social.posts') }}" class="text-sm text-purple-600 hover:underline">Review posts →</a>
+                <a href="{{ route('social.posts') }}" class="text-sm text-brand-purple-mid hover:underline">Review posts →</a>
             </div>
             @endif
         </div>

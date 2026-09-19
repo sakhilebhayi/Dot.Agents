@@ -8,7 +8,7 @@
     <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-6">
         <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
             <div class="flex items-center gap-4">
-                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-700 to-purple-500 flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
+                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-brand-purple to-brand-purple-light flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
                     {{ substr($this->deployment->agent?->name ?? 'AI', 0, 2) }}
                 </div>
                 <div>
@@ -33,7 +33,7 @@
 
         {{-- Tab nav --}}
         <nav class="flex gap-1 mt-5 -mb-6 border-t border-gray-100 dark:border-gray-800 pt-4">
-            <span class="px-4 py-2 text-sm font-medium border-b-2 border-purple-600 text-purple-600 dark:text-purple-400">
+            <span class="px-4 py-2 text-sm font-medium border-b-2 border-brand-purple-mid text-brand-purple-mid dark:text-brand-purple-light">
                 Overview
             </span>
             @if($this->deployment->status === 'active')
@@ -106,7 +106,7 @@
                     <dt class="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wide">Custom Instructions</dt>
                     <dd class="mt-1 font-medium text-gray-900 dark:text-white">
                         @if($this->deployment->custom_instructions)
-                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400">Configured</span>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-brand-purple-pale text-brand-purple dark:bg-brand-purple-deeper/30 dark:text-brand-purple-light">Configured</span>
                         @else
                             <span class="text-gray-400 dark:text-gray-500">Not set</span>
                         @endif

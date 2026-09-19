@@ -20,8 +20,8 @@
                             class="flex items-center gap-2 group {{ $n < $step ? 'cursor-pointer' : 'cursor-default' }}"
                             @if($n >= $step) disabled @endif>
                         <span class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 transition
-                            {{ $n < $step  ? 'bg-purple-600 text-white' : '' }}
-                            {{ $n === $step ? 'bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 ring-2 ring-purple-600' : '' }}
+                            {{ $n < $step  ? 'bg-brand-purple-mid text-white' : '' }}
+                            {{ $n === $step ? 'bg-brand-purple-pale dark:bg-brand-purple-deeper/40 text-brand-purple dark:text-brand-purple-light ring-2 ring-brand-purple-mid' : '' }}
                             {{ $n > $step  ? 'bg-gray-100 dark:bg-gray-800 text-gray-400' : '' }}">
                             @if($n < $step)
                                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
@@ -30,7 +30,7 @@
                             @endif
                         </span>
                         <span class="hidden sm:block text-xs font-medium
-                            {{ $n === $step ? 'text-purple-700 dark:text-purple-300' : 'text-gray-400 dark:text-gray-500' }}">
+                            {{ $n === $step ? 'text-brand-purple dark:text-brand-purple-light' : 'text-gray-400 dark:text-gray-500' }}">
                             {{ $label }}
                         </span>
                     </button>
@@ -51,7 +51,7 @@
             @foreach($platforms as $platform => $meta)
                 <button wire:click="selectPlatform('{{ $platform }}')"
                         class="relative flex flex-col items-center gap-3 p-6 rounded-2xl border-2 transition-all
-                            {{ in_array($platform, $this->connectedPlatforms) ? 'border-green-300 dark:border-green-700 bg-green-50 dark:bg-green-900/10' : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:border-purple-400 dark:hover:border-purple-500 hover:shadow-md' }}">
+                            {{ in_array($platform, $this->connectedPlatforms) ? 'border-green-300 dark:border-green-700 bg-green-50 dark:bg-green-900/10' : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:border-brand-purple-light dark:hover:border-brand-purple-light hover:shadow-md' }}">
                     <div class="{{ $meta['color'] }} w-12 h-12 rounded-xl flex items-center justify-center text-white font-bold text-sm">
                         {{ $meta['icon'] }}
                     </div>
@@ -111,13 +111,13 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <button wire:click="$set('connectionMode','quick')" type="button"
                         class="flex flex-col gap-2 p-4 rounded-xl border-2 text-left transition
-                            {{ $connectionMode === 'quick' ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20' : 'border-gray-200 dark:border-gray-700 hover:border-gray-300' }}">
+                            {{ $connectionMode === 'quick' ? 'border-brand-purple-light bg-brand-purple-pale dark:bg-brand-purple-deeper/20' : 'border-gray-200 dark:border-gray-700 hover:border-gray-300' }}">
                     <div class="flex items-center gap-2">
-                        <svg class="w-5 h-5 {{ $connectionMode === 'quick' ? 'text-purple-600' : 'text-gray-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-5 h-5 {{ $connectionMode === 'quick' ? 'text-brand-purple-mid' : 'text-gray-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
                         </svg>
                         <span class="font-semibold text-sm text-gray-900 dark:text-white">Quick Connect</span>
-                        <span class="ml-auto px-1.5 py-0.5 rounded text-xs font-medium bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300">Recommended</span>
+                        <span class="ml-auto px-1.5 py-0.5 rounded text-xs font-medium bg-brand-purple-pale dark:bg-brand-purple-deeper/40 text-brand-purple dark:text-brand-purple-light">Recommended</span>
                     </div>
                     <p class="text-xs text-gray-500 dark:text-gray-400">Use Dot.Agents' OAuth app. Connect in seconds, no configuration needed.</p>
                 </button>
@@ -140,7 +140,7 @@
             @if($connectionMode === 'advanced')
                 <div class="border-t border-gray-100 dark:border-gray-800 pt-4 space-y-4">
                     <p class="text-xs text-gray-500 dark:text-gray-400">
-                        Create an app at the <a href="{{ [\App\Livewire\Organizations\SocialCredentials::$platforms[$selectedPlatform]['docs'] ?? '#'] | join('') }}" target="_blank" rel="noopener noreferrer" class="text-purple-600 hover:underline">{{ $meta['short'] }} Developer Console</a>
+                        Create an app at the <a href="{{ [\App\Livewire\Organizations\SocialCredentials::$platforms[$selectedPlatform]['docs'] ?? '#'] | join('') }}" target="_blank" rel="noopener noreferrer" class="text-brand-purple-mid hover:underline">{{ $meta['short'] }} Developer Console</a>
                         and set the redirect URI to:
                         <code class="font-mono text-xs bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded ml-1">{{ route('social.auth.callback', ['platform' => $selectedPlatform]) }}</code>
                     </p>
@@ -148,14 +148,14 @@
                         <div>
                             <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">App / Client ID *</label>
                             <input wire:model="advClientId" type="text" autocomplete="off" spellcheck="false"
-                                   class="w-full text-sm font-mono rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-purple-600 focus:border-purple-600"
+                                   class="w-full text-sm font-mono rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid focus:border-brand-purple-mid"
                                    placeholder="App ID or Client ID">
                             @error('advClientId') <p class="mt-1 text-xs text-red-500">{{ $message }}</p> @enderror
                         </div>
                         <div>
                             <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">App / Client Secret *</label>
                             <input wire:model="advClientSecret" type="password" autocomplete="new-password"
-                                   class="w-full text-sm font-mono rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-purple-600 focus:border-purple-600"
+                                   class="w-full text-sm font-mono rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid focus:border-brand-purple-mid"
                                    placeholder="••••••••••••••••">
                             @error('advClientSecret') <p class="mt-1 text-xs text-red-500">{{ $message }}</p> @enderror
                         </div>
@@ -186,7 +186,7 @@
                 <label class="cursor-pointer">
                     <input type="checkbox" wire:model="selectedGoals" value="{{ $key }}" class="sr-only peer">
                     <div class="flex items-start gap-4 p-4 rounded-2xl border-2 transition-all bg-white dark:bg-gray-900
-                        peer-checked:border-purple-500 peer-checked:bg-purple-50 dark:peer-checked:bg-purple-900/20
+                        peer-checked:border-brand-purple-light peer-checked:bg-brand-purple-pale dark:peer-checked:bg-brand-purple-deeper/20
                         border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600">
                         <span class="text-2xl flex-shrink-0 mt-0.5">{{ $goal['icon'] }}</span>
                         <div class="min-w-0">
@@ -194,7 +194,7 @@
                             <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{{ $goal['desc'] }}</p>
                         </div>
                         <div class="flex-shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center transition
-                                    peer-checked:bg-purple-600 peer-checked:border-purple-600 border-gray-300 dark:border-gray-600 mt-0.5">
+                                    peer-checked:bg-brand-purple-mid peer-checked:border-brand-purple-mid border-gray-300 dark:border-gray-600 mt-0.5">
                         </div>
                     </div>
                 </label>
@@ -222,9 +222,9 @@
                     @foreach($aiFeatures as $key => $feature)
                         <label class="flex items-start gap-3 cursor-pointer group">
                             <input type="checkbox" wire:model="enabledFeatures" value="{{ $key }}"
-                                   class="mt-0.5 rounded border-gray-300 dark:border-gray-600 text-purple-600 focus:ring-purple-500">
+                                   class="mt-0.5 rounded border-gray-300 dark:border-gray-600 text-brand-purple-mid focus:ring-brand-purple-light">
                             <div>
-                                <p class="text-sm font-medium text-gray-900 dark:text-white group-hover:text-purple-700 dark:group-hover:text-purple-300 transition">{{ $feature['label'] }}</p>
+                                <p class="text-sm font-medium text-gray-900 dark:text-white group-hover:text-brand-purple dark:group-hover:text-brand-purple-light transition">{{ $feature['label'] }}</p>
                                 <p class="text-xs text-gray-500 dark:text-gray-400">{{ $feature['desc'] }}</p>
                             </div>
                         </label>
@@ -238,7 +238,7 @@
                     @foreach($perms as $key => $perm)
                         <label class="flex items-center gap-3 cursor-pointer">
                             <input type="checkbox" wire:model="enabledPermissions" value="{{ $key }}"
-                                   class="rounded border-gray-300 dark:border-gray-600 text-purple-600 focus:ring-purple-500">
+                                   class="rounded border-gray-300 dark:border-gray-600 text-brand-purple-mid focus:ring-brand-purple-light">
                             <span class="text-sm flex-1 text-gray-800 dark:text-gray-200">{{ $perm['icon'] }} {{ $perm['label'] }}</span>
                             <span class="text-xs px-2 py-0.5 rounded-full font-medium
                                 {{ $perm['risk'] === 'low'    ? 'bg-green-100  dark:bg-green-900/30  text-green-700  dark:text-green-400' : '' }}
@@ -260,10 +260,10 @@
                         <label class="cursor-pointer block">
                             <input type="radio" wire:model.number="autonomyLevel" value="{{ $level }}" class="sr-only peer">
                             <div class="flex items-start gap-3 p-3 rounded-xl border-2 transition
-                                peer-checked:border-purple-500 peer-checked:bg-purple-50 dark:peer-checked:bg-purple-900/20
+                                peer-checked:border-brand-purple-light peer-checked:bg-brand-purple-pale dark:peer-checked:bg-brand-purple-deeper/20
                                 border-gray-200 dark:border-gray-700 hover:border-gray-300">
                                 <span class="w-6 h-6 rounded-full border-2 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5 transition
-                                    peer-checked:bg-purple-600 peer-checked:border-purple-600 peer-checked:text-white
+                                    peer-checked:bg-brand-purple-mid peer-checked:border-brand-purple-mid peer-checked:text-white
                                     border-gray-300 dark:border-gray-600 text-gray-500">{{ $level }}</span>
                                 <div>
                                     <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ $info['label'] }}</p>
@@ -302,7 +302,7 @@
                     <p class="text-sm font-semibold text-gray-900 dark:text-white mt-0.5">{{ $platformMeta['label'] }}</p>
                 </div>
                 <span class="text-xs px-2 py-1 rounded-full
-                    {{ $connectionMode === 'quick' ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300' : 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400' }}">
+                    {{ $connectionMode === 'quick' ? 'bg-brand-purple-pale dark:bg-brand-purple-deeper/30 text-brand-purple dark:text-brand-purple-light' : 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400' }}">
                     {{ $connectionMode === 'quick' ? 'Quick Connect' : 'Custom App' }}
                 </span>
             </div>
@@ -340,7 +340,7 @@
             <div class="px-6 py-4">
                 <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Autonomy Level</p>
                 <div class="flex items-center gap-3">
-                    <span class="w-7 h-7 rounded-full bg-purple-600 text-white flex items-center justify-center text-xs font-bold">{{ $autonomyLevel }}</span>
+                    <span class="w-7 h-7 rounded-full bg-brand-purple-mid text-white flex items-center justify-center text-xs font-bold">{{ $autonomyLevel }}</span>
                     <div>
                         <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ $autonomyInfo['label'] }}</p>
                         <p class="text-xs text-gray-500 dark:text-gray-400">{{ $autonomyInfo['desc'] }}</p>
@@ -368,7 +368,7 @@
 
         @if($step < 5)
             <button wire:click="nextStep" type="button"
-                    class="inline-flex items-center gap-2 px-6 py-2.5 bg-purple-600 hover:bg-purple-700 text-white text-sm font-semibold rounded-xl transition">
+                    class="inline-flex items-center gap-2 px-6 py-2.5 bg-brand-purple-mid hover:bg-brand-purple text-white text-sm font-semibold rounded-xl transition">
                 Continue
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
             </button>

@@ -6,7 +6,7 @@
             <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Organize your AI agents across business departments.</p>
         </div>
         <button wire:click="openCreate"
-            class="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-xl transition-colors">
+            class="inline-flex items-center gap-2 px-4 py-2 bg-brand-purple-mid hover:bg-brand-purple text-white text-sm font-medium rounded-xl transition-colors">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
             New Department
         </button>
@@ -21,18 +21,18 @@
 
     {{-- Create / Edit Form --}}
     @if($showForm)
-    <div class="bg-white dark:bg-gray-900 rounded-2xl border border-purple-200 dark:border-purple-800 p-6 space-y-4">
+    <div class="bg-white dark:bg-gray-900 rounded-2xl border border-brand-purple-pale dark:border-brand-purple-dark p-6 space-y-4">
         <h3 class="font-semibold text-gray-900 dark:text-white text-sm">{{ $editingId ? 'Edit Department' : 'New Department' }}</h3>
         <form wire:submit="save" class="space-y-4">
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Name <span class="text-red-500">*</span></label>
-                    <input wire:model="formName" type="text" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-purple-600" placeholder="e.g. Marketing">
+                    <input wire:model="formName" type="text" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid" placeholder="e.g. Marketing">
                     @error('formName') <p class="mt-1 text-xs text-red-500">{{ $message }}</p> @enderror
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Type</label>
-                    <select wire:model="formType" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-purple-600">
+                    <select wire:model="formType" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid">
                         <option value="">Select type</option>
                         <option value="business">Business</option>
                         <option value="technical">Technical</option>
@@ -44,16 +44,16 @@
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Department Head</label>
-                    <input wire:model="formHeadName" type="text" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-purple-600" placeholder="Jane Smith">
+                    <input wire:model="formHeadName" type="text" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid" placeholder="Jane Smith">
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Description</label>
-                    <input wire:model="formDescription" type="text" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-purple-600" placeholder="Brief description…">
+                    <input wire:model="formDescription" type="text" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid" placeholder="Brief description…">
                 </div>
             </div>
             <div class="flex justify-end gap-2 pt-2">
                 <button type="button" wire:click="$set('showForm', false)" class="px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm font-medium rounded-xl">Cancel</button>
-                <button type="submit" wire:loading.attr="disabled" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 disabled:opacity-75 text-white text-sm font-medium rounded-xl transition-colors">
+                <button type="submit" wire:loading.attr="disabled" class="px-4 py-2 bg-brand-purple-mid hover:bg-brand-purple disabled:opacity-75 text-white text-sm font-medium rounded-xl transition-colors">
                     {{ $editingId ? 'Update' : 'Create' }} Department
                 </button>
             </div>
@@ -77,11 +77,11 @@
         @forelse($this->departments as $dept)
         <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md transition-all">
             <div class="flex items-start justify-between mb-3">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-purple-800 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-purple-mid to-brand-purple-dark flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
                     {{ strtoupper(substr($dept->name, 0, 2)) }}
                 </div>
                 <div class="flex gap-1">
-                    <button wire:click="openEdit({{ $dept->id }})" class="p-1.5 text-gray-400 hover:text-purple-600 rounded-lg transition-colors" title="Edit">
+                    <button wire:click="openEdit({{ $dept->id }})" class="p-1.5 text-gray-400 hover:text-brand-purple-mid rounded-lg transition-colors" title="Edit">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                     </button>
                     <button wire:click="confirmDelete({{ $dept->id }})" class="p-1.5 text-gray-400 hover:text-red-500 rounded-lg transition-colors" title="Delete">
@@ -100,17 +100,17 @@
                 @endif
                 <span>{{ $dept->deployments_count }} agent{{ $dept->deployments_count !== 1 ? 's' : '' }}</span>
                 @if($dept->type)
-                    <span class="ml-auto px-2 py-0.5 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 rounded-full capitalize">{{ $dept->type }}</span>
+                    <span class="ml-auto px-2 py-0.5 bg-brand-purple-pale dark:bg-brand-purple-deeper/30 text-brand-purple dark:text-brand-purple-light rounded-full capitalize">{{ $dept->type }}</span>
                 @endif
             </div>
         </div>
         @empty
         <div class="col-span-full bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-12 text-center">
-            <div class="w-14 h-14 bg-purple-100 dark:bg-purple-900/30 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <svg class="w-7 h-7 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+            <div class="w-14 h-14 bg-brand-purple-pale dark:bg-brand-purple-deeper/30 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <svg class="w-7 h-7 text-brand-purple-mid dark:text-brand-purple-light" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
             </div>
             <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">No departments yet.</p>
-            <button wire:click="openCreate" class="text-sm text-purple-600 hover:text-purple-700 font-medium">Create your first department →</button>
+            <button wire:click="openCreate" class="text-sm text-brand-purple-mid hover:text-brand-purple font-medium">Create your first department →</button>
         </div>
         @endforelse
     </div>

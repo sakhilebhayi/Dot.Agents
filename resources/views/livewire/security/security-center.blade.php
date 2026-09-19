@@ -35,17 +35,17 @@
     </div>
 
     {{-- DIS Control Panel --}}
-    <div class="bg-gradient-to-br from-gray-900 to-purple-950 dark:from-gray-950 dark:to-purple-950 rounded-2xl border border-purple-800/30 p-6 text-white">
+    <div class="bg-gradient-to-br from-gray-900 to-brand-purple-deeper dark:from-gray-950 dark:to-brand-purple-deeper rounded-2xl border border-brand-purple-dark/30 p-6 text-white">
         <div class="flex items-center justify-between mb-5">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-purple-700/50 flex items-center justify-center">
-                    <svg class="w-5 h-5 text-purple-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="w-10 h-10 rounded-xl bg-brand-purple/50 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-brand-purple-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
                     </svg>
                 </div>
                 <div>
                     <h2 class="font-bold text-lg">Digital Immune System</h2>
-                    <p class="text-purple-300 text-sm">Real-time threat detection & autonomous remediation</p>
+                    <p class="text-brand-purple-light text-sm">Real-time threat detection & autonomous remediation</p>
                 </div>
             </div>
             <button wire:click="runDISCheck" wire:loading.attr="disabled"
@@ -65,7 +65,7 @@
             ] as [$label, $value, $color])
                 <div class="bg-white/5 rounded-xl p-4 text-center">
                     <div class="text-3xl font-bold text-white">{{ $value }}</div>
-                    <div class="text-xs text-purple-300 mt-1">{{ $label }}</div>
+                    <div class="text-xs text-brand-purple-light mt-1">{{ $label }}</div>
                 </div>
             @endforeach
         </div>
@@ -102,7 +102,7 @@
             @endif
 
             @if(($disReport['quarantined'] ?? 0) > 0)
-                <div class="text-xs text-purple-700 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/20 rounded-lg px-3 py-2">
+                <div class="text-xs text-brand-purple dark:text-brand-purple-light bg-brand-purple-pale dark:bg-brand-purple-deeper/20 rounded-lg px-3 py-2">
                     ⚡ {{ $disReport['quarantined'] }} agent(s) automatically quarantined.
                 </div>
             @endif
@@ -181,7 +181,7 @@
                                 @if($event->status === 'open')
                                     <div class="flex gap-2 items-center">
                                         <button wire:click="resolveEvent({{ $event->id }})"
-                                            class="text-xs text-purple-600 hover:text-purple-700 dark:text-purple-400 font-medium">
+                                            class="text-xs text-brand-purple-mid hover:text-brand-purple dark:text-brand-purple-light font-medium">
                                             Resolve
                                         </button>
                                         @if($event->agent_deployment_id)

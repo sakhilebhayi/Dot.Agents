@@ -33,7 +33,7 @@
             @else
                 <div class="text-center py-6">
                     <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">This organization doesn't have an active subscription yet.</p>
-                    <a href="{{ route('billing.plans') }}" wire:navigate class="inline-flex items-center gap-2 text-sm text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 font-medium">
+                    <a href="{{ route('billing.plans') }}" wire:navigate class="inline-flex items-center gap-2 text-sm text-brand-purple-mid dark:text-brand-purple-light hover:text-brand-purple dark:hover:text-brand-purple-light font-medium">
                         Choose a plan to get started &rarr;
                     </a>
                 </div>
@@ -51,8 +51,8 @@
             </form>
         </div>
         <div class="px-5 py-4 flex items-center gap-4">
-            <div class="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-900/20 flex items-center justify-center flex-shrink-0">
-                <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="w-10 h-10 rounded-xl bg-brand-purple-pale dark:bg-brand-purple-deeper/20 flex items-center justify-center flex-shrink-0">
+                <svg class="w-5 h-5 text-brand-purple-mid dark:text-brand-purple-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 6h18a1 1 0 011 1v10a1 1 0 01-1 1H3a1 1 0 01-1-1V7a1 1 0 011-1z"/>
                 </svg>
             </div>
@@ -102,7 +102,7 @@
                                 </td>
                                 <td class="px-5 py-3">
                                     @if($invoice->pdf_url)
-                                        <a href="{{ $invoice->pdf_url }}" target="_blank" rel="noopener" class="text-xs text-purple-600 dark:text-purple-400 hover:underline">Download</a>
+                                        <a href="{{ $invoice->pdf_url }}" target="_blank" rel="noopener" class="text-xs text-brand-purple-mid dark:text-brand-purple-light hover:underline">Download</a>
                                     @else
                                         <span class="text-xs text-gray-400 dark:text-gray-600 cursor-not-allowed" title="PDF not available yet">Download</span>
                                     @endif

@@ -9,7 +9,7 @@
             @foreach(['1h' => '1h', '24h' => '24h', '7d' => '7 Days', '30d' => '30 Days'] as $key => $label)
                 <button wire:click="setTimeframe('{{ $key }}')"
                     wire:loading.attr="disabled"
-                    class="px-3 py-1.5 text-xs font-medium rounded-lg transition {{ $timeframe === $key ? 'bg-purple-600 text-white' : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700' }}">
+                    class="px-3 py-1.5 text-xs font-medium rounded-lg transition {{ $timeframe === $key ? 'bg-brand-purple-mid text-white' : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700' }}">
                     {{ $label }}
                 </button>
             @endforeach

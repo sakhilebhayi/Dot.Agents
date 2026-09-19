@@ -3,7 +3,7 @@
     <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-6">
         <div class="flex items-center justify-between">
             <div class="flex items-center gap-4">
-                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-700 to-purple-500 flex items-center justify-center text-white font-bold text-lg">
+                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-brand-purple to-brand-purple-light flex items-center justify-center text-white font-bold text-lg">
                     {{ substr($this->deployment->agent?->name ?? 'AI', 0, 2) }}
                 </div>
                 <div>
@@ -19,7 +19,7 @@
                     <option value="90d">Last 90 days</option>
                 </select>
                 <button wire:click="recalculate" wire:loading.attr="disabled"
-                    class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-xl transition-colors disabled:opacity-50">
+                    class="px-4 py-2 bg-brand-purple-mid hover:bg-brand-purple text-white text-sm font-medium rounded-xl transition-colors disabled:opacity-50">
                     <span wire:loading.remove>Recalculate</span>
                     <span wire:loading>Calculating...</span>
                 </button>
@@ -106,7 +106,7 @@
         <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-12 text-center">
             <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">No scorecard data yet for this period.</p>
             <button wire:click="recalculate"
-                class="px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-xl transition-colors">
+                class="px-6 py-2 bg-brand-purple-mid hover:bg-brand-purple text-white text-sm font-medium rounded-xl transition-colors">
                 Generate Scorecard
             </button>
         </div>

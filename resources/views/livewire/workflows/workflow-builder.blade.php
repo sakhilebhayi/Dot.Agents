@@ -19,10 +19,10 @@
                 <div
                     draggable="true"
                     @dragstart="startAgentDrag($event, '{{ $agent['slug'] }}', '{{ addslashes($agent['name']) }}')"
-                    class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 cursor-grab active:cursor-grabbing hover:border-purple-400 dark:hover:border-purple-500 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all group"
+                    class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 cursor-grab active:cursor-grabbing hover:border-brand-purple-light dark:hover:border-brand-purple-light hover:bg-brand-purple-pale dark:hover:bg-brand-purple-deeper/20 transition-all group"
                 >
-                    <div class="w-7 h-7 rounded-lg bg-purple-100 dark:bg-purple-900/40 flex items-center justify-center shrink-0">
-                        <svg class="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="w-7 h-7 rounded-lg bg-brand-purple-pale dark:bg-brand-purple-deeper/40 flex items-center justify-center shrink-0">
+                        <svg class="w-3.5 h-3.5 text-brand-purple-mid dark:text-brand-purple-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h14a2 2 0 012 2v10a2 2 0 01-2 2h-2"/>
                         </svg>
                     </div>
@@ -48,7 +48,7 @@
             <button
                 wire:click="save"
                 wire:loading.attr="disabled"
-                class="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold transition-colors"
+                class="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-brand-purple-mid hover:bg-brand-purple text-white text-xs font-semibold transition-colors"
                 aria-label="Save workflow graph"
             >
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
@@ -160,7 +160,7 @@
                 :style="`left: ${node.x}px; top: ${node.y}px; z-index: ${dragging === node.id ? 30 : 10};`"
                 class="absolute w-44 rounded-xl shadow-lg border-2 transition-shadow hover:shadow-xl select-none"
                 :class="[
-                    selectedNode === node.id ? 'border-yellow-400' : 'border-purple-200 dark:border-gray-700',
+                    selectedNode === node.id ? 'border-yellow-400' : 'border-brand-purple-pale dark:border-gray-700',
                     dragging === node.id ? 'opacity-90 shadow-2xl' : '',
                     connectingMode && connectionSourceId !== node.id ? 'cursor-crosshair' : ''
                 ]"
@@ -169,7 +169,7 @@
             >
                 {{-- Node header — drag handle --}}
                 <div
-                    class="flex items-center gap-2 px-3 py-2 bg-purple-600 dark:bg-purple-700 rounded-t-xl cursor-move"
+                    class="flex items-center gap-2 px-3 py-2 bg-brand-purple-mid dark:bg-brand-purple rounded-t-xl cursor-move"
                     @mousedown.stop="startDrag($event, node.id)"
                 >
                     <div class="w-5 h-5 rounded bg-white/20 flex items-center justify-center shrink-0">
@@ -212,7 +212,7 @@
                 {{-- INPUT port (top-centre) — CLICK to complete a connection --}}
                 {{-- Glows green and enlarges when another node is in connect-mode --}}
                 <div
-                    class="absolute left-1/2 -translate-x-1/2 flex items-center justify-center rounded-full border-2 border-purple-500 bg-white z-30 transition-all"
+                    class="absolute left-1/2 -translate-x-1/2 flex items-center justify-center rounded-full border-2 border-brand-purple-light bg-white z-30 transition-all"
                     :class="connectingMode && connectionSourceId !== node.id
                         ? 'w-6 h-6 -top-3 cursor-pointer ring-2 ring-green-400 ring-offset-1 scale-125 border-green-500'
                         : 'w-5 h-5 -top-3 cursor-default'"
@@ -224,7 +224,7 @@
                         class="rounded-full transition-all"
                         :class="connectingMode && connectionSourceId !== node.id
                             ? 'w-2.5 h-2.5 bg-green-500'
-                            : 'w-2 h-2 bg-purple-500'"
+                            : 'w-2 h-2 bg-brand-purple-light'"
                     ></div>
                 </div>
             </div>
@@ -233,8 +233,8 @@
         {{-- Empty state --}}
         <template x-if="nodes.length === 0">
             <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                <div class="w-16 h-16 rounded-2xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center mb-4">
-                    <svg class="w-8 h-8 text-purple-500 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="w-16 h-16 rounded-2xl bg-brand-purple-pale dark:bg-brand-purple-deeper/30 flex items-center justify-center mb-4">
+                    <svg class="w-8 h-8 text-brand-purple-light dark:text-brand-purple-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
                     </svg>
                 </div>
@@ -281,7 +281,7 @@
                             type="text"
                             :value="selectedNodeData()?.label"
                             @input="updateNodeLabel($event.target.value)"
-                            class="w-full text-xs rounded-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-purple-500"
+                            class="w-full text-xs rounded-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-brand-purple-light"
                         />
                     </div>
                     <div>

@@ -12,7 +12,7 @@
                 </span>
             @endif
             <button wire:click="$toggle('showCompose')"
-                class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-xl transition">
+                class="px-4 py-2 bg-brand-purple-mid hover:bg-brand-purple text-white text-sm font-medium rounded-xl transition">
                 + Compose Post
             </button>
         </div>
@@ -26,7 +26,7 @@
                 <div>
                     <label class="block text-xs font-medium text-gray-500 mb-1.5">Post Type</label>
                     <select wire:model="composingPostType"
-                        class="w-full text-sm border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500">
+                        class="w-full text-sm border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg px-3 py-2 focus:ring-2 focus:ring-brand-purple-light">
                         <option value="post">Standard Post</option>
                         <option value="reel">Reel / Short Video</option>
                         <option value="story">Story</option>
@@ -39,19 +39,19 @@
                     <textarea wire:model="composingContent"
                         rows="4"
                         placeholder="Write your post content..."
-                        class="w-full text-sm border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg px-4 py-3 focus:ring-2 focus:ring-purple-500 resize-none"></textarea>
+                        class="w-full text-sm border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg px-4 py-3 focus:ring-2 focus:ring-brand-purple-light resize-none"></textarea>
                     @error('composingContent') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-gray-500 mb-1.5">Schedule (optional)</label>
                     <input type="datetime-local" wire:model="composingScheduledAt"
-                        class="text-sm border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500">
+                        class="text-sm border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg px-3 py-2 focus:ring-2 focus:ring-brand-purple-light">
                     @error('composingScheduledAt') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                 </div>
                 <div class="flex items-center gap-3 pt-2">
                     <button wire:click="schedulePost"
                         wire:loading.attr="disabled"
-                        class="px-5 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg transition">
+                        class="px-5 py-2 bg-brand-purple-mid hover:bg-brand-purple text-white text-sm font-medium rounded-lg transition">
                         <span wire:loading.remove wire:target="schedulePost">Submit for Approval</span>
                         <span wire:loading wire:target="schedulePost">Submitting…</span>
                     </button>
@@ -68,7 +68,7 @@
     <div class="flex flex-wrap items-center gap-2">
         @foreach(['pending' => 'Pending Approval', 'scheduled' => 'Scheduled', 'published' => 'Published', 'draft' => 'Drafts', 'all' => 'All'] as $val => $lbl)
             <button wire:click="$set('filter', '{{ $val }}')"
-                class="px-3.5 py-1.5 text-xs font-medium rounded-full transition {{ $filter === $val ? 'bg-purple-600 text-white' : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700' }}">
+                class="px-3.5 py-1.5 text-xs font-medium rounded-full transition {{ $filter === $val ? 'bg-brand-purple-mid text-white' : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700' }}">
                 {{ $lbl }}
             </button>
         @endforeach
@@ -98,7 +98,7 @@
                         @endif
                     </div>
                     @if($post->agent_deployment_id)
-                        <span class="text-xs text-purple-500">AI Generated</span>
+                        <span class="text-xs text-brand-purple-light">AI Generated</span>
                     @endif
                 </div>
 

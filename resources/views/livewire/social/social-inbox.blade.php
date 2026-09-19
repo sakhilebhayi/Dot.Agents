@@ -8,7 +8,7 @@
             <div class="flex flex-wrap gap-1">
                 @foreach(['open' => 'Open', 'escalated' => 'Escalated', 'resolved' => 'Resolved', 'all' => 'All'] as $val => $lbl)
                     <button wire:click="$set('filter', '{{ $val }}')"
-                        class="px-2.5 py-1 text-xs rounded-full transition {{ $filter === $val ? 'bg-purple-600 text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400' }}">
+                        class="px-2.5 py-1 text-xs rounded-full transition {{ $filter === $val ? 'bg-brand-purple-mid text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400' }}">
                         {{ $lbl }}
                     </button>
                 @endforeach
@@ -19,8 +19,8 @@
         <div class="divide-y divide-gray-100 dark:divide-gray-800">
             @forelse($this->conversations as $conv)
                 <button wire:click="openConversation({{ $conv->id }})"
-                    class="w-full text-left flex items-start gap-3 px-4 py-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition {{ $activeConversationId === $conv->id ? 'bg-purple-50 dark:bg-purple-900/20 border-r-2 border-purple-600' : '' }}">
-                    <div class="w-9 h-9 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center text-white text-sm font-semibold flex-shrink-0">
+                    class="w-full text-left flex items-start gap-3 px-4 py-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition {{ $activeConversationId === $conv->id ? 'bg-brand-purple-pale dark:bg-brand-purple-deeper/20 border-r-2 border-brand-purple-mid' : '' }}">
+                    <div class="w-9 h-9 rounded-full bg-gradient-to-br from-brand-purple-light to-brand-purple-mid flex items-center justify-center text-white text-sm font-semibold flex-shrink-0">
                         {{ strtoupper(substr($conv->contact_name ?? $conv->contact_handle ?? '?', 0, 1)) }}
                     </div>
                     <div class="flex-1 min-w-0">
@@ -43,7 +43,7 @@
             @endforelse
         </div>
 
-        {{ $this->conversations->links('vendor.pagination.simple-tailwind') }}
+        {{ $this->conversations->links() }}
     </div>
 
     {{-- Conversation View --}}
@@ -52,7 +52,7 @@
             {{-- Header --}}
             <div class="flex items-center justify-between px-6 py-4 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
                 <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center text-white text-sm font-semibold">
+                    <div class="w-9 h-9 rounded-full bg-gradient-to-br from-brand-purple-light to-brand-purple-mid flex items-center justify-center text-white text-sm font-semibold">
                         {{ strtoupper(substr($this->activeConversation->contact_name ?? '?', 0, 1)) }}
                     </div>
                     <div>
@@ -84,13 +84,13 @@
                 @foreach($this->activeConversation->messages as $msg)
                     <div class="flex {{ $msg->isOutbound() ? 'justify-end' : 'justify-start' }}">
                         <div class="max-w-[70%]">
-                            <div class="rounded-2xl px-4 py-2.5 {{ $msg->isOutbound() ? 'bg-purple-600 text-white' : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700' }}">
+                            <div class="rounded-2xl px-4 py-2.5 {{ $msg->isOutbound() ? 'bg-brand-purple-mid text-white' : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700' }}">
                                 <p class="text-sm leading-relaxed">{{ $msg->content }}</p>
                             </div>
                             <div class="flex items-center gap-2 mt-1 {{ $msg->isOutbound() ? 'justify-end' : '' }}">
                                 <p class="text-xs text-gray-400">{{ $msg->created_at->format('H:i') }}</p>
                                 @if($msg->is_ai_generated)
-                                    <span class="text-xs text-purple-400">AI</span>
+                                    <span class="text-xs text-brand-purple-light">AI</span>
                                     @if($msg->was_disclosed_as_ai)
                                         <span class="text-xs text-gray-400" title="AI disclosure included">✓ Disclosed</span>
                                     @endif
@@ -110,11 +110,11 @@
                     <textarea wire:model="replyContent"
                         rows="2"
                         placeholder="Type a reply..."
-                        class="flex-1 resize-none rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-sm text-gray-900 dark:text-white px-4 py-3 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
+                        class="flex-1 resize-none rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-sm text-gray-900 dark:text-white px-4 py-3 focus:ring-2 focus:ring-brand-purple-light focus:border-transparent transition"
                         wire:keydown.cmd.enter="sendReply"></textarea>
                     <button wire:click="sendReply"
                         wire:loading.attr="disabled"
-                        class="px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-xl transition disabled:opacity-50">
+                        class="px-5 py-2.5 bg-brand-purple-mid hover:bg-brand-purple text-white text-sm font-medium rounded-xl transition disabled:opacity-50">
                         <span wire:loading.remove wire:target="sendReply">Send</span>
                         <span wire:loading wire:target="sendReply">Sending…</span>
                     </button>

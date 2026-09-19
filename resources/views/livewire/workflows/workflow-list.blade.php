@@ -25,8 +25,8 @@
     {{-- List --}}
     @if ($workflows->isEmpty())
         <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-16 text-center">
-            <div class="w-14 h-14 rounded-2xl bg-purple-50 dark:bg-purple-900/20 flex items-center justify-center mx-auto mb-4">
-                <svg class="w-7 h-7 text-[#3d2ea0] dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="w-14 h-14 rounded-2xl bg-brand-purple-pale dark:bg-brand-purple-deeper/20 flex items-center justify-center mx-auto mb-4">
+                <svg class="w-7 h-7 text-[#3d2ea0] dark:text-brand-purple-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"/>
                 </svg>
             </div>
@@ -43,7 +43,7 @@
     @else
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
             @foreach ($workflows as $wf)
-                <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-5 flex flex-col gap-3 hover:border-purple-300 dark:hover:border-purple-700 transition-colors">
+                <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-5 flex flex-col gap-3 hover:border-brand-purple-light dark:hover:border-brand-purple transition-colors">
                     {{-- Status + Trigger --}}
                     <div class="flex items-start justify-between gap-2">
                         <div class="flex-1 min-w-0">
@@ -125,7 +125,7 @@
                             wire:model="newName"
                             type="text"
                             placeholder="e.g. Lead Qualification Pipeline"
-                            class="w-full text-sm rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            class="w-full text-sm rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-brand-purple-light focus:border-transparent"
                             autofocus>
                         @error('newName') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                     </div>
@@ -136,7 +136,7 @@
                             wire:model="newDescription"
                             rows="2"
                             placeholder="Optional — what does this workflow do?"
-                            class="w-full text-sm rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"></textarea>
+                            class="w-full text-sm rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-brand-purple-light focus:border-transparent resize-none"></textarea>
                         @error('newDescription') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                     </div>
 
@@ -144,7 +144,7 @@
                         <label for="wf-trigger" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Trigger Type</label>
                         <select id="wf-trigger"
                             wire:model="newTrigger"
-                            class="w-full text-sm rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                            class="w-full text-sm rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-brand-purple-light focus:border-transparent">
                             <option value="manual">Manual</option>
                             <option value="scheduled">Scheduled</option>
                             <option value="event">Event</option>

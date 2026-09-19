@@ -6,7 +6,7 @@
             <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Manage who has access to your organization.</p>
         </div>
         <button wire:click="$set('showInviteForm', true)"
-            class="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-xl transition-colors">
+            class="inline-flex items-center gap-2 px-4 py-2 bg-brand-purple-mid hover:bg-brand-purple text-white text-sm font-medium rounded-xl transition-colors">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
             Add Member
         </button>
@@ -27,18 +27,18 @@
 
     {{-- Invite Form --}}
     @if($showInviteForm)
-    <div class="bg-white dark:bg-gray-900 rounded-2xl border border-purple-200 dark:border-purple-800 p-6">
+    <div class="bg-white dark:bg-gray-900 rounded-2xl border border-brand-purple-pale dark:border-brand-purple-dark p-6">
         <h3 class="font-semibold text-gray-900 dark:text-white text-sm mb-4">Invite a Member</h3>
         <form wire:submit="invite" class="flex flex-wrap gap-4 items-end">
             <div class="flex-1 min-w-48">
                 <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Email Address</label>
                 <input wire:model="inviteEmail" type="email" placeholder="colleague@company.com"
-                    class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-purple-600">
+                    class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid">
                 @error('inviteEmail') <p class="mt-1 text-xs text-red-500">{{ $message }}</p> @enderror
             </div>
             <div class="w-40">
                 <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Role</label>
-                <select wire:model="inviteRole" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-purple-600">
+                <select wire:model="inviteRole" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid">
                     <option value="viewer">Viewer</option>
                     <option value="member">Member</option>
                     <option value="admin">Admin</option>
@@ -46,7 +46,7 @@
                 </select>
             </div>
             <div class="flex gap-2">
-                <button type="submit" wire:loading.attr="disabled" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 disabled:opacity-75 text-white text-sm font-medium rounded-xl transition-colors">
+                <button type="submit" wire:loading.attr="disabled" class="px-4 py-2 bg-brand-purple-mid hover:bg-brand-purple disabled:opacity-75 text-white text-sm font-medium rounded-xl transition-colors">
                     Add Member
                 </button>
                 <button type="button" wire:click="$set('showInviteForm', false)" class="px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm font-medium rounded-xl transition-colors">
@@ -97,7 +97,7 @@
                     <td class="px-6 py-4">
                         @if($member->id !== $this->organization->owner_id && auth()->id() !== $member->id)
                             <select wire:change="updateRole({{ $member->id }}, $event.target.value)"
-                                class="text-xs rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-purple-600 py-1">
+                                class="text-xs rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-brand-purple-mid py-1">
                                 @foreach(['viewer','member','admin','owner'] as $r)
                                     <option value="{{ $r }}" {{ $member->pivot->role === $r ? 'selected' : '' }}>{{ ucfirst($r) }}</option>
                                 @endforeach

@@ -9,7 +9,7 @@
     </div>
 
     {{-- Primary CTA --}}
-    <div class="bg-gradient-to-br from-purple-50 to-yellow-50 dark:from-purple-900/20 dark:to-yellow-900/10 rounded-2xl border border-purple-200 dark:border-purple-800 p-6 flex flex-col sm:flex-row sm:items-center gap-4">
+    <div class="bg-gradient-to-br from-brand-purple-pale to-yellow-50 dark:from-brand-purple-deeper/20 dark:to-yellow-900/10 rounded-2xl border border-brand-purple-pale dark:border-brand-purple-dark p-6 flex flex-col sm:flex-row sm:items-center gap-4">
         <div class="flex-1">
             <p class="font-semibold text-gray-900 dark:text-white">Manage your social connections</p>
             <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Connect Facebook, Instagram, LinkedIn, X, and TikTok. Configure AI goals and automation levels per platform.</p>
@@ -70,7 +70,7 @@
                             @if($editing === $platform)
                                 <button wire:click="cancelEdit" class="px-3 py-1 text-xs font-medium rounded-lg border border-gray-200 dark:border-gray-700 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 transition">Cancel</button>
                             @else
-                                <button wire:click="openEdit('{{ $platform }}')" class="px-3 py-1 text-xs font-medium rounded-lg bg-purple-600 hover:bg-purple-700 text-white transition">
+                                <button wire:click="openEdit('{{ $platform }}')" class="px-3 py-1 text-xs font-medium rounded-lg bg-brand-purple-mid hover:bg-brand-purple text-white transition">
                                     {{ $cred ? 'Update' : 'Configure' }}
                                 </button>
                             @endif
@@ -81,27 +81,27 @@
                     <div class="border-t border-gray-200 dark:border-gray-700 px-4 py-4">
                         <form wire:submit="savePlatform" class="space-y-3">
                             <p class="text-xs text-gray-500 dark:text-gray-400">
-                                Set the redirect URI in your <a href="{{ $meta['docs'] }}" target="_blank" rel="noopener noreferrer" class="text-purple-600 hover:underline">{{ $meta['label'] }} Developer Console</a> to:
+                                Set the redirect URI in your <a href="{{ $meta['docs'] }}" target="_blank" rel="noopener noreferrer" class="text-brand-purple-mid hover:underline">{{ $meta['label'] }} Developer Console</a> to:
                                 <code class="font-mono bg-gray-100 dark:bg-gray-700 px-1 py-0.5 rounded text-xs ml-1">{{ route('social.auth.callback', ['platform' => $platform]) }}</code>
                             </p>
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <div>
                                     <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">App / Client ID *</label>
                                     <input wire:model="clientId" type="text" autocomplete="off" spellcheck="false"
-                                           class="w-full text-xs font-mono rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-purple-600 focus:border-purple-600"
+                                           class="w-full text-xs font-mono rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid focus:border-brand-purple-mid"
                                            placeholder="Client ID">
                                     @error('clientId') <p class="mt-1 text-xs text-red-500">{{ $message }}</p> @enderror
                                 </div>
                                 <div>
                                     <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">App / Client Secret *</label>
                                     <input wire:model="clientSecret" type="password" autocomplete="new-password"
-                                           class="w-full text-xs font-mono rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-purple-600 focus:border-purple-600"
+                                           class="w-full text-xs font-mono rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid focus:border-brand-purple-mid"
                                            placeholder="Client Secret">
                                     @error('clientSecret') <p class="mt-1 text-xs text-red-500">{{ $message }}</p> @enderror
                                 </div>
                             </div>
                             <button type="submit" wire:loading.attr="disabled"
-                                    class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold rounded-lg transition disabled:opacity-50">
+                                    class="px-4 py-2 bg-brand-purple-mid hover:bg-brand-purple text-white text-xs font-semibold rounded-lg transition disabled:opacity-50">
                                 <span wire:loading.remove wire:target="savePlatform">Save</span>
                                 <span wire:loading wire:target="savePlatform">Saving...</span>
                             </button>

@@ -174,7 +174,7 @@
                     </svg>
                 </button>
                 @isset($header)
-                    <h1 class="text-sm font-semibold text-[#111111] dark:text-white tracking-tight">{{ $header }}</h1>
+                    <h1 class="text-xl font-bold text-[#111111] dark:text-white tracking-tight">{{ $header }}</h1>
                 @endisset
             </div>
 

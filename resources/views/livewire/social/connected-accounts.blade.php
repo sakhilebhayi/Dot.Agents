@@ -34,7 +34,7 @@
         @foreach($this->platformStatus as $platform => $info)
         <div class="bg-white dark:bg-gray-900 rounded-2xl border-2 transition
             {{ $info['connected'] ? 'border-green-200 dark:border-green-800' : 'border-gray-200 dark:border-gray-700' }}
-            {{ $managing === $platform ? 'ring-2 ring-purple-500' : '' }}">
+            {{ $managing === $platform ? 'ring-2 ring-brand-purple-light' : '' }}">
 
             <div class="p-5">
                 <div class="flex items-center gap-3">
@@ -71,7 +71,7 @@
                     @if($info['settings'] && $info['settings']->goals)
                         <div class="mt-3 flex flex-wrap gap-1.5">
                             @foreach(array_slice($info['settings']->goals, 0, 3) as $goalKey)
-                                <span class="px-2 py-0.5 rounded-full text-xs bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300">
+                                <span class="px-2 py-0.5 rounded-full text-xs bg-brand-purple-pale dark:bg-brand-purple-deeper/30 text-brand-purple dark:text-brand-purple-light">
                                     {{ $goals[$goalKey]['icon'] ?? '' }} {{ $goals[$goalKey]['label'] ?? $goalKey }}
                                 </span>
                             @endforeach
@@ -91,10 +91,10 @@
                     <div class="mt-4 flex items-center gap-2">
                         @if($managing === $platform)
                             <button wire:click="closeManage"
-                                    class="flex-1 px-3 py-2 text-xs font-semibold rounded-xl bg-purple-600 border border-purple-600 text-white text-center">Done</button>
+                                    class="flex-1 px-3 py-2 text-xs font-semibold rounded-xl bg-brand-purple-mid border border-brand-purple-mid text-white text-center">Done</button>
                         @else
                             <button wire:click="openManage('{{ $platform }}')"
-                                    class="flex-1 px-3 py-2 text-xs font-semibold rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-purple-400 hover:text-purple-600 text-center transition">Manage Settings</button>
+                                    class="flex-1 px-3 py-2 text-xs font-semibold rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-brand-purple-light hover:text-brand-purple-mid text-center transition">Manage Settings</button>
                         @endif
                         <button wire:click="disconnect('{{ $platform }}')"
                                 wire:confirm="Disconnect {{ $info['short'] }}? Your agent will lose access to this account."
@@ -106,7 +106,7 @@
                 @else
                     <div class="mt-6">
                         <a href="{{ route('social.connect') }}"
-                           class="block w-full text-center px-4 py-2.5 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 text-sm font-medium text-gray-500 dark:text-gray-400 hover:border-purple-400 hover:text-purple-600 transition">
+                           class="block w-full text-center px-4 py-2.5 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 text-sm font-medium text-gray-500 dark:text-gray-400 hover:border-brand-purple-light hover:text-brand-purple-mid transition">
                             + Connect {{ $info['short'] }}
                         </a>
                     </div>
@@ -129,7 +129,7 @@
                         @foreach($goals as $key => $goal)
                             <label class="flex items-center gap-2 cursor-pointer">
                                 <input type="checkbox" wire:model="editGoals" value="{{ $key }}"
-                                       class="rounded border-gray-300 dark:border-gray-600 text-purple-600 focus:ring-purple-500">
+                                       class="rounded border-gray-300 dark:border-gray-600 text-brand-purple-mid focus:ring-brand-purple-light">
                                 <span class="text-xs text-gray-700 dark:text-gray-300">{{ $goal['icon'] }} {{ $goal['label'] }}</span>
                             </label>
                         @endforeach
@@ -142,7 +142,7 @@
                         @foreach($features as $key => $feature)
                             <label class="flex items-center gap-2 cursor-pointer">
                                 <input type="checkbox" wire:model="editFeatures" value="{{ $key }}"
-                                       class="rounded border-gray-300 dark:border-gray-600 text-purple-600 focus:ring-purple-500">
+                                       class="rounded border-gray-300 dark:border-gray-600 text-brand-purple-mid focus:ring-brand-purple-light">
                                 <span class="text-xs text-gray-700 dark:text-gray-300">{{ $feature['label'] }}</span>
                             </label>
                         @endforeach
@@ -152,7 +152,7 @@
                 <div>
                     <p class="text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide mb-3">Autonomy Level</p>
                     <select wire:model.number="editAutonomy"
-                            class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-purple-600 focus:border-purple-600">
+                            class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid focus:border-brand-purple-mid">
                         @foreach($autonomy as $level => $levelInfo)
                             <option value="{{ $level }}">Level {{ $level }}: {{ $levelInfo['label'] }}</option>
                         @endforeach
@@ -160,7 +160,7 @@
                 </div>
 
                 <button wire:click="saveSettings" wire:loading.attr="disabled"
-                        class="w-full py-2.5 bg-purple-600 hover:bg-purple-700 text-white text-sm font-semibold rounded-xl transition disabled:opacity-60">
+                        class="w-full py-2.5 bg-brand-purple-mid hover:bg-brand-purple text-white text-sm font-semibold rounded-xl transition disabled:opacity-60">
                     <span wire:loading.remove wire:target="saveSettings">Save Settings</span>
                     <span wire:loading wire:target="saveSettings">Saving...</span>
                 </button>

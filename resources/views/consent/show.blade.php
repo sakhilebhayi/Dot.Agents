@@ -46,7 +46,7 @@
                         </div>
                         <div>
                             <h1 class="text-xl font-bold text-white leading-tight">Platform Terms of Service</h1>
-                            <p class="text-purple-200 text-sm mt-0.5">One-time acceptance required before accessing the platform</p>
+                            <p class="text-brand-purple-pale text-sm mt-0.5">One-time acceptance required before accessing the platform</p>
                         </div>
                     </div>
                 </div>
@@ -69,8 +69,8 @@
                             ['icon' => 'M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3', 'title' => 'GDPR & POPIA Compliance', 'body' => 'You retain rights to access, correct, and delete your personal data at any time via organization settings.'],
                         ] as $point)
                         <div class="flex items-start gap-3.5 px-4 py-4">
-                            <div class="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                                <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div class="w-8 h-8 rounded-lg bg-brand-purple-pale flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <svg class="w-4 h-4 text-brand-purple-mid" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $point['icon'] }}"/>
                                 </svg>
                             </div>
@@ -87,14 +87,14 @@
                         @csrf
 
                         <label for="accept"
-                               class="flex items-start gap-3 p-4 rounded-xl border-2 border-gray-200 hover:border-purple-400 cursor-pointer transition-colors group">
+                               class="flex items-start gap-3 p-4 rounded-xl border-2 border-gray-200 hover:border-brand-purple-light cursor-pointer transition-colors group">
                             <input id="accept" type="checkbox" name="accept" required
-                                   class="mt-0.5 w-4 h-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500 flex-shrink-0">
+                                   class="mt-0.5 w-4 h-4 rounded border-gray-300 text-brand-purple-mid focus:ring-brand-purple-light flex-shrink-0">
                             <span class="text-sm text-gray-700 leading-relaxed">
                                 I have read and agree to the
-                                <a href="#" class="text-purple-600 hover:text-purple-700 font-medium underline underline-offset-2">Terms of Service</a>
+                                <a href="#" class="text-brand-purple-mid hover:text-brand-purple font-medium underline underline-offset-2">Terms of Service</a>
                                 and
-                                <a href="#" class="text-purple-600 hover:text-purple-700 font-medium underline underline-offset-2">Privacy Policy</a>,
+                                <a href="#" class="text-brand-purple-mid hover:text-brand-purple font-medium underline underline-offset-2">Privacy Policy</a>,
                                 including the processing of my personal data under GDPR and POPIA.
                             </span>
                         </label>

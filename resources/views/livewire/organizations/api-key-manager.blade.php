@@ -39,7 +39,7 @@
                 <input wire:model="newKeyName"
                     type="text"
                     placeholder="e.g. CI/CD Pipeline, n8n Integration"
-                    class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-purple-600 focus:border-purple-600"
+                    class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid focus:border-brand-purple-mid"
                     aria-label="API key name">
                 @error('newKeyName')
                     <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
@@ -47,7 +47,7 @@
             </div>
 
             <button type="submit"
-                class="px-4 py-2 text-sm font-semibold rounded-xl bg-purple-600 text-white hover:bg-purple-700 transition whitespace-nowrap"
+                class="px-4 py-2 text-sm font-semibold rounded-xl bg-brand-purple-mid text-white hover:bg-brand-purple transition whitespace-nowrap"
                 wire:loading.attr="disabled"
                 wire:loading.class="opacity-60 cursor-wait">
                 <span wire:loading.remove wire:target="createToken">Generate Key</span>

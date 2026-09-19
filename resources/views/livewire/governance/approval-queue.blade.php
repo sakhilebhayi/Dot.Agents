@@ -2,7 +2,7 @@
     {{-- Filters --}}
     <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 px-4 py-3 flex flex-wrap gap-3 items-center">
         <select wire:model.live="filterStatus"
-            class="text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-purple-600">
+            class="text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-brand-purple-mid">
             <option value="">All Statuses</option>
             <option value="pending">Pending</option>
             <option value="approved">Approved</option>
@@ -10,7 +10,7 @@
             <option value="escalated">Escalated</option>
         </select>
         <select wire:model.live="filterRisk"
-            class="text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-purple-600">
+            class="text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-brand-purple-mid">
             <option value="">All Risk Levels</option>
             <option value="critical">Critical</option>
             <option value="high">High</option>
@@ -31,7 +31,7 @@
                     $color = $riskColors[$approval->risk_level] ?? 'gray';
                 @endphp
                 <div wire:click="selectApproval({{ $approval->id }})"
-                    class="bg-white dark:bg-gray-900 rounded-2xl border {{ $selectedApproval?->id === $approval->id ? 'border-purple-500 ring-2 ring-purple-200 dark:ring-purple-800' : 'border-gray-200 dark:border-gray-700' }} p-5 cursor-pointer hover:border-purple-300 dark:hover:border-purple-600 transition-all">
+                    class="bg-white dark:bg-gray-900 rounded-2xl border {{ $selectedApproval?->id === $approval->id ? 'border-brand-purple-light ring-2 ring-brand-purple-pale dark:ring-brand-purple-dark' : 'border-gray-200 dark:border-gray-700' }} p-5 cursor-pointer hover:border-brand-purple-light dark:hover:border-brand-purple-mid transition-all">
                     <div class="flex items-start justify-between gap-3">
                         <div class="flex-1 min-w-0">
                             <div class="flex items-center gap-2 mb-1">
@@ -127,7 +127,7 @@
                             <label class="block text-xs text-gray-500 mb-1">Reviewer Notes</label>
                             <textarea wire:model="reviewerNotes" rows="3"
                                 placeholder="Add notes or reasoning..."
-                                class="w-full text-xs rounded-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-purple-600"></textarea>
+                                class="w-full text-xs rounded-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-brand-purple-mid"></textarea>
                         </div>
                         <div class="flex gap-2">
                             <button wire:click="approve" wire:loading.attr="disabled"
