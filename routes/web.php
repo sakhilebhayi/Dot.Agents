@@ -5,6 +5,7 @@ use App\Http\Controllers\BillingController;
 use App\Http\Controllers\HealthCheckController;
 use App\Http\Controllers\SocialAccountController;
 use App\Http\Controllers\SocialOAuthController;
+use App\Http\Controllers\SocialWebhookController;
 use App\Models\AgentDeployment;
 use App\Models\AgentWorkflow;
 use App\Models\User;
@@ -158,3 +159,8 @@ Route::middleware([
 // Stripe webhook — must be outside auth middleware + CSRF exempt (handled in VerifyCsrfToken)
 
 Route::post('/webhooks/stripe', [BillingController::class, 'webhook'])->name('stripe.webhook');
+
+// Social platform webhooks — must be outside auth middleware + CSRF exempt (handled in VerifyCsrfToken)
+
+Route::get('/social/webhooks/{platform}', [SocialWebhookController::class, 'verify'])->name('social.webhooks.verify');
+Route::post('/social/webhooks/{platform}', [SocialWebhookController::class, 'receive'])->name('social.webhooks.receive');

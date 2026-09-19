@@ -13,9 +13,14 @@ class VerifyCsrfToken extends Middleware
      * Security is enforced instead via Stripe-Signature header verification
      * in BillingController::webhook() using \Stripe\Webhook::constructEvent().
      *
+     * Social platform webhooks must be excluded for the same reason. Security
+     * is enforced instead via X-Hub-Signature-256 header verification in
+     * SocialWebhookController::receive().
+     *
      * @var array<int, string>
      */
     protected $except = [
         '/webhooks/stripe',
+        '/social/webhooks/*',
     ];
 }

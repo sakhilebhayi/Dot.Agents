@@ -32,11 +32,13 @@ use App\Listeners\LogSocialPostPublished;
 use App\Listeners\NotifyOnNegativeSentiment;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use SocialiteProviders\Discord\DiscordExtendSocialite;
+use SocialiteProviders\Instagram\InstagramExtendSocialite;
 use SocialiteProviders\Manager\SocialiteWasCalled;
 use SocialiteProviders\Patreon\PatreonExtendSocialite;
 use SocialiteProviders\Pinterest\PinterestExtendSocialite;
 use SocialiteProviders\Reddit\RedditExtendSocialite;
 use SocialiteProviders\Snapchat\SnapchatExtendSocialite;
+use SocialiteProviders\TikTok\TikTokExtendSocialite;
 use SocialiteProviders\Twitch\TwitchExtendSocialite;
 use SocialiteProviders\YouTube\YouTubeExtendSocialite;
 
@@ -65,6 +67,8 @@ class EventServiceProvider extends ServiceProvider
             RedditExtendSocialite::class.'@handle',
             DiscordExtendSocialite::class.'@handle',
             TwitchExtendSocialite::class.'@handle',
+            InstagramExtendSocialite::class.'@handle',
+            TikTokExtendSocialite::class.'@handle',
         ],
 
         // ── SCCS: Social Commerce & Customer Success events ──────────────────

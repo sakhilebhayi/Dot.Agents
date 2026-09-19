@@ -47,7 +47,14 @@ class PublishSocialPostJob implements ShouldQueue
         }
 
         try {
-            $this->post->update(['status' => 'published', 'published_at' => now()]);
+            $result = $publisher->publishWithResponse($this->post);
+
+            $this->post->update([
+                'status' => 'published',
+                'published_at' => now(),
+                'platform_post_id' => $result['platform_post_id'],
+                'platform_response' => $result['raw_response'],
+            ]);
 
             event(new SocialPostPublished($this->post));
 
