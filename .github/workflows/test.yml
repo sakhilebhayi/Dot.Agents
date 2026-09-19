@@ -5,6 +5,10 @@ on:
     branches: [main, develop, staging]
   pull_request:
     branches: [main, develop, staging]
+  # deploy.yml's pre-deploy-checks job calls this workflow via `uses:` as a
+  # reusable workflow -- without workflow_call as a trigger, GitHub rejects
+  # the entire deploy.yml file at parse time (zero jobs ever run).
+  workflow_call: {}
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

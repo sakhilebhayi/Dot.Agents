@@ -172,23 +172,5 @@ jobs:
               echo "Rolled back to: $PREVIOUS"
             else
               echo "ERROR: No previous release found for rollback"
-              exit 1rtisan queue:restart
-              sleep 3
-              curl -sf http://localhost/api/health && echo "Rollback healthy: $PREVIOUS" || echo "WARNING: rollback health check failed — manual inspection required"
-              echo "Rolled back to: $PREVIOUS"
-            else
-              echo "ERROR: No previous release found for rollback"
-              exit 1rtisan queue:restart
-              sleep 3
-              curl -sf http://localhost/api/health && echo "Rollback healthy: $PREVIOUS" || echo "WARNING: rollback health check failed — manual inspection required"
-              echo "Rolled back to: $PREVIOUS"
-            else
-              echo "ERROR: No previous release found for rollback"
-              exit 1rtisan queue:restart
-              sleep 3
-              curl -sf http://localhost/api/health && echo "Rollback healthy: $PREVIOUS" || echo "WARNING: rollback health check failed — manual inspection required"
-              echo "Rolled back to: $PREVIOUS"
-            else
-              echo "ERROR: No previous release found for rollback"
               exit 1
             fi
