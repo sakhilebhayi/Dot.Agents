@@ -20,7 +20,6 @@ use App\Services\Governance\Scorecard\ScorecardDataCollector;
 use App\Services\Governance\Scorecard\ScorecardDomainScorer;
 use App\Services\Governance\Scorecard\ScorecardGateEvaluator;
 use App\Services\Governance\ScorecardService;
-use App\Services\Infrastructure\ObservabilityService;
 use Illuminate\Support\ServiceProvider;
 
 class GovernanceServiceProvider extends ServiceProvider

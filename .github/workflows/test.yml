@@ -52,6 +52,20 @@ jobs:
       - name: Install dependencies
         run: composer install --no-interaction --no-progress --prefer-dist --optimize-autoloader
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Build frontend assets
+        # Several Blade layouts call @vite(...); without a real build,
+        # public/build/manifest.json (gitignored) doesn't exist and every
+        # such page 500s with ViteManifestNotFoundException.
+        run: |
+          npm ci
+          npm run build
+
       - name: Prepare environment
         run: |
           cp .env.example .env
@@ -130,6 +144,20 @@ jobs:
 
       - name: Install dependencies
         run: composer install --no-interaction --no-progress --prefer-dist --optimize-autoloader
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Build frontend assets
+        # Several Blade layouts call @vite(...); without a real build,
+        # public/build/manifest.json (gitignored) doesn't exist and every
+        # such page 500s with ViteManifestNotFoundException.
+        run: |
+          npm ci
+          npm run build
 
       - name: Prepare environment
         run: |

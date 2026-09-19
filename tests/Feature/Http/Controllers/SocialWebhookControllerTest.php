@@ -6,7 +6,6 @@ use App\Jobs\GenerateSocialResponseJob;
 use App\Models\AgentDeployment;
 use App\Models\Organization;
 use App\Models\SocialAccount;
-use App\Models\SocialConversation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
