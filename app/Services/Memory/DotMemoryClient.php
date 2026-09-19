@@ -27,9 +27,11 @@ class DotMemoryClient
 
     private const TIMEOUT_SECONDS = 5;
 
+    public function __construct(private readonly DotMemoryEnvelopeBuilder $envelopeBuilder) {}
+
     public function recordEvent(string $loopId, string $subjectType, string $subjectId, array $envelope = [], array $detail = []): bool
     {
-        return $this->post('api/intelligence/events', $this->envelope($loopId, $subjectType, $subjectId, $envelope, $detail));
+        return $this->post('api/intelligence/events', $this->envelopeBuilder->build($loopId, $subjectType, $subjectId, $envelope, $detail));
     }
 
     public function recordDecision(
@@ -42,7 +44,7 @@ class DotMemoryClient
         array $envelope = [],
         array $detail = [],
     ): bool {
-        $payload = $this->envelope($loopId, $subjectType, $subjectId, $envelope, $detail);
+        $payload = $this->envelopeBuilder->build($loopId, $subjectType, $subjectId, $envelope, $detail);
         $payload['confidence'] = $confidence;
         $payload['risk'] = $risk;
         $payload['autonomy_level'] = $autonomyLevel;
@@ -59,7 +61,7 @@ class DotMemoryClient
         array $envelope = [],
         array $detail = [],
     ): bool {
-        $payload = $this->envelope($loopId, $subjectType, $subjectId, $envelope, $detail);
+        $payload = $this->envelopeBuilder->build($loopId, $subjectType, $subjectId, $envelope, $detail);
         $payload['action_kind'] = $actionKind;
         $payload['executor_platform'] = self::PLATFORM;
         $payload['execution_status'] = $executionStatus;
@@ -75,7 +77,7 @@ class DotMemoryClient
         array $envelope = [],
         array $detail = [],
     ): bool {
-        $payload = $this->envelope($loopId, $subjectType, $subjectId, $envelope, $detail);
+        $payload = $this->envelopeBuilder->build($loopId, $subjectType, $subjectId, $envelope, $detail);
         $payload['verdict'] = $verdict;
 
         return $this->post('api/intelligence/outcomes', $payload);
@@ -128,29 +130,6 @@ class DotMemoryClient
 
             return null;
         }
-    }
-
-    /**
-     * @param  array<string, mixed>  $envelope  overrides/extends any envelope field
-     *                                          (source, subject_label, team_id, user_id,
-     *                                          signature, requires_approval, mechanic_ref,
-     *                                          approval_status, measure, ...) -- including
-     *                                          event_id/occurred_at, for a caller that needs
-     *                                          a deterministic retry.
-     * @param  array<string, mixed>  $detail
-     * @return array<string, mixed>
-     */
-    private function envelope(string $loopId, string $subjectType, string $subjectId, array $envelope, array $detail): array
-    {
-        return array_merge([
-            'loop_id' => $loopId,
-            'event_id' => (string) Str::uuid(),
-            'platform' => self::PLATFORM,
-            'subject_type' => $subjectType,
-            'subject_id' => $subjectId,
-            'occurred_at' => now()->toISOString(),
-            'detail' => $detail === [] ? null : $detail,
-        ], $envelope);
     }
 
     /**

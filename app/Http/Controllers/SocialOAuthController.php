@@ -8,18 +8,16 @@ use App\DTOs\Organizations\SaveConnectionSettingsData;
 use App\DTOs\Social\ConnectSocialAccountData;
 use App\Http\Requests\ConnectSocialAccountRequest;
 use App\Models\SocialAccount;
-use App\Services\Social\SocialPublishingService;
+use App\Services\Social\SocialOAuthDriverResolver;
 use App\Support\SocialPlatformConfig;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
-use Laravel\Socialite\Contracts\Factory as Socialite;
-use Laravel\Socialite\Two\AbstractProvider;
 
 class SocialOAuthController extends Controller
 {
-    public function __construct(private readonly Socialite $socialite) {}
+    public function __construct(private readonly SocialOAuthDriverResolver $driverResolver) {}
 
     public function redirect(ConnectSocialAccountRequest $request, string $platform): RedirectResponse
     {
@@ -27,7 +25,7 @@ class SocialOAuthController extends Controller
 
         session()->put("social_oauth_{$platform}_deployment_id", $request->validated('agent_deployment_id'));
 
-        $driver = $this->resolveDriver($platform);
+        $driver = $this->driverResolver->resolve($platform);
         $scopes = SocialPlatformConfig::scopesFor($platform);
 
         return empty($scopes) ? $driver->redirect() : $driver->scopes($scopes)->redirect();
@@ -55,7 +53,7 @@ class SocialOAuthController extends Controller
 
         Gate::authorize('create', [SocialAccount::class, (int) $orgId]);
 
-        $oauthUser = $this->resolveDriver($platform)->user();
+        $oauthUser = $this->driverResolver->resolve($platform)->user();
         $agentDeploymentId = session()->pull("social_oauth_{$platform}_deployment_id");
 
         $account = $action->execute(ConnectSocialAccountData::fromArray([
@@ -80,25 +78,5 @@ class SocialOAuthController extends Controller
 
         return redirect()->route('social.accounts')
             ->with('success', "Connected {$account->account_name} on ".ucfirst($platform).'.');
-    }
-
-    private function resolveDriver(string $platform): AbstractProvider
-    {
-        $driver = SocialPlatformConfig::driverFor($platform);
-        $orgId = (int) session('current_organization_id');
-
-        $orgCred = app(SocialPublishingService::class)->findCredential($orgId, $platform);
-
-        if ($orgCred) {
-            $callbackUrl = $orgCred->redirect_uri ?? route('social.auth.callback', ['platform' => $platform]);
-
-            config([
-                "services.{$driver}.client_id" => $orgCred->client_id,
-                "services.{$driver}.client_secret" => $orgCred->client_secret,
-                "services.{$driver}.redirect" => $callbackUrl,
-            ]);
-        }
-
-        return $this->socialite->driver($driver);
     }
 }

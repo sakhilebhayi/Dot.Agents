@@ -3,7 +3,6 @@
 namespace App\Actions\Governance;
 
 use App\DTOs\Governance\ProcessRetentionPurgeData;
-use App\Events\RetentionPurgeProcessed;
 use App\Models\RetentionPurgeProposal;
 use App\Services\Governance\AuditService;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -55,8 +54,6 @@ class ProcessRetentionPurgeAction
             data: ['deleted_count' => $deletedCount],
             subject: $proposal,
         );
-
-        event(new RetentionPurgeProcessed($proposal));
 
         return $proposal->refresh();
     }

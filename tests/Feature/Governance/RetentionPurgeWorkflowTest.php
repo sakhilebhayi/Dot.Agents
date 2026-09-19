@@ -4,7 +4,6 @@ namespace Tests\Feature\Governance;
 
 use App\Actions\Governance\ProcessRetentionPurgeAction;
 use App\DTOs\Governance\ProcessRetentionPurgeData;
-use App\Events\RetentionPurgeProcessed;
 use App\Models\AgentDeployment;
 use App\Models\AgentTask;
 use App\Models\Organization;
@@ -12,7 +11,6 @@ use App\Models\RetentionPurgeProposal;
 use App\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Event;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
@@ -91,21 +89,6 @@ class RetentionPurgeWorkflowTest extends TestCase
         $this->assertSame('rejected', $result->status);
         $this->assertSame('Need these for an ongoing investigation.', $result->reviewer_notes);
         $this->assertDatabaseCount('agent_tasks', 1);
-    }
-
-    public function test_processing_fires_the_event(): void
-    {
-        Event::fake([RetentionPurgeProcessed::class]);
-        $proposal = $this->eligibleTaskProposal();
-        $admin = $this->platformAdmin();
-        $this->actingAs($admin);
-
-        app(ProcessRetentionPurgeAction::class)->execute(
-            $proposal,
-            new ProcessRetentionPurgeData($proposal->id, 'approved'),
-        );
-
-        Event::assertDispatched(RetentionPurgeProcessed::class);
     }
 
     public function test_processing_creates_an_audit_log(): void

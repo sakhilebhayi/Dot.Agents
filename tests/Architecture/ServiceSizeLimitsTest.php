@@ -427,11 +427,14 @@ class ServiceSizeLimitsTest extends TestCase
             }
         }
 
-        // Allow up to 3 Actions that legitimately need no typed DTO
-        // (e.g. HandleStripeWebhookAction accepts an external SDK object)
-        if (count($violations) > 3) {
+        // Allow up to 4 Actions that legitimately need no typed DTO (e.g.
+        // HandleStripeWebhookAction accepts an external SDK object;
+        // ReceiveFacebookWebhookAction accepts a raw external webhook
+        // payload array and an HTTP Request — there is no internal domain
+        // shape to wrap until the payload has already been parsed).
+        if (count($violations) > 4) {
             $this->fail(
-                "Actions missing dedicated DTO (max 3 exceptions for external-typed inputs):\n"
+                "Actions missing dedicated DTO (max 4 exceptions for external-typed inputs):\n"
                 .implode("\n", $violations)
             );
         }
