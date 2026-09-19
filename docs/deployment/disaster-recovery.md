@@ -16,11 +16,15 @@
 
 ```bash
 # Automated daily backup (add to crontab)
-0 2 * * * mysqldump -u dotagents -p dotagents_prod \
+# Non-interactive auth: put the password in ~/.pgpass (format
+# host:port:database:username:password, chmod 600) or export PGPASSWORD --
+# unlike mysql's `-p` (interactive prompt), pg_dump/psql never accept a
+# password on the command line.
+0 2 * * * pg_dump -h 127.0.0.1 -U dotagents dotagents_prod \
   | gzip > /backups/dotagents_$(date +%Y%m%d).sql.gz
 
 # Verify backup integrity
-gunzip -c /backups/dotagents_latest.sql.gz | mysql -u root dotagents_verify
+gunzip -c /backups/dotagents_latest.sql.gz | psql -h 127.0.0.1 -U postgres dotagents_verify
 
 # Retention: 30 daily, 12 monthly, 5 yearly
 find /backups -name "*.sql.gz" -mtime +30 -delete
@@ -37,11 +41,15 @@ php artisan down --secret="recovery-token"
 
 # Step 3: Restore from backup
 gunzip -c /backups/dotagents_YYYYMMDD.sql.gz \
-  | mysql -u dotagents -p dotagents_prod
+  | psql -h 127.0.0.1 -U dotagents dotagents_prod
 
 # Step 4: Verify row counts
-mysql -e "SELECT table_name, table_rows FROM information_schema.tables \
-  WHERE table_schema = 'dotagents_prod' ORDER BY table_rows DESC LIMIT 20;"
+# Postgres has no MySQL-style information_schema.tables.table_rows; the
+# equivalent approximate per-table row count comes from the stats
+# collector via pg_stat_user_tables.
+psql -h 127.0.0.1 -U dotagents -d dotagents_prod -c \
+  "SELECT relname AS table_name, n_live_tup AS row_estimate \
+   FROM pg_stat_user_tables ORDER BY n_live_tup DESC LIMIT 20;"
 
 # Step 5: Run any missed migrations
 php artisan migrate --force
