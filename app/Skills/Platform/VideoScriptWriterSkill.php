@@ -63,7 +63,7 @@ class VideoScriptWriterSkill extends VideoScriptHelper
                 'duration_sec' => $duration,
                 'narration_cue' => $section['cue'],
                 'suggested_visual' => $section['visual'],
-                'tone_note' => $section['tone_note'] ?? $tone,
+                'tone_note' => $section['tone_note'],
                 'script_placeholder' => "[Write {$duration}s of {$section['name']} content about: {$brief}]",
             ];
             $timeOffset += $duration;

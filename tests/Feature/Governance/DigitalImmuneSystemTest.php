@@ -6,6 +6,7 @@ use App\Models\AgentDeployment;
 use App\Models\AgentTask;
 use App\Models\DecisionLog;
 use App\Models\Organization;
+use App\Models\UsageRecord;
 use App\Services\Governance\DigitalImmuneSystem;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -133,6 +134,51 @@ class DigitalImmuneSystemTest extends TestCase
         $report2 = $this->dis->runHealthCheck($this->org->id);
 
         $this->assertIsArray($report2);
+    }
+
+    public function test_dis_treats_a_single_usage_anomaly_as_a_warning(): void
+    {
+        $deployment = AgentDeployment::factory()->create([
+            'organization_id' => $this->org->id,
+            'status' => 'active',
+        ]);
+
+        UsageRecord::factory()->create([
+            'agent_deployment_id' => $deployment->id,
+            'organization_id' => $this->org->id,
+            'total_cost' => 75,
+            'recorded_date' => now()->toDateString(),
+        ]);
+
+        $status = $this->dis->checkDeployment($deployment);
+
+        $this->assertSame('warnings', $status['health']);
+        $this->assertSame('active', $deployment->fresh()->status);
+    }
+
+    public function test_dis_escalates_and_quarantines_after_consecutive_usage_anomalies(): void
+    {
+        $deployment = AgentDeployment::factory()->create([
+            'organization_id' => $this->org->id,
+            'status' => 'active',
+        ]);
+
+        UsageRecord::factory()->create([
+            'agent_deployment_id' => $deployment->id,
+            'organization_id' => $this->org->id,
+            'total_cost' => 75,
+            'recorded_date' => now()->toDateString(),
+        ]);
+
+        // Same anomaly detected 3 times in a row (e.g. 3 periodic health-check
+        // runs) should escalate from a routine warning to a critical,
+        // quarantine-triggering event rather than staying a flat warning forever.
+        $this->dis->checkDeployment($deployment);
+        $this->dis->checkDeployment($deployment);
+        $status = $this->dis->checkDeployment($deployment);
+
+        $this->assertSame('critical', $status['health']);
+        $this->assertSame('suspended', $deployment->fresh()->status);
     }
 
     public function test_dis_does_not_check_deployments_from_other_orgs(): void

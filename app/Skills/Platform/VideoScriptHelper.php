@@ -23,9 +23,26 @@ abstract class VideoScriptHelper extends BaseSkill
     ];
 
     /**
+     * Per-section tone guidance, independent of format — the same section name
+     * plays the same role in every format's pacing, so its delivery style stays
+     * consistent while the requested overall $tone still colors every section.
+     */
+    private const SECTION_TONE_MODIFIERS = [
+        'Intro' => 'welcoming, sets context',
+        'Hook' => 'high-energy, attention-grabbing',
+        'Problem Agitation' => 'empathetic but urgent',
+        'Core Message' => 'clear and confident',
+        'Main Content' => 'clear and confident',
+        'Solution' => 'clear and confident',
+        'Social Proof' => 'credible, trust-building',
+        'Summary' => 'concise, reassuring',
+        'CTA' => 'direct and motivating',
+    ];
+
+    /**
      * Return the section blueprint for the given format and tone.
      *
-     * @return array<int, array{name: string, weight: float, cue: string, visual: string}>
+     * @return array<int, array{name: string, weight: float, cue: string, visual: string, tone_note: string}>
      */
     protected function getScriptStructure(string $format, string $tone): array
     {
@@ -51,7 +68,14 @@ abstract class VideoScriptHelper extends BaseSkill
             ],
         ];
 
-        return $structures[$format] ?? $structures['standard'];
+        $sections = $structures[$format] ?? $structures['standard'];
+
+        return array_map(function (array $section) use ($tone) {
+            $modifier = self::SECTION_TONE_MODIFIERS[$section['name']] ?? null;
+            $section['tone_note'] = $modifier ? "{$tone}, {$modifier}" : $tone;
+
+            return $section;
+        }, $sections);
     }
 
     /** Generate a descriptive storyboard visual for the given frame position. */

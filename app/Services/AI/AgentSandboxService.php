@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Log;
  *  3. Memory isolation  — agent can only access its own deployment memory
  *  4. Tool restrictions — validates tool use against deployment config + DB rules
  *  5. Token budget      — prevents runaway token spend per task
+ *  6. Tool-call budget  — prevents runaway tool-call loops per task
  */
 class AgentSandboxService
 {
@@ -27,6 +28,20 @@ class AgentSandboxService
      * CVE mitigation: prevents recursive delegation amplification attacks.
      */
     private const MAX_DELEGATION_DEPTH = 3;
+
+    /**
+     * Maximum number of tool calls allowed within a single task execution,
+     * for any deployment regardless of charter/provisional status.
+     *
+     * Provisional (uncharted) agents already have a stricter, event-driven
+     * limit enforced in AgentOrchestrationService::executeTask() via the
+     * colony runtime contract (config('services.dot_brain.provisional_max_tool_calls')),
+     * escalating straight to quarantine. This is the broader safety net that
+     * also covers chartered agents, which otherwise have no tool-call limit
+     * at all — prevents a runaway tool-call loop (e.g. a cheap tool invoked
+     * indefinitely) regardless of trust tier.
+     */
+    private const MAX_TOOL_CALLS_PER_TASK = 15;
 
     public function __construct(
         private readonly ToolPermissionService $toolPermissions,
@@ -65,6 +80,28 @@ class AgentSandboxService
 
             throw new \RuntimeException(
                 "Token budget exceeded for deployment [{$deployment->id}]. Used: {$tokensUsed}, Limit: {$limit}."
+            );
+        }
+    }
+
+    /**
+     * Check whether a tool-call count is within the per-task limit.
+     *
+     * @throws \RuntimeException if the tool-call limit is exceeded
+     */
+    public function enforceToolCallLimit(AgentDeployment $deployment, int $toolCallCount): void
+    {
+        $limit = $deployment->agent?->model_config['max_tool_calls_per_task'] ?? self::MAX_TOOL_CALLS_PER_TASK;
+
+        if ($toolCallCount > $limit) {
+            Log::warning('AgentSandboxService: tool-call limit exceeded', [
+                'deployment_id' => $deployment->id,
+                'tool_calls_used' => $toolCallCount,
+                'limit' => $limit,
+            ]);
+
+            throw new \RuntimeException(
+                "Tool-call limit exceeded for deployment [{$deployment->id}]. Used: {$toolCallCount}, Limit: {$limit}."
             );
         }
     }

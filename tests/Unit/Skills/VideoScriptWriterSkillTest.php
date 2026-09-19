@@ -34,6 +34,22 @@ class VideoScriptWriterSkillTest extends TestCase
         $this->assertArrayHasKey('total_duration_sec', $result->output);
     }
 
+    public function test_script_sections_get_a_specific_tone_note_not_just_the_flat_tone(): void
+    {
+        $result = $this->skill->execute([
+            'action' => 'script',
+            'topic' => 'Introducing our AI workforce platform',
+            'format' => 'explainer',
+            'tone' => 'playful',
+        ]);
+
+        $sections = collect($result->output['sections'])->keyBy('section');
+
+        $this->assertSame('playful, high-energy, attention-grabbing', $sections['Hook']['tone_note']);
+        $this->assertSame('playful, direct and motivating', $sections['CTA']['tone_note']);
+        $this->assertNotSame($sections['Hook']['tone_note'], $sections['CTA']['tone_note']);
+    }
+
     public function test_script_fails_without_topic(): void
     {
         $result = $this->skill->execute(['action' => 'script', 'topic' => '']);

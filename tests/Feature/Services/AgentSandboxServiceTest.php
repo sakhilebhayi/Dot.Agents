@@ -71,4 +71,19 @@ class AgentSandboxServiceTest extends TestCase
         // 33000 tokens well exceeds the default 32000 limit
         $this->sandbox->enforceTokenBudget($this->deployment, 33000);
     }
+
+    public function test_enforce_tool_call_limit_passes_within_limit(): void
+    {
+        // Should not throw when within limit
+        $this->sandbox->enforceToolCallLimit($this->deployment, 5);
+        $this->assertTrue(true);
+    }
+
+    public function test_enforce_tool_call_limit_throws_when_exceeded(): void
+    {
+        $this->expectException(RuntimeException::class);
+
+        // 16 tool calls exceeds the default 15 limit
+        $this->sandbox->enforceToolCallLimit($this->deployment, 16);
+    }
 }

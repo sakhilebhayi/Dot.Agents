@@ -10,21 +10,18 @@ class UsageRecordFactory extends Factory
 {
     public function definition(): array
     {
+        $quantity = $this->faker->numberBetween(100, 10000);
+        $unitCost = $this->faker->randomFloat(8, 0.0001, 0.001);
+
         return [
             'organization_id' => Organization::factory(),
             'agent_deployment_id' => AgentDeployment::factory(),
-            'user_id' => null,
-            'record_type' => $this->faker->randomElement(['message', 'task', 'api_call']),
+            'metric_type' => $this->faker->randomElement(['tokens', 'tasks', 'api_calls', 'storage_gb']),
+            'quantity' => $quantity,
+            'unit_cost' => $unitCost,
+            'total_cost' => round($quantity * $unitCost, 4),
+            'model_used' => $this->faker->randomElement(['gpt-4o', 'gpt-4o-mini', 'claude-sonnet-5']),
             'recorded_date' => now()->toDateString(),
-            'message_count' => $this->faker->numberBetween(0, 50),
-            'task_count' => $this->faker->numberBetween(0, 20),
-            'token_count' => $this->faker->numberBetween(100, 10000),
-            'input_tokens' => $this->faker->numberBetween(50, 5000),
-            'output_tokens' => $this->faker->numberBetween(50, 5000),
-            'compute_units' => $this->faker->randomFloat(4, 0.01, 10.0),
-            'total_cost' => $this->faker->randomFloat(4, 0.001, 5.0),
-            'currency' => 'USD',
-            'metadata' => [],
         ];
     }
 }

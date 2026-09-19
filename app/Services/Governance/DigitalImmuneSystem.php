@@ -18,6 +18,14 @@ class DigitalImmuneSystem
 {
     private const CACHE_PREFIX = 'dis_';
 
+    /**
+     * Consecutive-detection threshold before an anomaly escalates from a
+     * routine warning to a critical, quarantine-triggering event. A single
+     * off day is normal variance; the same anomaly recurring this many times
+     * in a row is a real pattern worth acting on.
+     */
+    private const ANOMALY_THRESHOLD = 3;
+
     public function __construct(
         private readonly AuditService $auditService
     ) {}
@@ -87,6 +95,12 @@ class DigitalImmuneSystem
         $usageResult = $this->checkUsageAnomaly($deployment);
         if ($usageResult['detected']) {
             $events[] = $usageResult;
+            if ($usageResult['severity'] === 'critical') {
+                $health = 'critical';
+                $this->quarantineDeployment($deployment, $usageResult['reason']);
+            } else {
+                $health = $health === 'healthy' ? 'warnings' : $health;
+            }
         }
 
         // 5. Check for unapproved autonomous actions
@@ -189,19 +203,33 @@ class DigitalImmuneSystem
     private function checkUsageAnomaly(AgentDeployment $deployment): array
     {
         $todayUsage = UsageRecord::where('agent_deployment_id', $deployment->id)
-            ->where('recorded_date', now()->toDateString())
+            ->whereDate('recorded_date', now()->toDateString())
             ->sum('total_cost');
+
+        $streakKey = self::CACHE_PREFIX."usage_anomaly_streak_{$deployment->id}";
 
         // Simple threshold: $50/day per agent is flagged
         if ($todayUsage > 50) {
+            $streak = Cache::get($streakKey, 0) + 1;
+            Cache::put($streakKey, $streak, now()->addHours(48));
+
+            $escalated = $streak >= self::ANOMALY_THRESHOLD;
+
             return [
                 'detected' => true,
                 'type' => 'usage_anomaly',
-                'severity' => 'warning',
-                'message' => "High daily cost: \${$todayUsage}",
-                'recommendation' => 'Review agent activity and optimize prompts',
+                'severity' => $escalated ? 'critical' : 'warning',
+                'message' => "High daily cost: \${$todayUsage}".
+                    ($escalated ? " ({$streak} consecutive days)" : ''),
+                'recommendation' => $escalated
+                    ? 'Sustained excessive cost — quarantining pending investigation'
+                    : 'Review agent activity and optimize prompts',
+                'reason' => $escalated ? "Sustained usage anomaly: {$streak} consecutive detections" : null,
             ];
         }
+
+        // No anomaly today — reset the streak so isolated spikes don't accumulate forever
+        Cache::forget($streakKey);
 
         return ['detected' => false];
     }

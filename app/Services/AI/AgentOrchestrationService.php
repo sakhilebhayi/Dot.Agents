@@ -167,6 +167,10 @@ class AgentOrchestrationService
             );
             $durationMs = (int) ((microtime(true) - $startTime) * 1000);
 
+            // Universal sandbox boundary — applies regardless of charter status,
+            // unlike the stricter provisional-only contract check just below.
+            $this->sandbox->enforceToolCallLimit($deployment, count($response['tool_calls'] ?? []));
+
             // "runc:provisional" colony runtime contract: an uncharted agent's
             // resource use is bounded; a chartered agent has no such bound today.
             if ($isProvisional) {
