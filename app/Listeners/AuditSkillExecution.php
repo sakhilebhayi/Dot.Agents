@@ -32,21 +32,23 @@ class AuditSkillExecution implements ShouldQueue
         $deployment = $execution->deployment;
 
         // Governance audit record
-        $this->auditService->logAgentAction(
-            $deployment,
-            'skill.executed',
-            [
-                'skill_id' => $execution->skill_id,
-                'skill_name' => $execution->skill?->name,
-                'status' => $execution->status,
-                'confidence' => $execution->confidence,
-                'duration_ms' => $execution->duration_ms,
-            ]
-        );
+        if ($deployment) {
+            $this->auditService->logAgentAction(
+                $deployment,
+                'skill.executed',
+                [
+                    'skill_id' => $execution->skill_id,
+                    'skill_name' => $execution->skill?->name,
+                    'status' => $execution->status,
+                    'confidence' => $execution->confidence,
+                    'duration_ms' => $execution->duration_ms,
+                ]
+            );
+        }
 
         // Alert admins when confidence is dangerously low on a completed execution
         $confidence = (float) ($execution->confidence ?? 100.0);
-        $threshold = (float) ($deployment?->confidence_threshold ?? 75.0);
+        $threshold = (float) ($deployment->confidence_threshold ?? 75.0);
 
         if ($execution->status === 'completed' && $confidence < ($threshold * 0.7)) {
             SendPlatformNotification::toAdmins(

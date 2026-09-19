@@ -66,7 +66,7 @@ class SkillIntrospectionSkill extends BaseSkill
             'risk_level' => $a->skill?->risk_level,
             'confidence_score' => $a->skill?->confidence_score,
             'enabled' => $a->is_enabled,
-            'has_implementation' => app(SkillRegistryService::class)->hasImplementation($a->skill?->key ?? ''),
+            'has_implementation' => app(SkillRegistryService::class)->hasImplementation($a->skill->key ?? ''),
         ])->sortBy('layer')->values()->all();
 
         $layers = array_unique(array_column($skills, 'layer'));

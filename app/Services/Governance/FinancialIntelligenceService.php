@@ -45,7 +45,7 @@ class FinancialIntelligenceService
         $since = now()->subMonths(self::LOOKBACK_MONTHS);
 
         $scorecardTotals = AgentScorecard::withoutGlobalScope('organization')
-            ->whereHas('agentDeployment', fn ($q) => $q->where('organization_id', $organization->id))
+            ->whereHas('deployment', fn ($q) => $q->where('organization_id', $organization->id))
             ->where('period_end', '>=', $since)
             ->selectRaw('SUM(total_cost) as total_cost, SUM(estimated_savings) as total_savings, SUM(estimated_revenue_impact) as total_revenue_impact, COUNT(*) as scorecard_count')
             ->first();

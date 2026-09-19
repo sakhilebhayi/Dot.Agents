@@ -3,6 +3,7 @@
 namespace App\Livewire\Organizations;
 
 use App\Actions\Organizations\UpdateOrganizationSettingsAction;
+use App\DTOs\Organizations\UpdateOrganizationSettingsData;
 use App\Models\Organization;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Validate;
@@ -62,7 +63,7 @@ class OrganizationSettings extends Component
     {
         $this->validate();
 
-        $action->execute($this->currentOrganization, [
+        $action->execute($this->currentOrganization, UpdateOrganizationSettingsData::fromArray([
             'name' => $this->name,
             'domain' => $this->domain,
             'industry' => $this->industry,
@@ -70,7 +71,7 @@ class OrganizationSettings extends Component
             'country' => $this->country,
             'timezone' => $this->timezone,
             'currency' => $this->currency,
-        ]);
+        ]));
 
         $this->saved = true;
         $this->dispatch('settings-saved');

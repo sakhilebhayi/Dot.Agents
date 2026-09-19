@@ -38,7 +38,7 @@ class WorkflowOptimizationSkill extends BaseSkill
     public function execute(array $input, array $context = []): SkillResult
     {
         $workflowId = isset($input['workflow_id']) ? (int) $input['workflow_id'] : null;
-        $orgId = $context['deployment']?->organization_id ?? (int) session('current_organization_id');
+        $orgId = $context['deployment']->organization_id ?? (int) session('current_organization_id');
         $lookbackDays = (int) ($input['lookback_days'] ?? 30);
 
         if ($workflowId) {

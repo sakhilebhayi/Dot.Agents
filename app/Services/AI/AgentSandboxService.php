@@ -19,8 +19,6 @@ class AgentSandboxService
 {
     private const MAX_TOKENS_PER_TASK = 32000;
 
-    private const MAX_TOOL_CALLS_PER_TASK = 50;
-
     /**
      * Maximum number of nested agent delegations allowed.
      *
@@ -191,7 +189,7 @@ class AgentSandboxService
         }
 
         // 1. Agent-level tool registration check (fast — in-memory)
-        $agentTools = $deployment->agent?->tools ?? [];
+        $agentTools = $deployment->agent->tools ?? [];
 
         if (! empty($agentTools) && ! in_array($tool, $agentTools, true)) {
             Log::warning('AgentSandboxService: tool not registered for agent', [

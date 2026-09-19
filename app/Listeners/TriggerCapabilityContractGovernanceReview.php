@@ -3,7 +3,8 @@
 namespace App\Listeners;
 
 use App\Events\AgentCapabilityContractChanged;
-use App\Models\PlatformNotification;
+use App\Jobs\SendPlatformNotification;
+use App\Models\AgentDeployment;
 use App\Services\Governance\AuditService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
@@ -46,22 +47,31 @@ class TriggerCapabilityContractGovernanceReview implements ShouldQueue
             ]
         );
 
-        // Create a platform notification for the agent owner's organization
-        PlatformNotification::create([
-            'organization_id' => $agent->organization_id ?? null,
-            'type' => 'agent_capability_contract_changed',
-            'title' => "Breaking capability change — {$agent->name} v{$newVersion->version}",
-            'body' => "Agent \"{$agent->name}\" was published with a breaking capability "
-                ."change from v{$prevVersion->version} to v{$newVersion->version}. "
-                .'Review active deployments to ensure compatibility.',
-            'metadata' => [
-                'agent_id' => $agent->id,
-                'new_version_id' => $newVersion->id,
-                'prev_version_id' => $prevVersion->id,
-                'governance_action' => 'review_required',
-            ],
-            'read_at' => null,
-        ]);
+        // Agent is a platform-wide catalog resource with no organization_id of
+        // its own — notify admins of every organization that actually has a
+        // deployment of this agent, not a single (nonexistent) owning org.
+        $affectedOrgIds = AgentDeployment::withoutGlobalScope('organization')
+            ->where('agent_id', $agent->id)
+            ->pluck('organization_id')
+            ->unique();
+
+        foreach ($affectedOrgIds as $organizationId) {
+            SendPlatformNotification::toAdmins(
+                organizationId: $organizationId,
+                type: 'agent_capability_contract_changed',
+                title: "Breaking capability change — {$agent->name} v{$newVersion->version}",
+                message: "Agent \"{$agent->name}\" was published with a breaking capability "
+                    ."change from v{$prevVersion->version} to v{$newVersion->version}. "
+                    .'Review active deployments to ensure compatibility.',
+                severity: 'warning',
+                data: [
+                    'agent_id' => $agent->id,
+                    'new_version_id' => $newVersion->id,
+                    'prev_version_id' => $prevVersion->id,
+                    'governance_action' => 'review_required',
+                ],
+            );
+        }
 
         Log::info('[TriggerCapabilityContractGovernanceReview] Breaking change governance review created', [
             'agent_id' => $agent->id,

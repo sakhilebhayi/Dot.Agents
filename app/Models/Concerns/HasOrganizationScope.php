@@ -3,7 +3,6 @@
 namespace App\Models\Concerns;
 
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 
 /**
  * HasOrganizationScope — auto-scopes queries to the current organization.
@@ -34,8 +33,7 @@ trait HasOrganizationScope
             $organizationId = session('current_organization_id');
 
             if ($organizationId) {
-                /** @var Model $model */
-                $model = new static;
+                $model = new self;
                 $table = $model->getTable();
 
                 $query->where("{$table}.organization_id", (int) $organizationId);

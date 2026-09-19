@@ -18,8 +18,6 @@ class DigitalImmuneSystem
 {
     private const CACHE_PREFIX = 'dis_';
 
-    private const ANOMALY_THRESHOLD = 3; // consecutive anomalies before action
-
     public function __construct(
         private readonly AuditService $auditService
     ) {}

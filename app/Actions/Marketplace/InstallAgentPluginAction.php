@@ -69,7 +69,7 @@ class InstallAgentPluginAction
     {
         Gate::authorize('delete', $installation);
 
-        $pluginName = $installation->plugin?->name ?? "Plugin #{$installation->plugin_id}";
+        $pluginName = $installation->plugin->name ?? "Plugin #{$installation->plugin_id}";
         $orgId = $installation->organization_id;
         $pluginId = $installation->plugin_id;
 

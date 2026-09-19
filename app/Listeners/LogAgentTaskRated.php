@@ -24,9 +24,14 @@ class LogAgentTaskRated implements ShouldQueue
     public function handle(AgentTaskRated $event): void
     {
         $task = $event->task;
+        $deployment = $task->deployment;
+
+        if (! $deployment) {
+            return;
+        }
 
         $this->auditService->logAgentAction(
-            deployment: $task->deployment,
+            deployment: $deployment,
             event: 'task.rated',
             data: [
                 'task_id' => $task->id,

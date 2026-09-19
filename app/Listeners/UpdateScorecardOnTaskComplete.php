@@ -20,10 +20,15 @@ class UpdateScorecardOnTaskComplete implements ShouldQueue
     public function handle(AgentTaskCompleted $event): void
     {
         $task = $event->task;
+        $deployment = $task->deployment;
+
+        if (! $deployment) {
+            return;
+        }
 
         // Only regenerate weekly scorecards in real-time; monthly runs via schedule
         GenerateAgentScorecard::dispatch(
-            $task->deployment,
+            $deployment,
             'weekly'
         )->delay(now()->addSeconds(30)); // small delay to batch rapid task completions
     }

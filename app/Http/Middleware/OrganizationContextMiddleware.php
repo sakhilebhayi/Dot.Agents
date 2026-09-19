@@ -23,9 +23,7 @@ class OrganizationContextMiddleware
                     $org = $this->createOrganizationForUser($request->user());
                 }
 
-                if ($org) {
-                    session(['current_organization_id' => $org->id]);
-                }
+                session(['current_organization_id' => $org->id]);
             }
 
             // Validate that the session org still belongs to this user. Mirrors
@@ -57,7 +55,7 @@ class OrganizationContextMiddleware
      * Bootstrap a personal Organization for users that pre-date the
      * automatic org creation on registration.
      */
-    private function createOrganizationForUser(User $user): ?Organization
+    private function createOrganizationForUser(User $user): Organization
     {
         $baseName = explode(' ', $user->name, 2)[0]."'s Organization";
         $baseSlug = Str::slug($baseName);

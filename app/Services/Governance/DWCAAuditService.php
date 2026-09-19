@@ -101,7 +101,7 @@ class DWCAAuditService
         return [
             'deployment_id' => $deployment->id,
             'agent_id' => $agent?->id,
-            'agent_name' => $deployment->name ?? $agent?->name ?? 'Unknown',
+            'agent_name' => $deployment->name ?? $agent->name ?? 'Unknown',
             'agent_slug' => $agent?->slug,
             'composite_score' => $compositeScore,
             'certification_level' => $certificationLevel,
@@ -232,7 +232,7 @@ class DWCAAuditService
         if ($phase2['checks']['has_assigned_skills'] ?? false) {
             return 3;
         }
-        if (! empty($deployment->agent?->skills)) {
+        if (! empty($deployment->agent->skills)) {
             return 2;
         }
 

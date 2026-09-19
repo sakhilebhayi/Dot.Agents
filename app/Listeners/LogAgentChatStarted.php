@@ -26,12 +26,16 @@ class LogAgentChatStarted implements ShouldQueue
         $session = $event->session;
         $deployment = $session->deployment;
 
+        if (! $deployment) {
+            return;
+        }
+
         $this->auditService->logAgentAction($deployment, 'agent_chat_started', [
             'session_id' => $session->id,
             'user_id' => $session->user_id,
             'organization_id' => $session->organization_id,
             'session_type' => $session->session_type,
-            'started_at' => $session->started_at?->toIso8601String(),
+            'started_at' => $session->started_at->toIso8601String(),
         ]);
     }
 

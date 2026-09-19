@@ -185,7 +185,6 @@ class CustomerSuccessService
             ->selectRaw('user_id, COUNT(*) as session_count')
             ->groupBy('user_id')
             ->havingRaw('COUNT(*) >= 2')
-            ->get()
             ->count();
 
         $totalUsers = AgentSession::withoutGlobalScope('organization')

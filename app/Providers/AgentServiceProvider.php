@@ -7,6 +7,7 @@ use App\Services\AI\AgentOrchestrationService;
 use App\Services\AI\AgentPluginService;
 use App\Services\AI\AgentQuotaGuard;
 use App\Services\AI\AgentSandboxService;
+use App\Services\AI\EnterpriseBrainScorer;
 use App\Services\AI\EnterpriseBrainService;
 use App\Services\AI\ExecutiveCouncilService;
 use App\Services\AI\GraphWorkflowEngineService;
@@ -89,6 +90,7 @@ class AgentServiceProvider extends ServiceProvider
                 $app->make(EnterpriseConstitutionService::class),
                 $app->make(AuditService::class),
                 $app->make(ScorecardService::class),
+                $app->make(EnterpriseBrainScorer::class),
             );
         });
 

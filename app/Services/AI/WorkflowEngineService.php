@@ -34,7 +34,6 @@ class WorkflowEngineService
             'workflow_id' => $workflow->id,
             'organization_id' => $workflow->organization_id,
             'triggered_by' => $triggeredBy,
-            'trigger_type' => $workflow->trigger_type,
             'status' => 'running',
             'current_step' => 0,
             'input_data' => $inputData,
@@ -78,6 +77,10 @@ class WorkflowEngineService
         ]);
 
         $workflow = $execution->workflow;
+
+        if (! $workflow) {
+            throw new \RuntimeException("Execution #{$execution->id} has no associated workflow.");
+        }
 
         try {
             $this->runSteps($workflow, $execution);
@@ -171,6 +174,21 @@ class WorkflowEngineService
     }
 
     /**
-     * Execute a single workflow step.
+     * Mark an execution as failed and record the error.
      */
+    private function failExecution(WorkflowExecution $execution, string $errorMessage): void
+    {
+        $execution->update([
+            'status' => 'failed',
+            'error_message' => $errorMessage,
+            'completed_at' => now(),
+        ]);
+
+        $this->auditService->logUserAction(
+            event: 'workflow.failed',
+            description: "Workflow execution #{$execution->id} failed",
+            subject: $execution,
+            metadata: ['error' => $errorMessage]
+        );
+    }
 }

@@ -9,14 +9,6 @@ use Throwable;
 
 class LeadQualificationService
 {
-    private const INTENT_LEVELS = [
-        'high_intent' => 90,
-        'ready_to_buy' => 75,
-        'considering' => 50,
-        'interested' => 25,
-        'browsing' => 0,
-    ];
-
     /**
      * Score the purchase intent from a conversation context.
      *

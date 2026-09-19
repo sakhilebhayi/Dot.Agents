@@ -19,14 +19,14 @@ class Phase01AgentDiscovery implements DWCAPhaseContract
         $agent = $deployment->agent;
 
         $checks = [
-            'has_department' => ! empty($agent?->department_id),
-            'has_skills' => ! empty($agent?->skills),
-            'has_capabilities' => ! empty($agent?->capabilities),
-            'has_governance_config' => ! empty($agent?->risk_controls),
-            'has_scorecard_config' => ! empty($agent?->kpis),
-            'has_version' => ! empty($agent?->version),
-            'has_description' => ! empty($agent?->description),
-            'has_deployment_mode' => ! empty($agent?->default_deployment_mode),
+            'has_department' => ! empty($agent->department_id),
+            'has_skills' => ! empty($agent->skills),
+            'has_capabilities' => ! empty($agent->capabilities),
+            'has_governance_config' => ! empty($agent->risk_controls),
+            'has_scorecard_config' => ! empty($agent->kpis),
+            'has_version' => ! empty($agent->version),
+            'has_description' => ! empty($agent->description),
+            'has_deployment_mode' => ! empty($agent->default_deployment_mode),
         ];
 
         $passed = array_sum(array_map(fn ($v) => (int) $v, $checks));

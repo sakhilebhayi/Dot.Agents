@@ -21,7 +21,7 @@ class Phase02SkillAudit implements DWCAPhaseContract
             'has_assigned_skills' => $assignedSkills->isNotEmpty(),
             'skills_have_action_class' => true, // enforced by seeder/installer
             'skills_have_permissions' => $assignedSkills->every(
-                fn ($a) => ! empty($a->skill?->required_permissions)
+                fn ($a) => ! empty($a->skill->required_permissions)
             ),
             'skills_have_audit_required' => $assignedSkills->every(
                 fn ($a) => (bool) $a->skill?->audit_required

@@ -76,8 +76,8 @@ class EnterpriseBrainService
     {
         $twin = OrganizationTwin::where('organization_id', $organizationId)->latest()->first();
 
-        $monthlyCost = $twin?->monthly_ai_spend_usd ?? 0;
-        $roi = $twin?->estimated_ai_roi ?? 0;
+        $monthlyCost = $twin->monthly_ai_spend_usd ?? 0;
+        $roi = $twin->estimated_ai_roi ?? 0;
 
         $score = $this->scorer->computeEconomicScore($roi);
 
@@ -216,7 +216,7 @@ class EnterpriseBrainService
                 } elseif ($trend < -5) {
                     $decliningAgents++;
                     $insights[] = [
-                        'agent' => $deployment->agent?->name ?? "Deployment #{$deployment->id}",
+                        'agent' => $deployment->agent->name ?? "Deployment #{$deployment->id}",
                         'type' => 'declining_performance',
                         'score_drop' => round(abs($trend), 1),
                         'recommendation' => 'Review task quality, confidence thresholds, and knowledge gaps',

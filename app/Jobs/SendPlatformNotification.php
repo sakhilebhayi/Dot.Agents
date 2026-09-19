@@ -53,11 +53,14 @@ class SendPlatformNotification implements ShouldQueue
             'type' => $this->type,
             'title' => $this->title,
             'body' => $this->message,
-            'severity' => $this->severity,
+            'priority' => match ($this->severity) {
+                'critical' => 'urgent',
+                'error', 'high' => 'high',
+                'info', 'success' => 'low',
+                default => 'normal',
+            },
             'data' => $this->data,
             'action_url' => $this->actionUrl,
-            'action_label' => $this->actionLabel,
-            'is_read' => false,
         ]);
     }
 

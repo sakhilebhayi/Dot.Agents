@@ -71,6 +71,10 @@ class DetectAgentDelusion implements ShouldQueue
         if ($analysis['risk_score'] >= 60) {
             $deployment = $this->task->deployment;
 
+            if (! $deployment) {
+                return;
+            }
+
             event(new AgentDriftDetected(
                 $deployment,
                 'high_delusion_risk',

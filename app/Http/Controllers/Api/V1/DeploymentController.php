@@ -7,6 +7,7 @@ use App\Actions\Agents\DeployAgentAction;
 use App\Actions\Agents\PauseDeploymentAction;
 use App\Actions\Agents\UpdateDeploymentAction;
 use App\DTOs\Agents\DeployAgentData;
+use App\DTOs\Agents\UpdateDeploymentData;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\DeployAgentRequest;
 use App\Http\Requests\UpdateDeploymentRequest;
@@ -62,7 +63,7 @@ class DeploymentController extends Controller
     {
         $this->authorizeOrgAccess($deployment);
 
-        $updated = $action->execute($deployment, $request->validated());
+        $updated = $action->execute($deployment, UpdateDeploymentData::fromArray($request->validated()));
 
         return response()->json($updated);
     }

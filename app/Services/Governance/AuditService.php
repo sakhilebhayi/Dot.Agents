@@ -43,7 +43,7 @@ class AuditService
         /** @var User|null $currentUser */
         $currentUser = Auth::user();
         $orgId = session('current_organization_id')
-            ?? $currentUser?->currentOrganization()?->id
+            ?? $currentUser?->currentOrganization()->id
             ?? (($subject && isset($subject->organization_id)) ? (int) $subject->organization_id : null);
 
         return AuditLog::create([

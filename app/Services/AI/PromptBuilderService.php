@@ -26,7 +26,7 @@ class PromptBuilderService
         $agent = $deployment->agent;
         $persona = $agent->defaultPersona;
 
-        $basePrompt = $persona?->system_prompt ?? $this->buildDefaultSystemPrompt($deployment);
+        $basePrompt = $persona->system_prompt ?? $this->buildDefaultSystemPrompt($deployment);
 
         if (! empty($memoryContext)) {
             $memorySection = "\n\n## Relevant Memory Context\n".implode("\n", array_map(

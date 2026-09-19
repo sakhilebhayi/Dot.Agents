@@ -16,8 +16,7 @@ class SaveWorkflowAction
     /**
      * Persist workflow nodes and connections from the canvas state.
      *
-     * @param  array  $nodes  Raw node array from Alpine canvas
-     * @param  array  $connections  Raw connection array from Alpine canvas
+     * @param  SaveWorkflowData  $data  Contains the raw nodes and connections arrays from the Alpine canvas
      */
     public function execute(AgentWorkflow $workflow, SaveWorkflowData $data): AgentWorkflow
     {

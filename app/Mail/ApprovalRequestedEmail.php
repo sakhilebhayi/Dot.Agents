@@ -33,7 +33,7 @@ class ApprovalRequestedEmail extends Mailable implements ShouldQueue
             view: 'emails.approval-requested',
             with: [
                 'deploymentName' => $this->deployment->name,
-                'agentName' => $this->deployment->agent?->name ?? 'Agent',
+                'agentName' => $this->deployment->agent->name ?? 'Agent',
                 'taskDescription' => $this->approval->task_description ?? 'Review pending action',
                 'confidenceScore' => $this->approval->confidence_score ?? 0,
                 'approveUrl' => url("/approvals/{$this->approval->id}/approve"),

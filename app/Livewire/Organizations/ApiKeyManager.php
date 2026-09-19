@@ -83,7 +83,7 @@ class ApiKeyManager extends Component
             $this->plainTextToken = null;
         }
 
-        $this->unsetComputedProperty('tokens');
+        unset($this->tokens);
     }
 
     public function dismissToken(): void

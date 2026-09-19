@@ -33,17 +33,19 @@ class HandleSkillApprovalRequested implements ShouldQueue
         $deployment = $approval->deployment;
 
         // Audit: a skill has been blocked pending human approval
-        $this->auditService->logAgentAction(
-            $deployment,
-            'skill.approval.requested',
-            [
-                'skill_approval_id' => $approval->id,
-                'skill_id' => $approval->skill_id,
-                'skill_name' => $approval->skill?->name,
-                'requested_by_agent' => $deployment?->display_name,
-                'risk_level' => $approval->risk_level ?? 'medium',
-            ]
-        );
+        if ($deployment) {
+            $this->auditService->logAgentAction(
+                $deployment,
+                'skill.approval.requested',
+                [
+                    'skill_approval_id' => $approval->id,
+                    'skill_id' => $approval->skill_id,
+                    'skill_name' => $approval->skill?->name,
+                    'requested_by_agent' => $deployment?->display_name,
+                    'risk_level' => $approval->risk_level ?? 'medium',
+                ]
+            );
+        }
 
         // Notify all org admins — AgentSkillApproval has no designated single approver,
         // so the entire admin group must action it from the governance queue.

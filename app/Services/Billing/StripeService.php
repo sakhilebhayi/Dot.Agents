@@ -32,7 +32,7 @@ class StripeService
 
         $customer = $this->stripe->customers->create([
             'name' => $organization->name,
-            'email' => $organization->owner?->email ?? '',
+            'email' => $organization->owner->email ?? '',
             'metadata' => [
                 'organization_id' => $organization->id,
                 'organization_slug' => $organization->slug,

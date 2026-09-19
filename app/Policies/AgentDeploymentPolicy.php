@@ -40,7 +40,7 @@ class AgentDeploymentPolicy
         // Resolve the plan limit from the subscription plan table. -1 is the
         // seeded convention for "unlimited" (see database/seeders/AgentPlatformSeeder.php).
         $plan = SubscriptionPlan::where('slug', $org->plan)->first();
-        $maxAgents = $plan?->max_agents ?? PHP_INT_MAX; // no limit if plan not found
+        $maxAgents = $plan->max_agents ?? PHP_INT_MAX; // no limit if plan not found
         if ($maxAgents < 0) {
             return true;
         }

@@ -56,11 +56,11 @@ class RiskAssessmentSkill extends BaseSkill
             default => 'low',
         };
 
-        $findings = array_values(array_map(
+        $findings = array_map(
             fn ($dim, $key) => "{$key}: {$dim['finding']}",
             array_filter($dimensions, fn ($d) => ($d['score'] ?? 0) >= 50),
             array_keys(array_filter($dimensions, fn ($d) => ($d['score'] ?? 0) >= 50))
-        ));
+        );
 
         $recommendations = array_values(array_filter(array_map(
             fn ($d) => ($d['score'] ?? 0) >= 50 ? ($d['recommendation'] ?? null) : null,
@@ -140,7 +140,7 @@ class RiskAssessmentSkill extends BaseSkill
     private function assessConfidenceGap(array $output, mixed $deployment): array
     {
         $confidence = (float) ($output['confidence'] ?? 75.0);
-        $threshold = (float) ($deployment?->confidence_threshold ?? 75.0);
+        $threshold = (float) ($deployment->confidence_threshold ?? 75.0);
         $gap = max(0.0, $threshold - $confidence);
         $score = $this->clamp($gap * 2.0);
 

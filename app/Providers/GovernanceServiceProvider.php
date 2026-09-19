@@ -2,9 +2,9 @@
 
 namespace App\Providers;
 
-use App\Services\AI\AgentCertificationService;
 use App\Services\Governance\AgentReliabilityAuditorService;
 use App\Services\Governance\AgentReputationService;
+use App\Services\Governance\Audit\DWCAPhaseRunner;
 use App\Services\Governance\AuditService;
 use App\Services\Governance\CustomerSuccessService;
 use App\Services\Governance\DataTrustScoreService;
@@ -16,6 +16,7 @@ use App\Services\Governance\MegaV2ScorecardService;
 use App\Services\Governance\OrganizationalMemoryService;
 use App\Services\Governance\PredictionAccuracyTrackingService;
 use App\Services\Governance\Scorecard\ScorecardCertifier;
+use App\Services\Governance\Scorecard\ScorecardDataCollector;
 use App\Services\Governance\Scorecard\ScorecardDomainScorer;
 use App\Services\Governance\Scorecard\ScorecardGateEvaluator;
 use App\Services\Governance\ScorecardService;
@@ -48,14 +49,7 @@ class GovernanceServiceProvider extends ServiceProvider
 
         $this->app->singleton(MegaV2ScorecardService::class, function ($app) {
             return new MegaV2ScorecardService(
-                $app->make(DataTrustScoreService::class),
-                $app->make(AgentReliabilityAuditorService::class),
-                $app->make(PredictionAccuracyTrackingService::class),
-                $app->make(OrganizationalMemoryService::class),
-                $app->make(ObservabilityService::class),
-                $app->make(DigitalImmuneSystem::class),
-                $app->make(FinancialIntelligenceService::class),
-                $app->make(CustomerSuccessService::class),
+                $app->make(ScorecardDataCollector::class),
                 $app->make(ScorecardDomainScorer::class),
                 $app->make(ScorecardGateEvaluator::class),
                 $app->make(ScorecardCertifier::class),
@@ -64,10 +58,8 @@ class GovernanceServiceProvider extends ServiceProvider
 
         $this->app->singleton(DWCAAuditService::class, function ($app) {
             return new DWCAAuditService(
-                $app->make(AgentCertificationService::class),
                 $app->make(AuditService::class),
-                $app->make(DelusionDetectionService::class),
-                $app->make(DigitalImmuneSystem::class),
+                $app->make(DWCAPhaseRunner::class),
             );
         });
     }

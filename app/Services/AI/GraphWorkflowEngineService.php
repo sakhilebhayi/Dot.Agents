@@ -7,7 +7,6 @@ use App\Models\WorkflowExecution;
 use App\Models\WorkflowNode;
 use App\Services\AI\Workflow\WorkflowGraphResolver;
 use App\Services\Governance\AuditService;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Throwable;
@@ -31,9 +30,6 @@ class GraphWorkflowEngineService
 {
     /** Hard cap on nodes executed per workflow run — prevents workflow bombs. */
     private const MAX_NODES_PER_EXECUTION = 100;
-
-    /** Max concurrent workflow executions per organization per minute. */
-    private const MAX_EXECUTIONS_PER_ORG_PER_MINUTE = 20;
 
     public function __construct(
         private readonly AgentOrchestrationService $orchestrator,
@@ -224,16 +220,4 @@ class GraphWorkflowEngineService
         }
     }
 
-    // ──────────────────────────────────────────────
-    // Graph utilities
-    // ──────────────────────────────────────────────
-
-    /**
-     * Find start nodes — nodes that have no incoming edges.
-     * Delegates to WorkflowGraphResolver for cycle-detection and ordering.
-     */
-    private function findStartNodes(Collection $nodes, Collection $connections): Collection
-    {
-        return $this->graphResolver->resolveStartNodes($nodes, $connections);
-    }
 }

@@ -154,7 +154,7 @@ class AgentOrchestrationService
             $systemPrompt = Cache::remember(
                 "agent_system_prompt_{$deployment->id}",
                 600,
-                fn () => $persona?->system_prompt ?? $this->promptBuilder->buildDefaultSystemPrompt($deployment)
+                fn () => $persona->system_prompt ?? $this->promptBuilder->buildDefaultSystemPrompt($deployment)
             );
 
             $startTime = microtime(true);

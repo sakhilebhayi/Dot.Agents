@@ -48,8 +48,8 @@ class ModelRouterService
             [
                 'model' => $model,
                 'provider' => $provider,
-                'temperature' => $deployment->agent->defaultPersona?->temperature ?? 0.7,
-                'max_tokens' => $deployment->agent->defaultPersona?->max_tokens ?? 4096,
+                'temperature' => $deployment->agent->defaultPersona->temperature ?? 0.7,
+                'max_tokens' => $deployment->agent->defaultPersona->max_tokens ?? 4096,
             ],
             $deployment->model_config_override ?? []
         );

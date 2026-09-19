@@ -194,6 +194,8 @@ return [
     // ── Access Control ───────────────────────────────────────────────────────
     'middleware' => ['auth', 'can:viewHorizon'],
 
+    'admin_emails' => env('HORIZON_ADMIN_EMAILS', ''),
+
     'path' => env('HORIZON_PATH', 'horizon'),
 
     'domain' => env('HORIZON_DOMAIN', null),

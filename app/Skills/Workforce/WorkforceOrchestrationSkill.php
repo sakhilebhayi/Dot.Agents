@@ -116,7 +116,7 @@ class WorkforceOrchestrationSkill extends BaseSkill
 
     private function assessSelfCapability(string $task, float $confidence, ?AgentDeployment $deployment): array
     {
-        $confidenceThreshold = (float) ($deployment?->confidence_threshold ?? 75.0);
+        $confidenceThreshold = (float) ($deployment->confidence_threshold ?? 75.0);
         $complexityScore = $this->estimateComplexity($task);
 
         // Can handle if confidence meets threshold AND complexity is manageable

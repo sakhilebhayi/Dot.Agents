@@ -42,13 +42,19 @@ class ProcessAgentTask implements ShouldQueue
         }
 
         try {
+            $deployment = $this->task->deployment;
+
+            if (! $deployment) {
+                throw new \RuntimeException("Task {$this->task->id} has no associated deployment.");
+            }
+
             $completedTask = $orchestrator->executeTask(
-                $this->task->deployment,
+                $deployment,
                 $this->task
             );
 
             $auditService->logAgentAction(
-                $this->task->deployment,
+                $deployment,
                 'task_executed',
                 [
                     'task_id' => $this->task->id,

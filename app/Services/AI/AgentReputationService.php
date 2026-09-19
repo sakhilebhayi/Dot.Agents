@@ -104,7 +104,7 @@ class AgentReputationService
             ")
             ->first();
 
-        $total = (int) ($tasks?->total ?? 0);
+        $total = (int) ($tasks->total ?? 0);
 
         if ($total === 0) {
             return ['total' => 0, 'success_rate' => 75.0, 'failure_rate' => 0.0, 'avg_satisfaction' => 75.0];
@@ -133,8 +133,8 @@ class AgentReputationService
             ->first();
 
         return [
-            'total' => (int) ($stats?->total ?? 0),
-            'avg_confidence' => (float) ($stats?->avg_confidence ?? 75.0),
+            'total' => (int) ($stats->total ?? 0),
+            'avg_confidence' => (float) ($stats->avg_confidence ?? 75.0),
         ];
     }
 
@@ -148,7 +148,7 @@ class AgentReputationService
             ")
             ->first();
 
-        $total = (int) ($stats?->total ?? 0);
+        $total = (int) ($stats->total ?? 0);
         $approvalRate = $total > 0
             ? (($stats->approved / $total) * 100)
             : 100.0;  // no rejections = 100% approval rate

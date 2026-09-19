@@ -34,7 +34,7 @@ abstract class ExcelProcessingHelper extends BaseSkill
         $headers = str_getcsv(array_shift($lines), $delimiter);
         $rows = array_map(fn ($l) => array_combine($headers, str_getcsv($l, $delimiter) + array_fill(0, count($headers), null)), $lines);
 
-        return ['rows' => array_values(array_filter($rows)), 'headers' => $headers];
+        return ['rows' => array_values($rows), 'headers' => $headers];
     }
 
     /**

@@ -29,6 +29,12 @@ class ResumeDeploymentAction
 
         $deployment->update(['status' => 'active']);
 
+        $this->auditService->logUserAction(
+            event: 'deployment.resumed',
+            description: "Deployment {$deployment->display_name} resumed",
+            subject: $deployment,
+        );
+
         event(new AgentResumed($deployment));
 
         return $deployment->refresh();

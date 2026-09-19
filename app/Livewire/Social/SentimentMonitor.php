@@ -74,8 +74,8 @@ class SentimentMonitor extends Component
 
         // No explicit organization_id filter needed: SocialSentimentScore's
         // HasOrganizationScope trait applies it automatically from the session.
-        return (float) SocialSentimentScore::where('scored_at', '>=', $since)
-            ->avg('score') ?? 50.0;
+        return (float) (SocialSentimentScore::where('scored_at', '>=', $since)
+            ->avg('score') ?? 50.0);
     }
 
     public function markHandled(int $scoreId): void

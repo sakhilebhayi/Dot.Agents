@@ -38,7 +38,7 @@ class HorizonServiceProvider extends HorizonApplicationServiceProvider
             }
 
             $allowedEmails = array_filter(
-                explode(',', env('HORIZON_ADMIN_EMAILS', ''))
+                explode(',', config('horizon.admin_emails', ''))
             );
 
             return in_array($user->email, $allowedEmails);

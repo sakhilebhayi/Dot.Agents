@@ -33,7 +33,7 @@ class AgentQuotaGuard
             ? Cache::remember("plan:{$planSlug}", 3600, fn () => SubscriptionPlan::where('slug', $planSlug)->first())
             : null;
 
-        $limit = $plan?->monthly_token_quota ?? PHP_INT_MAX;
+        $limit = $plan->monthly_token_quota ?? PHP_INT_MAX;
 
         // -1 is this codebase's convention for "unlimited" on other plan limits
         // (see AgentDeploymentPolicy::create() for max_agents) — honor it here too.

@@ -44,7 +44,7 @@ class FinancialTrendAnalyzer
             ?? throw new \RuntimeException("Unsupported DB driver '{$driver}' for FinancialTrendAnalyzer.");
 
         $rows = AgentScorecard::withoutGlobalScope('organization')
-            ->whereHas('agentDeployment', fn ($q) => $q->whereIn('id', $deploymentIds))
+            ->whereHas('deployment', fn ($q) => $q->whereIn('id', $deploymentIds))
             ->where('period_end', '>=', now()->subMonths(self::LOOKBACK_MONTHS))
             ->selectRaw("{$dateExpr} as month, SUM(total_cost) as cost, SUM(estimated_savings) as savings, COUNT(*) as records")
             ->groupByRaw($dateExpr)

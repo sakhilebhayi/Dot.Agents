@@ -40,7 +40,7 @@ class GenerateMegaV2PlatformScorecard implements ShouldQueue
     {
         $suffix = $this->organizationId ?? 'all';
 
-        return [new WithoutOverlapping("mega-v2-scorecard-{$suffix}", expiresAt: 120)];
+        return [new WithoutOverlapping("mega-v2-scorecard-{$suffix}", expiresAfter: 120)];
     }
 
     public function handle(MegaV2ScorecardService $service): void

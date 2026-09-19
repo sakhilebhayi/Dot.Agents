@@ -71,7 +71,7 @@ class ResponseProcessorService
             'total_cost' => $response['cost'] ?? 0,
             'model_used' => $response['model'] ?? 'gpt-4o',
             'reference_type' => $session ? 'agent_session' : 'agent_task',
-            'reference_id' => $session?->id ?? $task?->id,
+            'reference_id' => $session->id ?? $task?->id,
             'recorded_date' => now()->toDateString(),
         ]);
     }

@@ -138,7 +138,7 @@ class AgentAuditorSkill extends BaseSkill
             ->where('created_at', '>=', $since)
             ->where('delusion_risk_score', '>=', 60)
             ->where('status', 'completed')   // completed without approval gate means it wasn't reviewed
-            ->whereDoesntHave('approvals')
+            ->whereDoesntHave('approval')
             ->count();
 
         $passed = $highRiskUnreviewed === 0;
@@ -156,7 +156,7 @@ class AgentAuditorSkill extends BaseSkill
             ->where('created_at', '>=', $since)
             ->where('status', 'completed')
             ->where('confidence_score', '<', $deployment->confidence_threshold)
-            ->whereDoesntHave('approvals')
+            ->whereDoesntHave('approval')
             ->count();
 
         $passed = $bypassed === 0;

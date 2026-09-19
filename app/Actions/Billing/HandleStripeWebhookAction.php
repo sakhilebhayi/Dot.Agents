@@ -108,7 +108,7 @@ class HandleStripeWebhookAction
 
     private function handleInvoicePaid(object $stripeInvoice): void
     {
-        $organizationId = $stripeInvoice->subscription_details?->metadata?->organization_id ?? null;
+        $organizationId = $stripeInvoice->subscription_details?->metadata->organization_id ?? null;
 
         if (! $organizationId) {
             return;
@@ -142,7 +142,7 @@ class HandleStripeWebhookAction
 
     private function handleInvoiceFailed(object $stripeInvoice): void
     {
-        $organizationId = $stripeInvoice->subscription_details?->metadata?->organization_id ?? null;
+        $organizationId = $stripeInvoice->subscription_details?->metadata->organization_id ?? null;
 
         if (! $organizationId) {
             return;

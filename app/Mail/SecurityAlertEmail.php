@@ -37,7 +37,7 @@ class SecurityAlertEmail extends Mailable implements ShouldQueue
                 'description' => $this->event->description ?? '',
                 'detectedAt' => $this->event->created_at,
                 'reviewUrl' => url('/security/events/'.$this->event->id),
-                'organizationName' => $this->event->organization?->name ?? 'Platform-Wide',
+                'organizationName' => $this->event->organization->name ?? 'Platform-Wide',
             ],
         );
     }
