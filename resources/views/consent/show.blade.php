@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Platform Terms — {{ config('app.name', 'Dot.Agents') }}</title>
-    <link rel="icon" href="/dot.logos3.png" type="image/png">
+    <link rel="icon" href="{{ asset('images/mark.png') }}" type="image/png">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-[#f9f9f7] font-sans antialiased min-h-screen flex flex-col">
@@ -13,7 +13,7 @@
     {{-- ── Top bar ── --}}
     <header class="bg-[#1e1660] flex-shrink-0">
         <div class="max-w-4xl mx-auto px-6 h-14 flex items-center gap-3">
-            <img src="/dot.logos3.png" alt="Dot.Agents" class="h-7 w-auto">
+            <img src="{{ asset('images/mark.png') }}" alt="Dot.Agents" class="h-7 w-7 object-contain">
             <span class="text-sm font-semibold text-white">Dot.Agents</span>
             <span class="text-white/30 text-xs ml-1">/ Platform Terms</span>
         </div>

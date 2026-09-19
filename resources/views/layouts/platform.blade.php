@@ -10,7 +10,7 @@
     <title>{{ $title ?? config('app.name', 'Dot.Agents') }}</title>
     <link rel="icon" href="/favicon-32x32.png" sizes="32x32" type="image/png">
     <link rel="icon" href="/favicon-16x16.png" sizes="16x16" type="image/png">
-    <link rel="icon" href="/dot.logos3.png" type="image/png">
+    <link rel="icon" href="{{ asset('images/mark.png') }}" type="image/png">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
@@ -49,7 +49,7 @@
     >
         {{-- Logo --}}
         <div class="flex items-center gap-3 px-5 py-4 border-b border-white/10 flex-shrink-0">
-            <img src="/dot.logos3.png" alt="Dot.Agents" class="h-7 w-auto flex-shrink-0">
+            <img src="{{ asset('images/mark.png') }}" alt="Dot.Agents" class="h-7 w-7 object-contain flex-shrink-0">
             <div class="min-w-0">
                 <p class="text-sm font-semibold text-white font-display leading-tight">Dot.Agents</p>
                 <p class="text-2xs text-white/40 leading-tight">Workforce Platform</p>

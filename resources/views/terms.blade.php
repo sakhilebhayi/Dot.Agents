@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Terms of Service — Dot.Agents</title>
     <meta name="description" content="Terms of Service for Dot.Agents — the Adaptive Enterprise Operating System.">
-    <link rel="icon" href="/dot.logos3.png" type="image/png">
+    <link rel="icon" href="{{ asset('images/mark.png') }}" type="image/png">
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     @endif
@@ -16,7 +16,7 @@
 <nav class="fixed top-0 inset-x-0 z-50 bg-[#f3f0ea]/95 backdrop-blur border-b border-[#e8e8e2]">
     <div class="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
         <a href="/" class="flex items-center gap-3">
-            <img src="/dot.logos3.png" alt="Dot.Agents" class="h-14 sm:h-[72px] w-auto">
+            <img src="{{ asset('images/mark.png') }}" alt="Dot.Agents" class="h-10 w-10 object-contain">
             <span class="font-semibold text-[#111111] font-display text-base">Dot.Agents</span>
         </a>
         <div class="flex items-center gap-3">
@@ -358,7 +358,7 @@
     <div class="max-w-6xl mx-auto">
         <div class="flex flex-col md:flex-row items-center justify-between gap-6">
             <div class="flex items-center gap-3">
-                <img src="/dot.logos3.png" alt="Dot.Agents" class="h-11 w-auto">
+                <img src="{{ asset('images/mark.png') }}" alt="Dot.Agents" class="h-8 w-8 object-contain">
                 <span class="font-semibold text-[#111111] font-display">Dot.Agents</span>
             </div>
             <div class="flex items-center gap-8">

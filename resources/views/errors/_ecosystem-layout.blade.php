@@ -51,7 +51,7 @@
                 ->all();
 
             $logoLightPath = null;
-            foreach (['images/logo-light.png', null] as $logoLightCandidate) {
+            foreach (['images/mark-light.png', null] as $logoLightCandidate) {
                 if ($logoLightCandidate && file_exists(public_path($logoLightCandidate))) {
                     $logoLightPath = $logoLightCandidate;
                     break;
@@ -100,7 +100,7 @@
                          platform's overall theme is light or dark -- so the
                          logo's ink-colored wordmark needs the dark-safe
                          white-ink variant here, not the default asset. --}}
-                    <img src="{{ asset($logoLightPath ?? 'images/logo.png') }}" alt="Dot.Agents" style="height: 40px; width: auto;">
+                    <img src="{{ asset($logoLightPath ?? 'images/mark.png') }}" alt="Dot.Agents" style="height: 40px; width: 40px; object-fit: contain;">
                 </a>
                 <div style="display: flex; align-items: center; gap: 12px;">
                     @auth
