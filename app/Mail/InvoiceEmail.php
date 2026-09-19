@@ -34,7 +34,7 @@ class InvoiceEmail extends Mailable implements ShouldQueue
             with: [
                 'invoiceNumber' => $this->invoice->invoice_number,
                 'orgName' => $this->organization->name,
-                'amount' => number_format($this->invoice->total_amount / 100, 2),
+                'amount' => number_format((float) $this->invoice->total, 2),
                 'currency' => strtoupper($this->invoice->currency ?? 'USD'),
                 'dueDate' => $this->invoice->due_date,
                 'billingPeriod' => $this->invoice->billing_period_label ?? '',

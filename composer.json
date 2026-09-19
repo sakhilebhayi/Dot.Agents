@@ -72,6 +72,10 @@
             "@php artisan config:clear --ansi",
             "bash bin/test.sh"
         ],
+        "test:pgsql": [
+            "@php artisan config:clear --ansi",
+            "bash bin/test-pgsql.sh"
+        ],
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi"

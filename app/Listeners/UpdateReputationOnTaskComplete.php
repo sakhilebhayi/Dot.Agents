@@ -49,17 +49,16 @@ class UpdateReputationOnTaskComplete implements ShouldQueue
             'task_id' => $task->id,
             'confidence_score' => $task->confidence_score,
             'cost' => $task->cost,
-            'latency_ms' => $task->latency_ms,
         ]);
 
         // Notify the requester if they're a real user (not a system trigger)
-        if ($task->requested_by) {
+        if ($task->assigned_by) {
             SendPlatformNotification::dispatch(
-                userId: $task->requested_by,
+                userId: $task->assigned_by,
                 organizationId: $task->organization_id,
                 type: 'task_completed',
                 title: "Task Completed by {$deployment->display_name}",
-                message: $task->output ? 'Your task has been completed. View the result.' : 'Task completed successfully.',
+                message: $task->result_summary ? 'Your task has been completed. View the result.' : 'Task completed successfully.',
                 severity: 'info',
                 data: ['task_id' => $task->id, 'deployment_id' => $deployment->id],
                 actionUrl: "/agents/{$deployment->id}"

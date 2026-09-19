@@ -73,7 +73,7 @@ class MemoryScoreCalculator
 
         $articlesByCategory = KnowledgeArticle::withoutGlobalScope('organization')
             ->where('organization_id', $orgId)
-            ->where('status', 'published')
+            ->where('is_published', true)
             ->selectRaw('category, count(*) as count')
             ->groupBy('category')
             ->pluck('count', 'category');
@@ -83,7 +83,7 @@ class MemoryScoreCalculator
             'memories_by_type' => $memoriesByType,
             'articles_by_category' => $articlesByCategory,
             'total_memories' => AgentMemory::withoutGlobalScope('organization')->where('organization_id', $orgId)->where('is_active', true)->count(),
-            'total_articles' => KnowledgeArticle::withoutGlobalScope('organization')->where('organization_id', $orgId)->where('status', 'published')->count(),
+            'total_articles' => KnowledgeArticle::withoutGlobalScope('organization')->where('organization_id', $orgId)->where('is_published', true)->count(),
             'total_decisions' => DecisionLog::withoutGlobalScope('organization')->where('organization_id', $orgId)->count(),
             'built_at' => now()->toIso8601String(),
         ];
@@ -98,7 +98,7 @@ class MemoryScoreCalculator
 
         $articles = KnowledgeArticle::withoutGlobalScope('organization')
             ->where('organization_id', $orgId)
-            ->where('status', 'published')->count();
+            ->where('is_published', true)->count();
 
         $ratio = $decisions > 0 ? min(1, ($articles / $decisions) * 10) : ($articles > 0 ? 1 : 0);
 

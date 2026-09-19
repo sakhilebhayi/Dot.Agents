@@ -25,8 +25,14 @@ class LogSocialLeadCaptured implements ShouldQueue
     {
         $lead = $event->lead;
 
+        // agent_deployment_id is nullable (e.g. human-only conversations) —
+        // only audit-log against a deployment when one is actually attached.
+        if (! $lead->agentDeployment) {
+            return;
+        }
+
         $this->auditService->logAgentAction(
-            $lead->deployment,
+            $lead->agentDeployment,
             'social.lead_captured',
             [
                 'lead_id' => $lead->id,

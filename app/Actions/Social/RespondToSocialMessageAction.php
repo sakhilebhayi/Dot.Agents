@@ -35,7 +35,7 @@ class RespondToSocialMessageAction
 
         // Update first-response time if this is the first reply
         if (! $conversation->first_response_at) {
-            $responseTimeSecs = now()->diffInSeconds($conversation->created_at);
+            $responseTimeSecs = (int) round(now()->diffInSeconds($conversation->created_at, absolute: true));
             $conversation->update([
                 'first_response_at' => now(),
                 'response_time_seconds' => $responseTimeSecs,

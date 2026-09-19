@@ -206,7 +206,7 @@ class ExecutiveCouncilService
             ],
             'final_decision' => $majorityVote,
             'completed_at' => now(),
-            'deliberation_duration_seconds' => now()->diffInSeconds($session->deliberation_started_at),
+            'deliberation_duration_seconds' => (int) round(now()->diffInSeconds($session->deliberation_started_at, absolute: true)),
         ]);
     }
 }

@@ -14,7 +14,7 @@ class MembershipPolicy
 
     public function view(User $user, Membership $membership): bool
     {
-        return $user->organizations()->where('organizations.id', $membership->organization_id)->exists();
+        return $user->organizations()->where('organizations.id', $membership->team_id)->exists();
     }
 
     public function create(User $user): bool
@@ -25,7 +25,7 @@ class MembershipPolicy
     public function update(User $user, Membership $membership): bool
     {
         return $user->organizations()
-            ->where('organizations.id', $membership->organization_id)
+            ->where('organizations.id', $membership->team_id)
             ->wherePivotIn('role', ['owner', 'admin'])
             ->exists();
     }
@@ -33,7 +33,7 @@ class MembershipPolicy
     public function delete(User $user, Membership $membership): bool
     {
         return $user->organizations()
-            ->where('organizations.id', $membership->organization_id)
+            ->where('organizations.id', $membership->team_id)
             ->wherePivot('role', 'owner')
             ->exists();
     }

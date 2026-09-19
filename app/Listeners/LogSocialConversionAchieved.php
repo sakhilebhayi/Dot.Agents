@@ -26,16 +26,20 @@ class LogSocialConversionAchieved implements ShouldQueue
     {
         $conversion = $event->conversion;
 
-        $this->auditService->logAgentAction(
-            $conversion->deployment,
-            'social.conversion_achieved',
-            [
-                'conversion_id' => $conversion->id,
-                'conversion_type' => $conversion->conversion_type,
-                'platform' => $conversion->platform,
-                'value' => $conversion->value,
-            ]
-        );
+        // agent_deployment_id is nullable (e.g. human-only conversations) —
+        // only audit-log against a deployment when one is actually attached.
+        if ($conversion->agentDeployment) {
+            $this->auditService->logAgentAction(
+                $conversion->agentDeployment,
+                'social.conversion_achieved',
+                [
+                    'conversion_id' => $conversion->id,
+                    'conversion_type' => $conversion->conversion_type,
+                    'platform' => $conversion->platform,
+                    'value' => $conversion->revenue,
+                ]
+            );
+        }
 
         SendPlatformNotification::toAdmins(
             organizationId: $conversion->organization_id,
@@ -43,7 +47,7 @@ class LogSocialConversionAchieved implements ShouldQueue
             title: 'Social Conversion Achieved',
             message: "A {$conversion->conversion_type} conversion was recorded on {$conversion->platform}.",
             severity: 'success',
-            data: ['conversion_id' => $conversion->id, 'value' => $conversion->value],
+            data: ['conversion_id' => $conversion->id, 'value' => $conversion->revenue],
             actionUrl: "/social/conversions/{$conversion->id}"
         );
     }

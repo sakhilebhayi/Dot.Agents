@@ -43,9 +43,9 @@ class UpdateReputationOnTaskFailed implements ShouldQueue
         );
 
         // Notify the requester of the failure
-        if ($task->requested_by) {
+        if ($task->assigned_by) {
             SendPlatformNotification::dispatch(
-                userId: $task->requested_by,
+                userId: $task->assigned_by,
                 organizationId: $task->organization_id,
                 type: 'task_failed',
                 title: "Task Failed: {$deployment->display_name}",

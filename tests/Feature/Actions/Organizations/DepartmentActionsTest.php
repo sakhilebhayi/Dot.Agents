@@ -132,7 +132,7 @@ class DepartmentActionsTest extends TestCase
             DeleteDepartmentData::fromId($dept->id)
         );
 
-        $this->assertDatabaseMissing('departments', ['id' => $dept->id, 'deleted_at' => null]);
+        $this->assertDatabaseMissing('departments', ['id' => $dept->id]);
     }
 
     public function test_delete_department_rejects_cross_org_deletion(): void

@@ -26,16 +26,20 @@ class LogPurchaseIntentDetected implements ShouldQueue
     {
         $conversation = $event->conversation;
 
-        $this->auditService->logAgentAction(
-            $conversation->deployment,
-            'social.purchase_intent_detected',
-            [
-                'conversation_id' => $conversation->id,
-                'intent_score' => $event->intentScore,
-                'intent_level' => $event->intentLevel,
-                'platform' => $conversation->platform,
-            ]
-        );
+        // agent_deployment_id is nullable (e.g. human-only conversations) —
+        // only audit-log against a deployment when one is actually attached.
+        if ($conversation->agentDeployment) {
+            $this->auditService->logAgentAction(
+                $conversation->agentDeployment,
+                'social.purchase_intent_detected',
+                [
+                    'conversation_id' => $conversation->id,
+                    'intent_score' => $event->intentScore,
+                    'intent_level' => $event->intentLevel,
+                    'platform' => $conversation->platform,
+                ]
+            );
+        }
 
         if ($event->intentLevel === 'high') {
             SendPlatformNotification::toAdmins(

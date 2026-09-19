@@ -23,7 +23,7 @@ class Invoice extends Model
         'tax' => 'decimal:2',
         'total' => 'decimal:2',
         'invoice_date' => 'date',
-        'due_at' => 'datetime',
+        'due_date' => 'date',
         'paid_at' => 'datetime',
         'voided_at' => 'datetime',
         'billing_address' => 'array',
@@ -48,7 +48,7 @@ class Invoice extends Model
 
     public function isOverdue(): bool
     {
-        return $this->status === 'open' && $this->due_at?->isPast();
+        return $this->status === 'open' && $this->due_date?->isPast();
     }
 
     public function scopeForOrganization($query, int $organizationId)

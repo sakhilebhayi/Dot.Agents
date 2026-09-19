@@ -21,7 +21,7 @@ class OrganizationSubscription extends Model
 
     protected $casts = [
         'amount' => 'decimal:2',
-        'trial_ends_at' => 'datetime',
+        'trial_end' => 'datetime',
         'current_period_start' => 'datetime',
         'current_period_end' => 'datetime',
         'cancelled_at' => 'datetime',
@@ -50,7 +50,7 @@ class OrganizationSubscription extends Model
 
     public function isOnTrial(): bool
     {
-        return $this->trial_ends_at && $this->trial_ends_at->isFuture();
+        return $this->trial_end && $this->trial_end->isFuture();
     }
 
     public function scopeActive($query)

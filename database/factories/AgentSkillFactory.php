@@ -23,7 +23,7 @@ class AgentSkillFactory extends Factory
             'audit_required' => true,
             'delegation_capable' => false,
             'is_active' => true,
-            'confidence_score' => $this->faker->randomFloat(1, 60, 95),
+            'confidence_score' => $this->faker->numberBetween(60, 95),
         ];
     }
 

@@ -35,7 +35,7 @@ class SkillExecutionValidator
 
         // ── 2. Organization policy constraints ─────────────────────
         $org = Organization::find($data->organizationId);
-        $orgPolicies = $org?->policies ?? [];
+        $orgPolicies = $org?->settings['policies'] ?? [];
 
         $skillBlockedByOrg = in_array($skill->key, $orgPolicies['blocked_skills'] ?? []);
         $checks['org_policy_check'] = ! $skillBlockedByOrg;

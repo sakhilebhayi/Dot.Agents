@@ -41,7 +41,6 @@ class AuditSkillExecution implements ShouldQueue
                 'status' => $execution->status,
                 'confidence' => $execution->confidence,
                 'duration_ms' => $execution->duration_ms,
-                'cost' => $execution->cost,
             ]
         );
 

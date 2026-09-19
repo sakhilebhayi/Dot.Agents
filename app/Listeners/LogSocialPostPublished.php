@@ -35,7 +35,7 @@ class LogSocialPostPublished implements ShouldQueue
             'social.post_published',
             [
                 'post_id' => $post->id,
-                'platform' => $post->platform,
+                'platform' => $post->socialPage->socialAccount->platform,
                 'scheduled_at' => $post->scheduled_at?->toISOString(),
                 'published_at' => $post->published_at?->toISOString(),
             ]

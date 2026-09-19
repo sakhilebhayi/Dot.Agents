@@ -26,26 +26,30 @@ class NotifyOnNegativeSentiment implements ShouldQueue
     {
         $score = $event->sentimentScore;
 
-        $this->auditService->logAgentAction(
-            $score->deployment,
-            'social.negative_sentiment',
-            [
-                'sentiment_score_id' => $score->id,
-                'sentiment_score' => $score->sentiment_score,
-                'platform' => $score->platform,
-                'content_snippet' => $score->content_snippet,
-            ]
-        );
+        // agent_deployment_id is nullable (e.g. human-only conversations) —
+        // only audit-log against a deployment when one is actually attached.
+        if ($score->agentDeployment) {
+            $this->auditService->logAgentAction(
+                $score->agentDeployment,
+                'social.negative_sentiment',
+                [
+                    'sentiment_score_id' => $score->id,
+                    'sentiment_score' => $score->score,
+                    'platform' => $score->platform,
+                    'content_snippet' => $score->summary,
+                ]
+            );
+        }
 
         // Alert org admins when sentiment drops critically
-        if ($score->sentiment_score <= -0.7) {
+        if ($score->score <= -0.7) {
             SendPlatformNotification::toAdmins(
                 organizationId: $score->organization_id,
                 type: 'negative_sentiment_alert',
                 title: 'Critical Negative Sentiment Detected',
-                message: "Sentiment score of {$score->sentiment_score} detected on {$score->platform}. Immediate review recommended.",
+                message: "Sentiment score of {$score->score} detected on {$score->platform}. Immediate review recommended.",
                 severity: 'error',
-                data: ['sentiment_score_id' => $score->id, 'score' => $score->sentiment_score],
+                data: ['sentiment_score_id' => $score->id, 'score' => $score->score],
                 actionUrl: '/social/sentiment'
             );
         }

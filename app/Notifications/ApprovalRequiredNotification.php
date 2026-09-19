@@ -38,7 +38,7 @@ class ApprovalRequiredNotification extends Notification implements ShouldQueue
             'approval_id' => $this->approval->id,
             'deployment_id' => $this->deployment->id,
             'deployment_name' => $this->deployment->name,
-            'task_description' => $this->approval->task_description,
+            'task_description' => $this->approval->description,
             'confidence_score' => $this->approval->confidence_score,
             'expires_at' => $this->approval->expires_at?->toISOString(),
             'url' => url("/approvals/{$this->approval->id}"),

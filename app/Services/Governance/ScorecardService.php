@@ -146,11 +146,11 @@ class ScorecardService
             'reliability' => $scorecard->reliability_score,
             'trustworthiness' => $scorecard->trustworthiness_score,
             'cost_savings' => $scorecard->cost_savings_score,
-            'responsiveness' => $scorecard->responsiveness_score,
-            'collaboration' => $scorecard->collaboration_score,
-            'innovation' => $scorecard->innovation_score,
-            'risk_management' => $scorecard->risk_management_score,
-            'overall_score' => $scorecard->overall_score,
+            'revenue_impact' => $scorecard->revenue_impact_score,
+            'risk_management' => $scorecard->risk_impact_score,
+            'user_satisfaction' => $scorecard->user_satisfaction_score,
+            'learning_rate' => $scorecard->learning_rate_score,
+            'overall_score' => $scorecard->overall_health_score,
         ];
     }
 }

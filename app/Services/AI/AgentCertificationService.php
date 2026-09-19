@@ -3,6 +3,7 @@
 namespace App\Services\AI;
 
 use App\Models\Agent;
+use App\Models\AgentMessage;
 use App\Models\AgentTask;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -182,10 +183,12 @@ class AgentCertificationService
 
     private function scorePerformance(Agent $agent, int $organizationId): int
     {
-        $avgLatency = AgentTask::whereHas('deployment', fn ($q) => $q
-            ->where('agent_id', $agent->id)
+        // latency_ms is tracked per-message (real LLM call latency), not on
+        // AgentTask (which only has coarser, minute-granularity durations) —
+        // go through AgentMessage -> AgentSession -> AgentDeployment.
+        $avgLatency = AgentMessage::withoutGlobalScope('organization')
             ->where('organization_id', $organizationId)
-        )
+            ->whereHas('session.deployment', fn ($q) => $q->where('agent_id', $agent->id))
             ->whereNotNull('latency_ms')
             ->avg('latency_ms');
 

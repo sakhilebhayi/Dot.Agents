@@ -35,7 +35,7 @@ class LogSocialMessageReceived implements ShouldQueue
             'social.message_received',
             [
                 'message_id' => $message->id,
-                'platform' => $message->platform,
+                'platform' => $message->socialConversation->platform,
                 'direction' => $message->direction,
             ]
         );

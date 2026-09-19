@@ -4,6 +4,7 @@ namespace App\Services\AI;
 
 use App\Models\AgentApproval;
 use App\Models\AgentDeployment;
+use App\Models\AgentMessage;
 use App\Models\AgentScorecard;
 use App\Models\AgentTask;
 use App\Models\EnterpriseHealthScore;
@@ -103,18 +104,35 @@ class EnterpriseBrainService
         // Aggregate task performance by agent deployment
         $taskStats = AgentTask::whereHas('deployment', fn ($q) => $q->where('organization_id', $organizationId))
             ->where('created_at', '>=', $since)
-            ->selectRaw("agent_deployment_id, COUNT(*) as task_count, AVG(latency_ms) as avg_latency, SUM(CASE WHEN status = 'failed' THEN 1 ELSE 0 END) as failures")
+            ->selectRaw("agent_deployment_id, COUNT(*) as task_count, SUM(CASE WHEN status = 'failed' THEN 1 ELSE 0 END) as failures")
             ->groupBy('agent_deployment_id')
-            ->get();
+            ->get()
+            ->keyBy('agent_deployment_id');
+
+        // latency_ms is tracked per-message (real LLM call latency), not on
+        // AgentTask — join through AgentSession to group by deployment.
+        $latencyStats = AgentMessage::withoutGlobalScope('organization')
+            ->join('agent_sessions', 'agent_messages.session_id', '=', 'agent_sessions.id')
+            ->where('agent_messages.organization_id', $organizationId)
+            ->where('agent_messages.created_at', '>=', $since)
+            ->whereNotNull('agent_messages.latency_ms')
+            ->selectRaw('agent_sessions.agent_deployment_id as agent_deployment_id, AVG(agent_messages.latency_ms) as avg_latency')
+            ->groupBy('agent_sessions.agent_deployment_id')
+            ->get()
+            ->keyBy('agent_deployment_id');
 
         $bottlenecks = [];
-        foreach ($taskStats as $stat) {
-            if ($stat->avg_latency > 5000 || ($stat->task_count > 0 && ($stat->failures / $stat->task_count) > 0.1)) {
+        foreach ($taskStats as $deploymentId => $stat) {
+            $avgLatency = (float) ($latencyStats->get($deploymentId)->avg_latency ?? 0);
+            $taskCount = (int) $stat->task_count;
+            $failures = (int) $stat->failures;
+
+            if ($avgLatency > 5000 || ($taskCount > 0 && ($failures / $taskCount) > 0.1)) {
                 $bottlenecks[] = [
-                    'deployment_id' => $stat->agent_deployment_id,
-                    'avg_latency_ms' => round($stat->avg_latency),
-                    'failure_rate' => $stat->task_count > 0 ? round(($stat->failures / $stat->task_count) * 100, 1) : 0,
-                    'severity' => $stat->avg_latency > 10000 ? 'critical' : 'warning',
+                    'deployment_id' => $deploymentId,
+                    'avg_latency_ms' => round($avgLatency),
+                    'failure_rate' => $taskCount > 0 ? round(($failures / $taskCount) * 100, 1) : 0,
+                    'severity' => $avgLatency > 10000 ? 'critical' : 'warning',
                 ];
             }
         }

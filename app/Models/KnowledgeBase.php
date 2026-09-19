@@ -35,7 +35,7 @@ class KnowledgeBase extends Model
 
     public function publishedArticles(): HasMany
     {
-        return $this->hasMany(KnowledgeArticle::class)->where('status', 'published');
+        return $this->hasMany(KnowledgeArticle::class)->where('is_published', true);
     }
 
     public function scopeForOrganization($query, int $organizationId)

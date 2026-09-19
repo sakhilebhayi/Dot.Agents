@@ -43,7 +43,7 @@ class KnowledgeArticle extends Model
 
     public function scopePublished($query)
     {
-        return $query->where('status', 'published');
+        return $query->where('is_published', true);
     }
 
     public function scopeForOrganization($query, int $organizationId)
