@@ -11,7 +11,7 @@
                     @if($this->subscription)
                         <h2 class="text-2xl font-bold">{{ $this->subscription->plan?->name }}</h2>
                         <p class="text-purple-200 text-sm mt-1">
-                            ${{ number_format($this->subscription->plan?->price_monthly, 0) }}/month &middot;
+                            ${{ number_format($this->subscription->plan?->price, 0) }}/month &middot;
                             Renews {{ $this->subscription->current_period_end?->format('M j, Y') }}
                         </p>
                         <div class="flex gap-3 mt-3">
@@ -69,7 +69,7 @@
                     @endif
                     <h4 class="font-bold text-gray-900 dark:text-white">{{ $plan->name }}</h4>
                     <div class="my-3">
-                        <span class="text-3xl font-bold text-gray-900 dark:text-white">${{ number_format($plan->price_monthly, 0) }}</span>
+                        <span class="text-3xl font-bold text-gray-900 dark:text-white">${{ number_format($plan->price, 0) }}</span>
                         <span class="text-gray-400 text-sm">/month</span>
                     </div>
                     <ul class="space-y-2 mb-5">
@@ -90,7 +90,7 @@
                         </div>
                     @else
                         <a href="{{ route('billing.plans') }}" wire:navigate class="block w-full py-2 text-center text-sm font-medium {{ $plan->is_featured ? 'bg-purple-600 hover:bg-purple-700 text-white' : 'border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800' }} rounded-xl transition-colors">
-                            {{ ($this->subscription && $plan->price_monthly > ($this->subscription->plan?->price_monthly ?? 0)) ? 'Upgrade' : 'Switch' }}
+                            {{ ($this->subscription && $plan->price > ($this->subscription->plan?->price ?? 0)) ? 'Upgrade' : 'Switch' }}
                         </a>
                     @endif
                 </div>

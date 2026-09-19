@@ -5,6 +5,7 @@ namespace Tests\Feature\Livewire;
 use App\Livewire\Billing\BillingDashboard;
 use App\Models\Invoice;
 use App\Models\Organization;
+use App\Models\OrganizationSubscription;
 use App\Models\SubscriptionPlan;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -96,5 +97,38 @@ class BillingDashboardTest extends TestCase
 
         $this->assertCount(1, $invoices);
         $this->assertEquals($this->organization->id, $invoices->first()->organization_id);
+    }
+
+    /**
+     * Regression: SubscriptionPlan's $casts used to reference nonexistent
+     * price_monthly/price_annually columns (real columns are price/yearly_price),
+     * so this figure silently rendered blank/null regardless of the real price.
+     */
+    #[Test]
+    public function available_plans_section_renders_the_real_price(): void
+    {
+        $this->actingAs($this->user);
+
+        SubscriptionPlan::factory()->create(['is_active' => true, 'price' => 137]);
+
+        Livewire::actingAs($this->user)
+            ->test(BillingDashboard::class)
+            ->assertSee('$137');
+    }
+
+    #[Test]
+    public function current_plan_card_renders_the_real_price(): void
+    {
+        $this->actingAs($this->user);
+
+        $plan = SubscriptionPlan::factory()->create(['price' => 253]);
+        OrganizationSubscription::factory()->create([
+            'organization_id' => $this->organization->id,
+            'plan_id' => $plan->id,
+        ]);
+
+        Livewire::actingAs($this->user)
+            ->test(BillingDashboard::class)
+            ->assertSee('$253');
     }
 }

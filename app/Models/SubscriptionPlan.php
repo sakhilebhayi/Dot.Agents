@@ -18,17 +18,14 @@ class SubscriptionPlan extends Model
     ];
 
     protected $casts = [
-        'price_monthly' => 'decimal:2',
-        'price_annually' => 'decimal:2',
+        'price' => 'decimal:2',
+        'yearly_price' => 'decimal:2',
         'max_agents' => 'integer',
-        'max_tasks_per_month' => 'integer',
         'max_users' => 'integer',
-        'max_storage_gb' => 'integer',
         'features' => 'array',
         'is_active' => 'boolean',
         'is_public' => 'boolean',
         'sort_order' => 'integer',
-        'metadata' => 'array',
     ];
 
     public function getRouteKeyName(): string

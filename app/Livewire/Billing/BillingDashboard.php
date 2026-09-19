@@ -29,7 +29,7 @@ class BillingDashboard extends Component
     #[Computed]
     public function plans()
     {
-        return SubscriptionPlan::where('is_active', true)->orderBy('price_monthly')->get();
+        return SubscriptionPlan::where('is_active', true)->orderBy('price')->get();
     }
 
     #[Computed]

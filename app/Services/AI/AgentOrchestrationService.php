@@ -123,7 +123,7 @@ class AgentOrchestrationService
             'organization_id' => $deployment->organization_id,
         ]);
 
-        // ── Plan quota check: max_tasks_per_month ───────────────────────────
+        // ── Plan quota check: monthly_token_quota ────────────────────────────
         $org = Organization::find($deployment->organization_id);
         $this->quotaGuard->assertQuotaAvailable($deployment->organization_id, $org?->plan);
 
