@@ -1,0 +1,105 @@
+name: Server Inspect
+
+# Read-only reconnaissance: how does agents.infodot.co.za actually run?
+# Nothing in this repository says where the live site's code sits, how it got
+# there, or which drivers it uses (the code is built for Postgres + Redis +
+# Horizon + Reverb; the host is shared cPanel with none of the last three).
+# This prints facts so a pipeline can be designed for what is really there.
+#
+# Fixed commands only -- this workflow must never become a general remote
+# shell. It changes nothing on the host. It prints:
+#   - top-level home entries and any directory named like "agents";
+#   - for each Laravel app found there: git branch/commit/dirty state, the
+#     remote URL with any embedded credentials masked, and the NAMES of
+#     .env keys, with VALUES shown only for a short allow-list of driver
+#     settings (never keys, tokens or passwords);
+#   - PHP version and the extensions that decide the architecture;
+#   - running queue/horizon/reverb processes, and cron lines naming agents.
+#
+# Secrets needed (repository secrets): DEPLOY_HOST, DEPLOY_USER,
+# DEPLOY_SSH_KEY, DEPLOY_KNOWN_HOSTS. No DEPLOY_PATH: finding it is the point.
+on:
+  workflow_dispatch:
+
+jobs:
+  inspect:
+    name: Inspect how agents.infodot.co.za runs
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          printf '%s\n' "${{ secrets.DEPLOY_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+
+      - name: Inspect
+        run: |
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=yes \
+              "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}" \
+              'bash -s' <<'INSPECT'
+          set -uo pipefail
+
+          echo "== home entries (top level)"
+          ls -1 "$HOME" | head -60
+
+          echo "== directories named like agents"
+          ls -1d "$HOME"/*agents* "$HOME"/public_html/*agents* 2>/dev/null || echo "none found"
+
+          echo "== Laravel apps under them (an 'artisan' file within 3 levels)"
+          APPS="$(find "$HOME"/*agents* "$HOME"/public_html/*agents* -maxdepth 3 -name artisan -type f -exec dirname {} \; 2>/dev/null | sort -u)"
+          [ -n "$APPS" ] && echo "$APPS" || echo "none found"
+
+          for APP in $APPS; do
+            echo
+            echo "######## $APP"
+            if [ -d "$APP/.git" ]; then
+              echo "-- git: branch $(git -C "$APP" rev-parse --abbrev-ref HEAD 2>/dev/null), HEAD $(git -C "$APP" log -1 --format='%h %cI %s' 2>/dev/null | cut -c1-110)"
+              echo "-- git remote (credentials masked):"
+              git -C "$APP" remote -v 2>/dev/null | sed -E 's#(://)[^/@]*@#\1***@#' | head -2
+              echo "-- git working tree: $(git -C "$APP" status --short 2>/dev/null | wc -l | tr -d ' ') changed/untracked path(s); first 8:"
+              git -C "$APP" status --short 2>/dev/null | head -8
+            else
+              echo "-- not a git checkout (deployed some other way: archive, rsync, upload)"
+              ls -ld "$APP" | awk '{print "-- owner/mtime: "$3" "$6" "$7" "$8}'
+            fi
+            echo "-- release layout:"
+            ls -1d "$APP"/releases "$APP"/current "$APP"/shared 2>/dev/null || echo "no releases/current/shared (not a symlinked-release layout)"
+            echo "-- vendor present: $([ -d "$APP/vendor" ] && echo yes || echo no); public/build present: $([ -d "$APP/public/build" ] && echo yes || echo no)"
+            echo "-- laravel/framework in composer.lock: $(grep -A1 '"name": "laravel/framework"' "$APP/composer.lock" 2>/dev/null | grep version | tr -d ' ",' )"
+            if [ -f "$APP/.env" ]; then
+              echo "-- .env driver settings (allow-listed values only):"
+              grep -E '^(APP_ENV|APP_DEBUG|APP_URL|DB_CONNECTION|QUEUE_CONNECTION|CACHE_STORE|CACHE_DRIVER|SESSION_DRIVER|BROADCAST_CONNECTION|BROADCAST_DRIVER|MAIL_MAILER|FILESYSTEM_DISK|SCOUT_DRIVER|LOG_CHANNEL)=' "$APP/.env" || echo "(none of the allow-listed keys are set)"
+              echo "-- .env key NAMES only (no values):"
+              grep -E '^[A-Za-z_][A-Za-z0-9_]*=' "$APP/.env" | cut -d= -f1 | tr '\n' ' ' | fold -s -w 110
+              echo
+            else
+              echo "-- no .env file in $APP"
+            fi
+            echo "-- newest logs:"
+            ls -1t "$APP"/storage/logs/*.log 2>/dev/null | head -3 || echo "none"
+          done
+
+          echo
+          echo "== default php"
+          php -v 2>/dev/null | head -1 || echo "no php on PATH"
+          echo "== alt php binaries"
+          ls -1 /opt/alt/*/usr/bin/php /opt/cpanel/ea-php*/root/usr/bin/php 2>/dev/null | head -10 || true
+          echo "== php extensions that decide the architecture (php -m)"
+          php -m 2>/dev/null | grep -iE '^(redis|pdo_pgsql|pgsql|pdo_mysql|pdo_sqlite|sqlite3|pcntl|posix|imagick|gd|intl|mbstring)$' | tr '\n' ' '
+          echo
+          echo "== composer"
+          command -v composer && composer --version 2>/dev/null | head -1 || ls "$HOME"/composer.phar 2>/dev/null || echo "no composer found"
+
+          echo "== running artisan/horizon/reverb/redis processes for this account (commands only)"
+          ps -u "$(id -un)" -o pid=,etime=,args= 2>/dev/null | grep -E 'artisan|horizon|reverb|redis-server|supervisord' | grep -v grep | cut -c1-140 | head -12 || true
+          echo "(empty list = none running right now)"
+
+          echo "== cron lines that mention agents"
+          crontab -l 2>/dev/null | grep -i agents | cut -c1-200 || echo "none"
+
+          echo "== server github access (public key fingerprints only)"
+          ls -1 "$HOME"/.ssh/*.pub 2>/dev/null || echo "no pub keys"
+          INSPECT

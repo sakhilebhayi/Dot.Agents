@@ -1,10 +1,11 @@
 name: Deploy
 
+# Manual-only. The first automated run (2026-10-17, run 39004024576) showed
+# this pipeline cannot deploy yet: no DEPLOY_* secrets exist, and its remote
+# script assumes a VPS layout while agents.infodot.co.za lives on the shared
+# cPanel host (198.38.92.233). Until that is decided, a push to main must not
+# start a deploy that is certain to fail. Run it from the Actions tab.
 on:
-  push:
-    branches:
-      - main        # → production
-      - staging     # → staging
   workflow_dispatch:
     inputs:
       environment:
@@ -37,10 +38,14 @@ jobs:
     steps:
       - id: env
         run: |
-          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
-            echo "environment=production" >> $GITHUB_OUTPUT
-          elif [[ "${{ github.event.inputs.environment }}" != "" ]]; then
+          # The chosen input wins. The ref used to be checked first, so
+          # dispatching "staging" from the main branch silently deployed to
+          # production -- and with the push trigger gone, dispatch is the only
+          # way in.
+          if [[ "${{ github.event.inputs.environment }}" != "" ]]; then
             echo "environment=${{ github.event.inputs.environment }}" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "environment=production" >> $GITHUB_OUTPUT
           else
             echo "environment=staging" >> $GITHUB_OUTPUT
           fi
