@@ -1,10 +1,11 @@
 name: Deploy
 
+# Manual-only. The first automated run (2026-10-17, run 39004024576) showed
+# this pipeline cannot deploy yet: no DEPLOY_* secrets exist, and its remote
+# script assumes a VPS layout while agents.infodot.co.za lives on the shared
+# cPanel host (198.38.92.233). Until that is decided, a push to main must not
+# start a deploy that is certain to fail. Run it from the Actions tab.
 on:
-  push:
-    branches:
-      - main        # → production
-      - staging     # → staging
   workflow_dispatch:
     inputs:
       environment:
@@ -37,10 +38,14 @@ jobs:
     steps:
       - id: env
         run: |
-          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
-            echo "environment=production" >> $GITHUB_OUTPUT
-          elif [[ "${{ github.event.inputs.environment }}" != "" ]]; then
+          # The chosen input wins. The ref used to be checked first, so
+          # dispatching "staging" from the main branch silently deployed to
+          # production -- and with the push trigger gone, dispatch is the only
+          # way in.
+          if [[ "${{ github.event.inputs.environment }}" != "" ]]; then
             echo "environment=${{ github.event.inputs.environment }}" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "environment=production" >> $GITHUB_OUTPUT
           else
             echo "environment=staging" >> $GITHUB_OUTPUT
           fi
@@ -70,15 +75,22 @@ jobs:
           npm run build
 
       - name: Create deployment archive
+        # Write the archive outside the tree being archived. With the output
+        # inside `.`, GNU tar creating release.tar.gz changes the directory it
+        # is reading and fails with "tar: .: file changed as we read it"
+        # (exit 1): the first automated run on 2026-10-17 (run 39004024576)
+        # died here, and the `--exclude='release.tar.gz'` added earlier does not
+        # prevent it. tar has finished and closed the file before `mv`, so
+        # the file ends up in the workspace exactly where it was meant to be.
         run: |
-          tar -czf release.tar.gz \
+          tar -czf /tmp/release.tar.gz \
             --exclude='.git' \
             --exclude='node_modules' \
             --exclude='tests' \
             --exclude='.github' \
             --exclude='storage/logs/*.log' \
-            --exclude='release.tar.gz' \
             .
+          mv /tmp/release.tar.gz "$GITHUB_WORKSPACE/release.tar.gz"
 
       - name: Validate production environment requirements
         run: |
@@ -95,6 +107,7 @@ jobs:
 
       # ── Zero-downtime deployment via SSH ──────────────────────────────────
       - name: Deploy to server (zero-downtime)
+        id: deploy_to_server
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.DEPLOY_HOST }}
@@ -154,8 +167,15 @@ jobs:
         run: echo "Deployment to ${{ needs.determine-environment.outputs.environment }} succeeded"
 
       # ── Automatic rollback on failure ──────────────────────────────────────
+      # Only roll back when the deploy step itself failed. A bare `failure()`
+      # also fires when an EARLIER step (archive, npm build) failed, before
+      # anything new reached the server: the run on 2026-10-17 tried to roll
+      # back after a failed `tar`, and with real DEPLOY_* secrets that would
+      # have switched the live site to the previous release for no reason.
+      # `failure()` stays in the condition: without a status function GitHub
+      # skips the step as soon as any earlier step has failed.
       - name: Rollback on failure
-        if: failure()
+        if: failure() && steps.deploy_to_server.outcome == 'failure'
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.DEPLOY_HOST }}
