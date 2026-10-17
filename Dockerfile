@@ -19,12 +19,13 @@ RUN apk add --no-cache \
     icu-dev \
     oniguruma-dev \
     linux-headers \
+    postgresql-dev \
     $PHPIZE_DEPS
 
 # Install PHP extensions
 RUN docker-php-ext-configure gd --with-jpeg --with-webp \
     && docker-php-ext-install \
-        pdo_mysql \
+        pdo_pgsql \
         mbstring \
         exif \
         pcntl \
@@ -81,6 +82,9 @@ LABEL description="Dot.Agents Enterprise AI Workforce Platform"
 WORKDIR /var/www/html
 
 # Install runtime dependencies only
+# postgresql-libs: pdo_pgsql needs libpq at runtime -- unlike pdo_mysql
+# (removed above), which used PHP's bundled mysqlnd driver and needed no
+# external client library here.
 RUN apk add --no-cache \
     nginx \
     supervisor \
@@ -89,7 +93,8 @@ RUN apk add --no-cache \
     libwebp \
     libzip \
     icu-libs \
-    oniguruma
+    oniguruma \
+    postgresql-libs
 
 # Copy PHP extensions from build stage
 COPY --from=php-deps /usr/local/lib/php/extensions /usr/local/lib/php/extensions

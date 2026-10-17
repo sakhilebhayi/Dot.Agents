@@ -14,9 +14,9 @@ services:
       APP_ENV: ${APP_ENV:-production}
       APP_KEY: ${APP_KEY}
       APP_URL: ${APP_URL}
-      DB_CONNECTION: mysql
+      DB_CONNECTION: pgsql
       DB_HOST: db
-      DB_PORT: 3306
+      DB_PORT: 5432
       DB_DATABASE: ${DB_DATABASE:-dotagents}
       DB_USERNAME: ${DB_USERNAME:-dotagents}
       DB_PASSWORD: ${DB_PASSWORD}
@@ -52,7 +52,7 @@ services:
     environment:
       APP_ENV: ${APP_ENV:-production}
       APP_KEY: ${APP_KEY}
-      DB_CONNECTION: mysql
+      DB_CONNECTION: pgsql
       DB_HOST: db
       DB_DATABASE: ${DB_DATABASE:-dotagents}
       DB_USERNAME: ${DB_USERNAME:-dotagents}
@@ -78,7 +78,7 @@ services:
     environment:
       APP_ENV: ${APP_ENV:-production}
       APP_KEY: ${APP_KEY}
-      DB_CONNECTION: mysql
+      DB_CONNECTION: pgsql
       DB_HOST: db
       DB_DATABASE: ${DB_DATABASE:-dotagents}
       DB_USERNAME: ${DB_USERNAME:-dotagents}
@@ -93,23 +93,27 @@ services:
     networks:
       - dotagents
 
-  # ── MySQL 8 ──────────────────────────────────────────────────────────────────
+  # ── PostgreSQL 16 ────────────────────────────────────────────────────────────
+  # DB_ROOT_PASSWORD (still in .env.example) has no direct equivalent here --
+  # POSTGRES_USER is the actual Postgres superuser for this container, the
+  # same role MYSQL_ROOT_PASSWORD's root account played, so the app's own
+  # DB_USERNAME/DB_PASSWORD double as the admin credentials.
   db:
-    image: mysql:8.4
+    image: postgres:16-alpine
     container_name: dotagents-db
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${DB_DATABASE:-dotagents}
-      MYSQL_USER: ${DB_USERNAME:-dotagents}
-      MYSQL_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_DATABASE:-dotagents}
+      POSTGRES_USER: ${DB_USERNAME:-dotagents}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
-      - db_data:/var/lib/mysql
-      - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+      - db_data:/var/lib/postgresql/data
+      - ./docker/postgres/postgresql.conf:/etc/postgresql/postgresql.conf
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
     ports:
-      - "3306:3306"
+      - "5432:5432"
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-dotagents} -d ${DB_DATABASE:-dotagents}"]
       interval: 10s
       timeout: 5s
       retries: 10

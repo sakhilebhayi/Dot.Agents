@@ -1,5 +1,22 @@
 name: Deploy
 
+# ── Verification status (2026-09-19 audit) ───────────────────────────────────
+# What HAS been verified without real infrastructure: this file parses as
+# valid YAML (Ruby/Psych and actionlint), every embedded `run:`/`script:`
+# block passes `bash -n`, and the remote-side logic below (health-check
+# STATUS population under curl -f, the tar path math for the new upload
+# step, and the rollback's "previous release" mtime ordering) was checked
+# by actually reproducing the same curl/tar invocations locally against a
+# throwaway HTTP server and directory tree -- see the inline comments at
+# each of those steps for what was reproduced and what it showed.
+#
+# What CANNOT be verified here and needs a real run against a real host:
+# actual SSH connectivity/auth with DEPLOY_HOST/DEPLOY_USER/DEPLOY_SSH_KEY
+# (none configured in this environment), whether passwordless sudo for
+# `systemctl reload php8.4-fpm` is actually configured on the target host
+# (see the comment at that line), and real-world timing (network latency,
+# migration duration, actual FPM reload speed) that the health-check
+# retry budget below is only reasoned about, not measured.
 on:
   push:
     branches:
@@ -18,6 +35,16 @@ on:
         required: false
         type: boolean
         default: false
+        # NOTE (2026-09-19 audit): this input is declared but not wired to
+        # any behavior anywhere in this file -- no job/step reads
+        # `github.event.inputs.rollback`. Dispatching this workflow with
+        # "Rollback to previous release?" set to true currently just runs a
+        # completely normal deploy; it does NOT perform a rollback. Building
+        # real manual-rollback support means adding a job that skips
+        # build/deploy and runs only the rollback SSH script -- left as a
+        # documented gap rather than guessed at, since it's a job-control
+        # redesign beyond this audit's scope (add the missing transfer step
+        # + fix bugs in the existing remote-side logic).
 
 concurrency:
   group: deploy-${{ github.ref }}
@@ -35,12 +62,21 @@ jobs:
     outputs:
       environment: ${{ steps.env.outputs.environment }}
     steps:
+      # NOTE (2026-09-19 audit): the explicit workflow_dispatch input is
+      # checked FIRST, ref second. The original order checked `github.ref
+      # == refs/heads/main` first, which meant dispatching this workflow
+      # manually FROM the main branch with "Target environment" set to
+      # "staging" silently deployed to production anyway -- the ref check
+      # short-circuited before the input was ever read. `push` events have
+      # no `github.event.inputs` at all, so `github.event.inputs.environment`
+      # is simply empty and falls through to the ref check exactly as
+      # before; this reordering only changes workflow_dispatch behavior.
       - id: env
         run: |
-          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
-            echo "environment=production" >> $GITHUB_OUTPUT
-          elif [[ "${{ github.event.inputs.environment }}" != "" ]]; then
+          if [[ "${{ github.event.inputs.environment }}" != "" ]]; then
             echo "environment=${{ github.event.inputs.environment }}" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "environment=production" >> $GITHUB_OUTPUT
           else
             echo "environment=staging" >> $GITHUB_OUTPUT
           fi
@@ -70,17 +106,52 @@ jobs:
           npm run build
 
       - name: Create deployment archive
+        # Must write outside the tree being archived -- writing release.tar.gz
+        # into the current directory while `tar .` reads it causes
+        # "tar: .: file changed as we read it" every single time.
+        #
+        # `storage/` is excluded wholesale here, not just `storage/logs/*.log`:
+        # this repo commits real storage/{app,framework,logs}/... directories
+        # (with .gitignore placeholders -- verified with `find storage -type
+        # d`), so without this the archive would ship a real `storage/`
+        # directory. The remote script below symlinks the release's storage/
+        # to the shared one, and `ln -sfn` cannot replace an existing *real*
+        # (non-symlink) directory with a symlink -- verified locally: it
+        # silently nests the new link inside it instead
+        # (release/storage/storage -> shared/storage), leaving release/storage
+        # itself untouched, exit code 0, no error. Excluding storage/ here
+        # means that path doesn't exist yet when the remote script creates the
+        # symlink, so there's nothing to collide with.
         run: |
-          tar -czf release.tar.gz \
+          tar -czf /tmp/release.tar.gz \
             --exclude='.git' \
             --exclude='node_modules' \
             --exclude='tests' \
             --exclude='.github' \
-            --exclude='storage/logs/*.log' \
-            --exclude='release.tar.gz' \
+            --exclude='storage' \
             .
+          # Relocate into the workspace (tar has already finished and closed
+          # the file, so this isn't the same self-read race as before) so the
+          # transfer step below can reference it by a plain, workspace-
+          # relative filename instead of an absolute path -- see that step's
+          # comment for why that distinction matters.
+          mv /tmp/release.tar.gz "$GITHUB_WORKSPACE/release.tar.gz"
 
       - name: Validate production environment requirements
+        # NOTE (2026-09-19 audit): this checks .env in the runner's checkout,
+        # not the real production config. `.env` is gitignored in this repo
+        # (confirmed: line 3 of .gitignore, not a tracked file), so a fresh
+        # `actions/checkout@v4` never has one -- `[ -f "$ENV_FILE" ]` is
+        # false on every real run and this step has effectively never fired.
+        # The actual production .env lives at $SHARED_DIR/.env on the target
+        # host (symlinked into each release by the deploy script below) and
+        # is invisible to this CI-runner-side step entirely. Even if it did
+        # fire, it only emits `::warning::` and never `exit 1`, so it
+        # wouldn't block a bad deploy either way. Left as-is rather than
+        # redesigned: a real version of this check would need to run against
+        # the remote $SHARED_DIR/.env inside the SSH script, which is a
+        # bigger change than this audit's scope covers -- documenting the gap
+        # rather than silently leaving it looking like a real gate.
         run: |
           # Ensure QUEUE_CONNECTION is not 'database' in production.
           # The database driver is a bottleneck under sustained load and
@@ -93,8 +164,66 @@ jobs:
             fi
           fi
 
+      # ── Transfer the archive to the server ─────────────────────────────────
+      # Nothing before this point ever puts release.tar.gz on the remote host.
+      # appleboy/ssh-action (used below) only runs a remote script -- it does
+      # not transfer files -- yet that script does
+      # `tar -xzf /tmp/release.tar.gz -C "$RELEASE_DIR"`, assuming the archive
+      # is already there. appleboy/scp-action is the natural companion to
+      # appleboy/ssh-action: same author, same auth inputs, so it reuses the
+      # exact same DEPLOY_HOST/DEPLOY_USER/DEPLOY_SSH_KEY secrets below with
+      # no new credential shape to provision. It also runs as a "composite"
+      # action directly on the runner rather than inside a Docker container
+      # (confirmed against its published action.yml: `runs.using: composite`).
+      #
+      # `source` is deliberately the plain workspace-relative filename
+      # produced by the `mv` at the end of "Create deployment archive" above,
+      # not the original absolute `/tmp/release.tar.gz` path. Every example
+      # in appleboy/scp-action's own README uses a workspace-relative source
+      # with no leading directory component when the intent is "land at
+      # target/<basename>"; `strip_components` exists specifically to peel
+      # off leading path segments when a source path does carry them, which
+      # implies an absolute source's internal archive entry is NOT just its
+      # basename. Using a bare relative filename with no directory prefix
+      # sidesteps that ambiguity entirely instead of guessing a
+      # `strip_components` count. UNVERIFIED (no real SSH server available in
+      # this environment): this reasoning has not been exercised against a
+      # live scp-action run. The explicit existence check at the top of
+      # "Deploy to server" below will fail loudly and specifically if the
+      # file doesn't land at /tmp/release.tar.gz as expected, rather than
+      # surfacing tar's more confusing "file not found".
+      - name: Upload release archive to server
+        uses: appleboy/scp-action@v1.0.0
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          source: "release.tar.gz"
+          target: "/tmp"
+          overwrite: true
+
       # ── Zero-downtime deployment via SSH ──────────────────────────────────
+      # Two things below are genuinely unverifiable without a real target
+      # host, since DEPLOY_HOST/DEPLOY_USER/DEPLOY_SSH_KEY don't exist in
+      # this environment and can't be fabricated:
+      #   - Host key verification: none of the three SSH-based steps in this
+      #     job (this one, the upload above, or the rollback below) set
+      #     `fingerprint`, so appleboy/ssh-action and appleboy/scp-action both
+      #     skip host key checking (equivalent to StrictHostKeyChecking=no).
+      #     That's a pre-existing choice in the two ssh-action steps, not one
+      #     introduced here -- flagged, not changed, since fixing it means
+      #     pinning the real host's SHA256 key fingerprint as a secret, which
+      #     nobody can supply from this environment.
+      #   - `sudo systemctl reload php8.4-fpm` (here and in the rollback
+      #     script below) requires DEPLOY_USER to have passwordless sudo (a
+      #     NOPASSWD sudoers entry) for that command on the target host.
+      #     ssh-action runs the remote script non-interactively with no TTY,
+      #     so if sudo ever prompted for a password here it would hang until
+      #     `command_timeout` (default 10m) kills the step rather than fail
+      #     fast. This must be provisioned on the server; it cannot be
+      #     verified or configured from CI.
       - name: Deploy to server (zero-downtime)
+        id: deploy_to_server
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.DEPLOY_HOST }}
@@ -109,10 +238,32 @@ jobs:
             # Create release directory
             mkdir -p "$RELEASE_DIR"
 
+            # Fail fast and clearly if the upload step didn't deliver the
+            # archive to the path this script assumes, instead of letting
+            # `tar -xzf` fail with a more confusing "file not found". Placed
+            # *after* mkdir -p, not before: the rollback step's "previous
+            # release" selection relies on RELEASE_DIR always having been
+            # created before any failure in this script, so this check must
+            # not be the first thing that can exit non-zero.
+            if [ ! -f /tmp/release.tar.gz ]; then
+              echo "ERROR: /tmp/release.tar.gz not found on remote host -- the upload step did not deliver the archive to the expected path."
+              exit 1
+            fi
+
             # Extract release
             tar -xzf /tmp/release.tar.gz -C "$RELEASE_DIR"
 
-            # Link shared .env and storage
+            # Link shared .env and storage. `rm -rf` first, defensively:
+            # `ln -sfn` cannot replace an existing *real* (non-symlink)
+            # directory with a symlink -- it silently nests the new link
+            # inside it instead, exit code 0, no error (verified locally).
+            # The archive no longer ships a real storage/ directory (see
+            # "Create deployment archive" above) and .env is never present in
+            # the checkout (gitignored), so neither path should exist here in
+            # practice today -- this guards against that assumption ever
+            # quietly breaking (e.g. if the tar excludes above are edited
+            # later) rather than relying on it silently.
+            rm -rf "$RELEASE_DIR/.env" "$RELEASE_DIR/storage"
             ln -sfn "$SHARED_DIR/.env" "$RELEASE_DIR/.env"
             ln -sfn "$SHARED_DIR/storage" "$RELEASE_DIR/storage"
 
@@ -135,9 +286,32 @@ jobs:
             php "$CURRENT_DIR/artisan" queue:restart
 
             # Health check — verify the new release responds on the API health endpoint
+            #
+            # Verified locally (curl 8.x, reproduced against a throwaway HTTP
+            # server returning 503, and against a closed port for
+            # connection-refused): `-w "%{http_code}"` is written to stdout
+            # regardless of `-f`'s own non-zero exit — curl already knows the
+            # status line before `-f` decides to fail on it, so STATUS is
+            # always freshly (re)assigned every iteration, never empty or
+            # stale from a prior loop pass. On outright connection failure
+            # (refused/timeout, no HTTP response at all) curl's `-w` prints
+            # "000", which also correctly fails the `!= "200"` check below.
+            # Loop runs at most 3 real attempts (no off-by-one): `break` short
+            # -circuits the trailing `|| sleep 5` on success, and `[ "$i" -lt
+            # 3 ]` skips the sleep after the final attempt so it doesn't wait
+            # 5s it will never use. `--max-time 8` bounds each attempt so a
+            # backend that accepts the connection but never responds (a real
+            # possible FPM-reload failure mode) can't silently turn this into
+            # a multi-minute hang against ssh-action's 10m command_timeout —
+            # without it the "sleep 5 + up to 3×5s" budget below is not
+            # actually enforced. Total worst case with the cap: ~5s initial +
+            # 3×(8s curl + 5s sleep) ≈ 44s, still comfortably short for a
+            # PHP-FPM graceful reload (SIGUSR2, sub-second to a few seconds
+            # in practice) — reasoned about, not measured against a real FPM.
             sleep 5
             for i in 1 2 3; do
-              STATUS=$(curl -sf -o /dev/null -w "%{http_code}" http://localhost/api/health) && break || sleep 5
+              STATUS=$(curl -sf --max-time 8 -o /dev/null -w "%{http_code}" http://localhost/api/health) && break
+              [ "$i" -lt 3 ] && sleep 5
             done
             if [ "$STATUS" != "200" ]; then
               echo "Health check failed (HTTP $STATUS) — triggering rollback"
@@ -154,8 +328,33 @@ jobs:
         run: echo "Deployment to ${{ needs.determine-environment.outputs.environment }} succeeded"
 
       # ── Automatic rollback on failure ──────────────────────────────────────
+      # Scoped to the deploy step specifically (steps.deploy_to_server.outcome),
+      # not a bare `failure()` job-wide check. `failure()` alone is true if ANY
+      # earlier step in this job failed -- including "Install dependencies",
+      # "Build frontend assets", "Create deployment archive", or "Upload
+      # release archive to server", none of which ever touch the remote host.
+      # With only `if: failure()`, a plain `npm run build` failure on the
+      # runner -- nothing ever deployed, nothing to roll back -- would still
+      # SSH in here and force `current` to point at the second-most-recent
+      # release, silently downgrading a perfectly healthy, currently-serving
+      # production release. Rollback must only fire when the remote deploy
+      # itself failed.
+      #
+      # CRITICAL: `failure()` must still be included even though this `if`
+      # already checks `steps.deploy_to_server.outcome`. Confirmed against
+      # GitHub's own docs (actions/expressions.md, "Status check functions"):
+      # "a default status check of success() is applied unless you include
+      # one of these functions" -- an `if:` with no success()/failure()/
+      # always()/cancelled() call is silently ANDed with success(). Without
+      # `failure() &&` here, this step would be `success() && (outcome ==
+      # 'failure')`, which can never be true once the deploy step has
+      # actually failed (success() is false from that point on in the job) --
+      # i.e. writing just `if: steps.deploy_to_server.outcome == 'failure'`
+      # would silently disable rollback entirely, the exact opposite of what
+      # it looks like it does. This is exactly the class of "looks correct,
+      # never fires" bug the rest of this audit is about.
       - name: Rollback on failure
-        if: failure()
+        if: failure() && steps.deploy_to_server.outcome == 'failure'
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.DEPLOY_HOST }}
@@ -163,13 +362,28 @@ jobs:
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           script: |
             set -e
+            # `ls -dt` sorts release directories newest-first by mtime.
+            # RELEASE_DIR is always mkdir'd before anything in "Deploy to
+            # server" can fail, so entry #1 here is that just-created,
+            # failed release, and entry #2 (`sed -n '2p'`) is the release
+            # that was actually live before this deploy attempt started --
+            # i.e. the correct rollback target. Traced every failure point
+            # in the deploy script above (mkdir, tar extract, migrate, cache
+            # warm, cutover, fpm reload, queue:restart, health check) and
+            # none of them let RELEASE_DIR become `current` before failing,
+            # so it's always exactly one slot newer than the real previous
+            # release. Edge case that can't be fully ruled out without a
+            # real host: two deploys landing in the same second would tie on
+            # mtime, making `ls -dt`'s secondary sort (filesystem-dependent)
+            # the tiebreaker -- not a realistic risk for this pipeline's
+            # manual/CI-triggered cadence.
             PREVIOUS=$(ls -dt /var/www/dotagents/releases/*/ | sed -n '2p')
             if [ -n "$PREVIOUS" ]; then
               ln -sfn "$PREVIOUS" /var/www/dotagents/current
               sudo systemctl reload php8.4-fpm
               php /var/www/dotagents/current/artisan queue:restart
               sleep 3
-              curl -sf http://localhost/api/health && echo "Rollback healthy: $PREVIOUS" || echo "WARNING: rollback health check failed — manual inspection required"
+              curl -sf --max-time 8 http://localhost/api/health && echo "Rollback healthy: $PREVIOUS" || echo "WARNING: rollback health check failed — manual inspection required"
               echo "Rolled back to: $PREVIOUS"
             else
               echo "ERROR: No previous release found for rollback"
