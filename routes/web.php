@@ -2,10 +2,13 @@
 
 use App\Http\Controllers\Auth\EcosystemAuthController;
 use App\Http\Controllers\BillingController;
+use App\Http\Controllers\GuardianHealthController;
 use App\Http\Controllers\HealthCheckController;
+use App\Http\Controllers\SchedulerProbeController;
 use App\Http\Controllers\SocialAccountController;
 use App\Http\Controllers\SocialOAuthController;
 use App\Http\Controllers\SocialWebhookController;
+use App\Http\Middleware\AuthenticateGuardian;
 use App\Models\AgentDeployment;
 use App\Models\AgentWorkflow;
 use App\Models\User;
@@ -164,3 +167,14 @@ Route::post('/webhooks/stripe', [BillingController::class, 'webhook'])->name('st
 
 Route::get('/social/webhooks/{platform}', [SocialWebhookController::class, 'verify'])->name('social.webhooks.verify');
 Route::post('/social/webhooks/{platform}', [SocialWebhookController::class, 'receive'])->name('social.webhooks.receive');
+
+// Public liveness probe for the cron scheduler and queue worker, watched from GitHub every
+// 15 minutes by .github/workflows/scheduler-watchdog.yml.
+Route::get('/up/scheduler', SchedulerProbeController::class)->name('up.scheduler');
+
+// Guardian observability report for Dot.Brain (dot-guardian/v1): operational
+// detail, so behind a bearer token (fails closed with 503 when none is
+// configured) rather than public like /up and /up/scheduler.
+Route::get('/guardian/health', GuardianHealthController::class)
+    ->middleware(AuthenticateGuardian::class)
+    ->name('guardian.health');
