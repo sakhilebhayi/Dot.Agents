@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\Route;
 // ── Health Checks ─────────────────────────────────────────────────────────────
 // Public ping — used by load balancers and uptime monitors
 Route::match(['get', 'post'], '/auth/ecosystem', [EcosystemAuthController::class, 'handle'])
-    ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class, \Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class])->name('auth.ecosystem');
+    ->withoutMiddleware(['Illuminate\Foundation\Http\Middleware\VerifyCsrfToken', 'Illuminate\Foundation\Http\Middleware\ValidateCsrfToken'])->name('auth.ecosystem');
 
 Route::get('/health', [HealthCheckController::class, 'ping'])->name('health.ping');
 
