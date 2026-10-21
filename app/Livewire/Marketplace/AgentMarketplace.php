@@ -19,6 +19,9 @@ class AgentMarketplace extends Component
 {
     use ManagesAgentDeploy, WithPagination;
 
+    /** Actions a read-only (viewer) role may still call; every other action is refused for it. */
+    public const READ_ONLY_ACTIONS = ['openPreview', 'closePreview', 'setDepartment', 'setSkill', 'clearFilters'];
+
     // ── Search & Sort ────────────────────────────────────────────────
     public string $search = '';
 

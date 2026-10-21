@@ -130,19 +130,25 @@
                                 class="w-full text-xs rounded-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-brand-purple-mid"></textarea>
                         </div>
                         <div class="flex gap-2">
+                            @writable
                             <button wire:click="approve" wire:loading.attr="disabled"
                                 class="flex-1 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium rounded-lg transition-colors">
                                 ✓ Approve
                             </button>
+                            @endwritable
+                            @writable
                             <button wire:click="reject" wire:loading.attr="disabled"
                                 class="flex-1 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-medium rounded-lg transition-colors">
                                 ✕ Reject
                             </button>
+                            @endwritable
                         </div>
+                        @writable
                         <button wire:click="escalate" wire:loading.attr="disabled"
                             class="w-full mt-2 py-2 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 text-xs font-medium rounded-lg transition-colors">
                             ↑ Escalate
                         </button>
+                        @endwritable
                     @else
                         <div class="text-center py-3 text-xs text-gray-400">
                             {{ $selectedApproval->isExpired() ? 'This approval request has expired.' : 'This request has already been ' . $selectedApproval->status . '.' }}

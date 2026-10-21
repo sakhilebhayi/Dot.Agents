@@ -69,6 +69,7 @@ Route::middleware([
     'verified',
     'consent.required',
     'org.context',
+    'writable', // a read-only (viewer) role gets 403 on every non-GET request
 ])->group(function () {
 
     // Dashboard
@@ -135,7 +136,8 @@ Route::middleware([
         Route::get('/', fn () => view('billing.index'))->name('index');
         Route::get('/plans', fn () => view('billing.plans'))->name('plans');
         Route::get('/success', [BillingController::class, 'success'])->name('success');
-        Route::get('/portal', [BillingController::class, 'portal'])->name('portal');
+        // Opens a Stripe billing-management session: a GET that acts, so `writable:any` refuses it for viewers.
+        Route::get('/portal', [BillingController::class, 'portal'])->middleware('writable:any')->name('portal');
         Route::post('/checkout/{plan}', [BillingController::class, 'checkout'])->name('checkout');
         Route::get('/settings', fn () => view('billing.settings'))->name('settings.billing');
     });
@@ -155,8 +157,9 @@ Route::middleware([
         Route::delete('/accounts/{socialAccount}', [SocialAccountController::class, 'destroy'])->name('accounts.destroy');
 
         // OAuth redirect + callback (platform = facebook|instagram|linkedin|twitter|tiktok)
-        Route::get('/auth/{platform}/redirect', [SocialOAuthController::class, 'redirect'])->name('auth.redirect');
-        Route::get('/auth/{platform}/callback', [SocialOAuthController::class, 'callback'])->name('auth.callback');
+        // Both GETs start or finish connecting an account, so `writable:any` refuses them for viewers.
+        Route::get('/auth/{platform}/redirect', [SocialOAuthController::class, 'redirect'])->middleware('writable:any')->name('auth.redirect');
+        Route::get('/auth/{platform}/callback', [SocialOAuthController::class, 'callback'])->middleware('writable:any')->name('auth.callback');
     });
 });
 

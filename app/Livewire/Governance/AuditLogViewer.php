@@ -15,6 +15,9 @@ class AuditLogViewer extends Component
 {
     use WithPagination;
 
+    /** Actions a read-only (viewer) role may still call; every other action is refused for it. */
+    public const READ_ONLY_ACTIONS = ['export'];
+
     public string $search = '';
 
     public string $filterCategory = '';

@@ -116,11 +116,13 @@
                         </td>
                         <td class="px-6 py-4 text-right">
                             @if($lead->status === 'new')
+                                @writable
                                 <button wire:click="qualify({{ $lead->id }})"
                                     wire:loading.attr="disabled"
                                     class="text-xs font-medium text-brand-purple-mid hover:text-brand-purple-dark dark:text-brand-purple-light">
                                     Qualify →
                                 </button>
+                                @endwritable
                             @endif
                         </td>
                     </tr>

@@ -70,9 +70,11 @@
                             @if($editing === $platform)
                                 <button wire:click="cancelEdit" class="px-3 py-1 text-xs font-medium rounded-lg border border-gray-200 dark:border-gray-700 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 transition">Cancel</button>
                             @else
+                                @writable
                                 <button wire:click="openEdit('{{ $platform }}')" class="px-3 py-1 text-xs font-medium rounded-lg bg-brand-purple-mid hover:bg-brand-purple text-white transition">
                                     {{ $cred ? 'Update' : 'Configure' }}
                                 </button>
+                                @endwritable
                             @endif
                         </div>
                     </div>

@@ -14,6 +14,9 @@ class ApprovalQueue extends Component
 {
     use WithPagination;
 
+    /** Actions a read-only (viewer) role may still call; every other action is refused for it. */
+    public const READ_ONLY_ACTIONS = ['selectApproval'];
+
     public string $filterStatus = 'pending';
 
     public string $filterRisk = '';

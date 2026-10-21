@@ -18,11 +18,13 @@
                     <option value="30d" selected>Last 30 days</option>
                     <option value="90d">Last 90 days</option>
                 </select>
+                @writable
                 <button wire:click="recalculate" wire:loading.attr="disabled"
                     class="px-4 py-2 bg-brand-purple-mid hover:bg-brand-purple text-white text-sm font-medium rounded-xl transition-colors disabled:opacity-50">
                     <span wire:loading.remove>Recalculate</span>
                     <span wire:loading>Calculating...</span>
                 </button>
+                @endwritable
             </div>
         </div>
     </div>
@@ -105,10 +107,12 @@
     @else
         <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-12 text-center">
             <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">No scorecard data yet for this period.</p>
+            @writable
             <button wire:click="recalculate"
                 class="px-6 py-2 bg-brand-purple-mid hover:bg-brand-purple text-white text-sm font-medium rounded-xl transition-colors">
                 Generate Scorecard
             </button>
+            @endwritable
         </div>
     @endif
 

@@ -6,6 +6,9 @@ use Laravel\Jetstream\Http\Livewire\NavigationMenu as JetstreamNavigationMenu;
 
 class NavigationMenu extends JetstreamNavigationMenu
 {
+    /** Actions a read-only (viewer) role may still call; every other action is refused for it. */
+    public const READ_ONLY_ACTIONS = ['toJSON'];
+
     /**
      * Guard against Alpine.js $wire proxy forwarding `toJSON` as a server call.
      *

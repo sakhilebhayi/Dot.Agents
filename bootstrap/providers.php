@@ -11,6 +11,7 @@ use App\Providers\GovernanceServiceProvider;
 use App\Providers\HorizonServiceProvider;
 use App\Providers\JetstreamServiceProvider;
 use App\Providers\PolicyServiceProvider;
+use App\Providers\ReadOnlyServiceProvider;
 use App\Providers\SocialServiceProvider;
 
 return [
@@ -28,4 +29,6 @@ return [
     FortifyServiceProvider::class,
     HorizonServiceProvider::class,
     JetstreamServiceProvider::class,
+    // Read-only (viewer) role: Gate, Livewire and Blade hooks
+    ReadOnlyServiceProvider::class,
 ];

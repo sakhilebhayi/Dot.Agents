@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\BlockWritesForReadOnlyUsers;
 use App\Http\Middleware\ConsentRequiredMiddleware;
 use App\Http\Middleware\CorrelationIdMiddleware;
 use App\Http\Middleware\OrganizationContextMiddleware;
@@ -37,6 +38,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'org.context' => OrganizationContextMiddleware::class,
             'consent.required' => ConsentRequiredMiddleware::class,
+            'writable' => BlockWritesForReadOnlyUsers::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
