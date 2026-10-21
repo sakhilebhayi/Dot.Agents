@@ -13,8 +13,9 @@ use Illuminate\Support\Facades\Route;
 // Public health probe — no authentication, used by load balancers and CI/CD pipelines
 Route::get('/health', HealthController::class)->name('api.health');
 
-// All API routes are versioned under /v1 with auth:sanctum + org.context
-Route::prefix('v1')->name('api.v1.')->middleware(['auth:sanctum', 'org.context'])->group(function () {
+// All API routes are versioned under /v1 with auth:sanctum + org.context; `writable` refuses
+// every non-GET request from a read-only (viewer) role, whatever abilities its token carries
+Route::prefix('v1')->name('api.v1.')->middleware(['auth:sanctum', 'org.context', 'writable'])->group(function () {
 
     // Authenticated user — only safe, non-sensitive fields returned
     Route::get('/me', fn (Request $request) => response()->json(

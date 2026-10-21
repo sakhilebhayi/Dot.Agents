@@ -36,13 +36,13 @@
             <span class="px-4 py-2 text-sm font-medium border-b-2 border-brand-purple-mid text-brand-purple-mid dark:text-brand-purple-light">
                 Overview
             </span>
-            @if($this->deployment->status === 'active')
+            @if($this->deployment->status === 'active' && auth()->user()->can('chat', $this->deployment))
                 <a href="{{ route('agents.chat', $this->deployment) }}"
                     class="px-4 py-2 text-sm font-medium border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition">
                     Chat
                 </a>
             @else
-                <span class="px-4 py-2 text-sm font-medium border-b-2 border-transparent text-gray-300 dark:text-gray-700 cursor-not-allowed" title="Chat only available for active deployments">
+                <span class="px-4 py-2 text-sm font-medium border-b-2 border-transparent text-gray-300 dark:text-gray-700 cursor-not-allowed" title="Chat is only available for active deployments, to roles that can write">
                     Chat
                 </span>
             @endif

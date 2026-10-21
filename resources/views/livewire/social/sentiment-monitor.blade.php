@@ -84,11 +84,13 @@
                         <span class="text-sm font-bold {{ $score->score < 30 ? 'text-red-600' : 'text-orange-600' }}">
                             {{ round($score->score) }}/100
                         </span>
+                        @writable
                         <button wire:click="markHandled({{ $score->id }})"
                             wire:loading.attr="disabled"
                             class="px-3 py-1.5 text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 disabled:opacity-50 transition">
                             Mark Handled
                         </button>
+                        @endwritable
                     </div>
                 @endforeach
             </div>

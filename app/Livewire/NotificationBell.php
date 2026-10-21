@@ -9,6 +9,9 @@ use Livewire\Component;
 
 class NotificationBell extends Component
 {
+    /** Actions a read-only (viewer) role may still call; every other action is refused for it. */
+    public const READ_ONLY_ACTIONS = ['toggle', 'markAsRead', 'markAllAsRead', 'refresh', '__dispatch'];
+
     public bool $open = false;
 
     #[Computed]

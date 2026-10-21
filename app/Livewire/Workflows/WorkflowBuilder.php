@@ -28,6 +28,9 @@ class WorkflowBuilder extends Component
 {
     use ManagesWorkflowCanvas;
 
+    /** Actions a read-only (viewer) role may still call; every other action is refused for it. */
+    public const READ_ONLY_ACTIONS = ['toJSON'];
+
     public AgentWorkflow $workflow;
 
     /** Raw node array — synced from Alpine via save() */

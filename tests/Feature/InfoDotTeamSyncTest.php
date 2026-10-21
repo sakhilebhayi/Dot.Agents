@@ -96,9 +96,8 @@ class InfoDotTeamSyncTest extends TestCase
         $this->assertSame('admin', $carl->fresh()->teamRole($team->fresh())->key);
     }
 
-    public function test_an_infodot_viewer_gets_the_least_powerful_role_this_app_defines(): void
+    public function test_an_infodot_viewer_gets_the_read_only_viewer_role(): void
     {
-        // Dot.Agents defines only "admin" and "editor": there is no read-only team role to map viewer onto.
         $this->signIn('ann@acme.test', [$this->company(self::ACME, 'Acme Ltd', 'owner')], self::ACME);
         $this->signIn('vic@acme.test', [$this->company(self::ACME, 'Acme Ltd', 'viewer')], self::ACME);
 
@@ -106,8 +105,11 @@ class InfoDotTeamSyncTest extends TestCase
         $vic = User::where('email', 'vic@acme.test')->firstOrFail();
 
         $this->assertTrue($vic->belongsToTeam($team));
-        $this->assertSame('editor', $vic->teamRole($team)->key);
-        $this->assertFalse($vic->hasTeamPermission($team, 'delete'), 'never the administrator role');
+        $this->assertSame('viewer', $vic->teamRole($team)->key);
+        $this->assertTrue($vic->hasTeamPermission($team, 'read'));
+        $this->assertFalse($vic->hasTeamPermission($team, 'create'));
+        $this->assertFalse($vic->hasTeamPermission($team, 'update'));
+        $this->assertFalse($vic->hasTeamPermission($team, 'delete'));
     }
 
     public function test_a_person_removed_in_infodot_loses_the_company_here_at_next_sign_in(): void

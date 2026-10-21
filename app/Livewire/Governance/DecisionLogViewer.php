@@ -12,6 +12,9 @@ class DecisionLogViewer extends Component
 {
     use WithPagination;
 
+    /** Actions a read-only (viewer) role may still call; every other action is refused for it. */
+    public const READ_ONLY_ACTIONS = ['view', 'closeDetail'];
+
     public string $filterRisk = '';
 
     public string $filterDeployment = '';

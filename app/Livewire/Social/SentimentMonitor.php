@@ -15,6 +15,9 @@ class SentimentMonitor extends Component
 {
     use ResolvesCurrentOrganization;
 
+    /** Actions a read-only (viewer) role may still call; every other action is refused for it. */
+    public const READ_ONLY_ACTIONS = ['setTimeframe'];
+
     public string $timeframe = '24h';
 
     public string $platform = 'all';

@@ -14,6 +14,9 @@ class SocialInbox extends Component
 {
     use ResolvesCurrentOrganization;
 
+    /** Actions a read-only (viewer) role may still call; every other action is refused for it. */
+    public const READ_ONLY_ACTIONS = ['openConversation'];
+
     public string $filter = 'open';             // open|escalated|resolved|all
 
     public string $platform = 'all';

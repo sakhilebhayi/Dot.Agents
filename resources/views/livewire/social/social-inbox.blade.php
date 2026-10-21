@@ -62,11 +62,13 @@
                 </div>
                 <div class="flex items-center gap-2">
                     @if(!$this->activeConversation->is_escalated)
+                        @writable
                         <button wire:click="escalate({{ $this->activeConversation->id }})"
                             class="px-3 py-1.5 text-xs font-medium bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 rounded-lg hover:bg-orange-200 transition"
                             wire:loading.attr="disabled">
                             Escalate
                         </button>
+                        @endwritable
                     @else
                         <span class="px-3 py-1.5 text-xs font-medium bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-lg">Escalated</span>
                     @endif
@@ -112,12 +114,14 @@
                         placeholder="Type a reply..."
                         class="flex-1 resize-none rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-sm text-gray-900 dark:text-white px-4 py-3 focus:ring-2 focus:ring-brand-purple-light focus:border-transparent transition"
                         wire:keydown.cmd.enter="sendReply"></textarea>
+                    @writable
                     <button wire:click="sendReply"
                         wire:loading.attr="disabled"
                         class="px-5 py-2.5 bg-brand-purple-mid hover:bg-brand-purple text-white text-sm font-medium rounded-xl transition disabled:opacity-50">
                         <span wire:loading.remove wire:target="sendReply">Send</span>
                         <span wire:loading wire:target="sendReply">Sending…</span>
                     </button>
+                    @endwritable
                 </div>
             </div>
         @else

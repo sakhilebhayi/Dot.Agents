@@ -65,12 +65,16 @@
                         <p class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ $skill->webhook_url }}</p>
                     </div>
                     <div class="flex items-center gap-2 flex-shrink-0">
+                        @writable
                         <button wire:click="toggleActive({{ $skill->id }})" class="text-xs font-medium text-brand-purple-mid hover:text-brand-purple-dark">
                             {{ $skill->is_active ? 'Disable' : 'Enable' }}
                         </button>
+                        @endwritable
+                        @writable
                         <button wire:click="delete({{ $skill->id }})" wire:confirm="Delete this custom skill? Deployments using it will stop being able to invoke it." class="text-xs font-medium text-red-600 hover:text-red-800">
                             Delete
                         </button>
+                        @endwritable
                     </div>
                 </div>
             @empty

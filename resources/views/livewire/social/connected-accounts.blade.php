@@ -93,14 +93,18 @@
                             <button wire:click="closeManage"
                                     class="flex-1 px-3 py-2 text-xs font-semibold rounded-xl bg-brand-purple-mid border border-brand-purple-mid text-white text-center">Done</button>
                         @else
+                            @writable
                             <button wire:click="openManage('{{ $platform }}')"
                                     class="flex-1 px-3 py-2 text-xs font-semibold rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-brand-purple-light hover:text-brand-purple-mid text-center transition">Manage Settings</button>
+                            @endwritable
                         @endif
+                        @writable
                         <button wire:click="disconnect('{{ $platform }}')"
                                 wire:confirm="Disconnect {{ $info['short'] }}? Your agent will lose access to this account."
                                 class="px-3 py-2 text-xs font-medium rounded-xl border border-red-200 dark:border-red-800 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition">
                             Disconnect
                         </button>
+                        @endwritable
                     </div>
 
                 @else

@@ -29,6 +29,7 @@
     @if($showInviteForm)
     <div class="bg-white dark:bg-gray-900 rounded-2xl border border-brand-purple-pale dark:border-brand-purple-dark p-6">
         <h3 class="font-semibold text-gray-900 dark:text-white text-sm mb-4">Invite a Member</h3>
+        @writable
         <form wire:submit="invite" class="flex flex-wrap gap-4 items-end">
             <div class="flex-1 min-w-48">
                 <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Email Address</label>
@@ -54,6 +55,7 @@
                 </button>
             </div>
         </form>
+        @endwritable
     </div>
     @endif
 
@@ -111,10 +113,12 @@
                     </td>
                     <td class="px-6 py-4 text-right">
                         @if($member->id !== $this->organization->owner_id && $member->id !== auth()->id())
+                            @writable
                             <button wire:click="confirmRemove({{ $member->id }})"
                                 class="text-xs text-red-500 hover:text-red-700 font-medium transition-colors">
                                 Remove
                             </button>
+                            @endwritable
                         @endif
                     </td>
                 </tr>

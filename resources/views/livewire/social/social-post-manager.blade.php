@@ -49,12 +49,14 @@
                     @error('composingScheduledAt') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                 </div>
                 <div class="flex items-center gap-3 pt-2">
+                    @writable
                     <button wire:click="schedulePost"
                         wire:loading.attr="disabled"
                         class="px-5 py-2 bg-brand-purple-mid hover:bg-brand-purple text-white text-sm font-medium rounded-lg transition">
                         <span wire:loading.remove wire:target="schedulePost">Submit for Approval</span>
                         <span wire:loading wire:target="schedulePost">Submitting…</span>
                     </button>
+                    @endwritable
                     <button wire:click="$set('showCompose', false)"
                         class="px-5 py-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm font-medium rounded-lg hover:bg-gray-200 transition">
                         Cancel
@@ -119,11 +121,13 @@
 
                 @if($post->isPendingApproval())
                     <div class="flex items-center gap-2 mt-4 pt-3 border-t border-yellow-200 dark:border-yellow-800">
+                        @writable
                         <button wire:click="approvePost({{ $post->id }})"
                             wire:loading.attr="disabled"
                             class="flex-1 px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold rounded-lg transition text-center">
                             ✓ Approve & Schedule
                         </button>
+                        @endwritable
                         <button class="flex-1 px-4 py-2 bg-red-100 hover:bg-red-200 text-red-700 text-xs font-semibold rounded-lg transition text-center">
                             ✕ Reject
                         </button>
