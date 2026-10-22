@@ -22,6 +22,8 @@ use Illuminate\Support\Facades\Log;
  *   someone in InfoDot removes their access here at their next sign-in.
  * - The company InfoDot says is active becomes the person's current team.
  * - Personal teams are never linked or removed.
+ * - Each company also gets an organization here, with the person's role in it,
+ *   because the data policies check organizations (see SyncOrganizationsFromInfoDot).
  */
 class SyncTeamsFromInfoDot
 {
@@ -49,6 +51,8 @@ class SyncTeamsFromInfoDot
             if ($team && $user->belongsToTeam($team)) {
                 $user->switchTeam($team);
             }
+
+            app(SyncOrganizationsFromInfoDot::class)($user, $listed, is_string($active) ? $active : null);
         });
     }
 
