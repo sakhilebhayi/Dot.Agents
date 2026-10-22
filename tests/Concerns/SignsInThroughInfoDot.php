@@ -37,7 +37,25 @@ trait SignsInThroughInfoDot
         ])]);
 
         auth()->logout();
-        $this->get(route('auth.ecosystem', ['token' => 'one-time']))->assertRedirect();
+        $this->post(route('auth.ecosystem'), ['token' => 'one-time'], $this->fromInfodot())->assertRedirect();
+    }
+
+    /**
+     * InfoDot's launch page, as the browser reports it.
+     *
+     * @return array<string, string>
+     */
+    protected function fromInfodot(): array
+    {
+        $infodot = parse_url((string) config('ecosystem.infodot.redeem_url', ''), PHP_URL_HOST);
+
+        if (is_string($infodot) && $infodot !== '') {
+            return ['Origin' => 'https://'.$infodot];
+        }
+
+        $host = (string) parse_url((string) config('app.url'), PHP_URL_HOST);
+
+        return ['Origin' => 'https://'.(str_contains($host, '.') ? substr($host, strpos($host, '.') + 1) : $host)];
     }
 
     /** @return array<string, mixed> */
