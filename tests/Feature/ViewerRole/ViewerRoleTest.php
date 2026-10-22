@@ -23,6 +23,20 @@ class ViewerRoleTest extends TestCase
     use MakesRoleScenarios;
     use RefreshDatabase;
 
+    /** InfoDot's launch page, as the browser reports it. */
+    private function fromInfodot(): array
+    {
+        $infodot = parse_url((string) config('ecosystem.infodot.redeem_url', ''), PHP_URL_HOST);
+
+        if (is_string($infodot) && $infodot !== '') {
+            return ['Origin' => 'https://'.$infodot];
+        }
+
+        $host = (string) parse_url((string) config('app.url'), PHP_URL_HOST);
+
+        return ['Origin' => 'https://'.(str_contains($host, '.') ? substr($host, strpos($host, '.') + 1) : $host)];
+    }
+
     private const URL = 'https://infodot.test/api/ecosystem/redeem';
 
     private const ACME = '11111111-1111-4111-8111-111111111111';
@@ -134,7 +148,7 @@ class ViewerRoleTest extends TestCase
         ])]);
 
         auth()->logout();
-        $this->get(route('auth.ecosystem', ['token' => 'one-time']))->assertRedirect();
+        $this->post(route('auth.ecosystem'), ['token' => 'one-time'], $this->fromInfodot())->assertRedirect();
     }
 
     public function test_signing_in_as_an_infodot_viewer_or_unknown_role_lands_read_only(): void
