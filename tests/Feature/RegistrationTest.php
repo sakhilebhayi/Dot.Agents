@@ -28,9 +28,7 @@ class RegistrationTest extends TestCase
             $this->markTestSkipped('Registration support is enabled.');
         }
 
-        $response = $this->get('/register');
-
-        $response->assertStatus(404);
+        $this->get('/register')->assertRedirect('/login');
     }
 
     public function test_new_users_can_register(): void

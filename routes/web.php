@@ -15,6 +15,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
+use Laravel\Fortify\Features;
 
 // ── Health Checks ─────────────────────────────────────────────────────────────
 // Public ping — used by load balancers and uptime monitors
@@ -186,3 +187,9 @@ Route::get('/up/scheduler', SchedulerProbeController::class)->name('up.scheduler
 Route::get('/guardian/health', GuardianHealthController::class)
     ->middleware(AuthenticateGuardian::class)
     ->name('guardian.health');
+
+// Public sign-up is closed (accounts are created by InfoDot at first sign-in). Keep the named route so any link or
+// invitation email that points at it lands on the login page instead of failing.
+if (! Features::enabled(Features::registration())) {
+    Route::redirect('/register', '/login')->name('register');
+}
