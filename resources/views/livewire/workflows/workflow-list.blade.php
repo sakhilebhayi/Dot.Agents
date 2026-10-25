@@ -13,6 +13,7 @@
             <h2 class="text-base font-semibold text-gray-900 dark:text-white">Workflows</h2>
             <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Orchestrate multi-agent pipelines for complex tasks.</p>
         </div>
+        @writable
         <button wire:click="openCreateModal"
             class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-xl bg-[#3d2ea0] hover:bg-[#5b48c8] text-white transition-colors">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -20,6 +21,7 @@
             </svg>
             New Workflow
         </button>
+        @endwritable
     </div>
 
     {{-- List --}}
@@ -32,6 +34,7 @@
             </div>
             <p class="text-sm font-medium text-gray-900 dark:text-white mb-1">No workflows yet</p>
             <p class="text-xs text-gray-500 dark:text-gray-400 mb-5 max-w-xs mx-auto">Build your first workflow to automate multi-agent processes.</p>
+            @writable
             <button wire:click="openCreateModal"
                 class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-xl bg-[#3d2ea0] hover:bg-[#5b48c8] text-white transition-colors">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -39,6 +42,7 @@
                 </svg>
                 Create Workflow
             </button>
+            @endwritable
         </div>
     @else
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -88,6 +92,7 @@
                             class="flex-1 py-1.5 text-xs font-medium text-center bg-[#3d2ea0] hover:bg-[#5b48c8] text-white rounded-lg transition-colors">
                             Open Builder
                         </a>
+                        @writable
                         <button
                             wire:click="deleteWorkflow({{ $wf->id }})"
                             wire:confirm="Delete '{{ addslashes($wf->name) }}'? This cannot be undone."
@@ -97,6 +102,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                             </svg>
                         </button>
+                        @endwritable
                     </div>
                 </div>
             @endforeach

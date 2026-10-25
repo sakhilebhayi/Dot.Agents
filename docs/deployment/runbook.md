@@ -3,7 +3,7 @@
 ## Prerequisites
 
 - PHP 8.4+, Composer 2.x
-- PostgreSQL 16+ (production) / SQLite (development)
+- MySQL 8.0+ (production) / SQLite (development)
 - Redis 7.x
 - Node.js 20 LTS + npm
 
@@ -13,7 +13,7 @@
 
 ```bash
 # Install PHP extensions
-sudo apt install php8.4 php8.4-fpm php8.4-pgsql php8.4-redis \
+sudo apt install php8.4 php8.4-fpm php8.4-mysql php8.4-redis \
   php8.4-xml php8.4-curl php8.4-zip php8.4-mbstring
 
 # Install Composer
@@ -68,9 +68,9 @@ APP_URL=https://your-domain.com
 APP_DEBUG=false
 
 # Database
-DB_CONNECTION=pgsql
+DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
-DB_PORT=5432
+DB_PORT=3306
 DB_DATABASE=dotagents
 DB_USERNAME=dotagents
 DB_PASSWORD=
@@ -165,88 +165,21 @@ server {
 
 ## 7. Zero-Downtime Deployment (CI/CD)
 
-**This section describes what `.github/workflows/deploy.yml` actually does.**
-It is not the `git pull`-in-place flow this section used to describe — that
-predates the release/shared/current layout below and doesn't match the real
-pipeline. Corrected 2026-09-19 as part of the deploy.yml transfer-step audit
-(see `docs/feature-completion-ledger.md`, "Phase 6 — second pass on
-deploy.yml").
-
-### 7.1 One-time prerequisites (before the *first* CI-driven deploy)
-
-`deploy.yml` builds the app on the CI runner, ships the built archive to the
-target host, and symlinks it into place — it never creates or populates
-anything under `shared/`, and it assumes the directory layout below already
-exists. A human must do the following once, by hand, before the first real
-deploy can succeed:
-
 ```bash
-# Create the release/current/shared layout
-sudo mkdir -p /var/www/dotagents/{releases,shared}
-sudo mkdir -p /var/www/dotagents/shared/storage/{app/public,app/private,framework/cache/data,framework/sessions,framework/testing,framework/views,logs}
-sudo chown -R www-data:www-data /var/www/dotagents
+# Blue-green deployment sequence:
+1. git pull origin main
+2. composer install --no-dev --optimize-autoloader
+3. npm ci && npm run build
+4. php artisan migrate --force
+5. php artisan config:cache && php artisan route:cache
+6. php artisan view:cache && php artisan event:cache
+7. php artisan queue:restart     # Gracefully restart workers
+8. sudo service php8.4-fpm restart
 
-# Hand-provision the shared .env with REAL production values (DB, Redis,
-# API keys, etc.) -- deploy.yml only ever symlinks $SHARED_DIR/.env into
-# each release, it never creates or edits it.
-sudo -u www-data cp /path/to/checked-out/repo/.env.example /var/www/dotagents/shared/.env
-sudo -u www-data nano /var/www/dotagents/shared/.env
-sudo chmod 640 /var/www/dotagents/shared/.env
-```
-
-The very first `current` symlink doesn't exist yet either — the first
-successful CI-driven deploy creates it (`ln -sfn "$RELEASE_DIR" "$CURRENT_DIR"`
-in the deploy script). Point Nginx's `root` (see §6) at
-`/var/www/dotagents/current/public` once that first deploy has run.
-
-### 7.2 Passwordless sudo for the CI deploy user
-
-`deploy.yml` runs `sudo systemctl reload php8.4-fpm` non-interactively over
-SSH (via `appleboy/ssh-action`, no TTY). If `sudo` ever prompts for a
-password there, the step hangs until the action's `command_timeout` (10m)
-kills it instead of failing fast. The SSH user behind `secrets.DEPLOY_USER`
-needs a `NOPASSWD` sudoers entry scoped to exactly that command:
-
-```bash
-# /etc/sudoers.d/dotagents-deploy — replace `deploy_user` with whatever
-# account secrets.DEPLOY_USER actually is on this host.
-deploy_user ALL=(root) NOPASSWD: /usr/bin/systemctl reload php8.4-fpm
-```
-
-Validate with `visudo -cf /etc/sudoers.d/dotagents-deploy` before relying on
-it. Without this, every deploy and every rollback that reaches the
-`sudo systemctl reload` line will hang rather than fail cleanly.
-
-### 7.3 What the pipeline does per deploy
-
-```bash
-# On the CI runner (GitHub Actions):
-1. composer install --no-dev --optimize-autoloader
-2. npm ci && npm run build
-3. tar -czf a release archive (excludes .git, node_modules, tests,
-   .github, storage -- storage/ is always the shared one, never shipped)
-4. Transfer the archive to the target host (appleboy/scp-action, to /tmp)
-
-# Over SSH on the target host (appleboy/ssh-action):
-5. Extract into a new /var/www/dotagents/releases/<timestamp>/ directory
-6. Symlink in $SHARED_DIR/.env and $SHARED_DIR/storage
-7. php artisan migrate --force --no-interaction
-8. php artisan config:cache / route:cache / view:cache / event:cache
-9. Atomic cutover: ln -sfn the new release to /var/www/dotagents/current
-10. sudo systemctl reload php8.4-fpm      # zero-downtime, not a full restart
-11. php artisan queue:restart             # workers exit gracefully; a
-                                           # process supervisor (see §4) must
-                                           # already be configured to
-                                           # auto-restart them
-12. Health-check retry against /api/health; exit 1 on failure to trigger
-    the rollback below
-13. Prune releases beyond the last 5
-
-# Rollback (automatic, only if step 5-12 above actually failed):
-- Re-point current to the previous release directory (by mtime)
-- sudo systemctl reload php8.4-fpm
-- php artisan queue:restart
-- Health-check the rollback target; warn (don't fail) if still unhealthy
+# Rollback:
+git checkout HEAD~1
+php artisan migrate:rollback
+php artisan config:cache
 ```
 
 ## 8. Health Checks

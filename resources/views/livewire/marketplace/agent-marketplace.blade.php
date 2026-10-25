@@ -223,10 +223,12 @@
                                 class="flex-1 px-3 py-2 text-sm font-medium text-brand-purple-mid dark:text-brand-purple-light border border-brand-purple-pale dark:border-brand-purple-dark rounded-lg hover:bg-brand-purple-pale dark:hover:bg-brand-purple-deeper/20 transition">
                             Preview
                         </button>
+                        @writable
                         <button wire:click="startDeploy({{ $agent->id }})" aria-label="Deploy {{ $agent->name }}"
                                 class="flex-1 px-3 py-2 text-sm font-medium text-white bg-brand-purple-mid hover:bg-brand-purple rounded-lg transition">
                             Deploy
                         </button>
+                        @endwritable
                     </div>
                 </div>
             </article>
@@ -376,10 +378,12 @@
                         <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ $previewAgent->formatted_price }}</p>
                         <p class="text-xs text-gray-500 dark:text-gray-400">{{ number_format($previewAgent->total_deployments) }} active deployments</p>
                     </div>
+                    @writable
                     <button wire:click="startDeploy({{ $previewAgent->id }})"
                             class="px-6 py-2.5 bg-brand-purple-mid hover:bg-brand-purple text-white font-semibold rounded-xl transition shadow-md shadow-brand-purple-light/20">
                         Deploy Agent →
                     </button>
+                    @endwritable
                 </div>
             </div>
         </div>

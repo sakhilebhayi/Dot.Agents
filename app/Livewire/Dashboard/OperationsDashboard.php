@@ -23,6 +23,9 @@ use Livewire\Component;
  */
 class OperationsDashboard extends Component
 {
+    /** Actions a read-only (viewer) role may still call; every other action is refused for it. */
+    public const READ_ONLY_ACTIONS = ['refresh'];
+
     public string $timeframe = '24h';
 
     public function boot(PlatformMetricsService $metrics): void

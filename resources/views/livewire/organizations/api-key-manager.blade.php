@@ -34,6 +34,7 @@
     <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-5 space-y-4">
         <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Create a new API key</h3>
 
+        @writable
         <form wire:submit="createToken" class="flex gap-3 items-start">
             <div class="flex-1">
                 <input wire:model="newKeyName"
@@ -54,6 +55,7 @@
                 <span wire:loading wire:target="createToken">Generating…</span>
             </button>
         </form>
+        @endwritable
     </div>
 
     {{-- Existing keys --}}
@@ -76,6 +78,7 @@
                 </p>
             </div>
 
+            @writable
             <button wire:click="revokeToken({{ $token['id'] }})"
                 wire:confirm="Revoke this API key? Any integrations using it will stop working immediately."
                 type="button"
@@ -83,6 +86,7 @@
                 aria-label="Revoke key {{ $token['name'] }}">
                 Revoke
             </button>
+            @endwritable
         </div>
         @empty
         <div class="px-5 py-8 text-center text-sm text-gray-400 dark:text-gray-500">

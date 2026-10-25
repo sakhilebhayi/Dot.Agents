@@ -15,6 +15,9 @@ use Livewire\Component;
 
 class KnowledgeManager extends Component
 {
+    /** Actions a read-only (viewer) role may still call; every other action is refused for it. */
+    public const READ_ONLY_ACTIONS = ['selectBase'];
+
     public ?int $activeBaseId = null;
 
     public bool $showBaseForm = false;

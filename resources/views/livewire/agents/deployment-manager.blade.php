@@ -75,13 +75,13 @@
 
                 {{-- Actions --}}
                 <div class="flex gap-2">
-                    @if($dep->status === 'active')
+                    @if($dep->status === 'active' && auth()->user()->can('chat', $dep))
                         <a href="{{ route('agents.chat', $dep) }}"
                             class="flex-1 py-1.5 text-xs font-medium text-center bg-brand-purple-mid hover:bg-brand-purple text-white rounded-lg transition-colors">
                             Chat
                         </a>
                     @else
-                        <span class="flex-1 py-1.5 text-xs font-medium text-center bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-600 rounded-lg cursor-not-allowed" title="Chat only available for active deployments">
+                        <span class="flex-1 py-1.5 text-xs font-medium text-center bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-600 rounded-lg cursor-not-allowed" title="Chat is only available for active deployments, to roles that can write">
                             Chat
                         </span>
                     @endif

@@ -11,6 +11,9 @@ use Livewire\Component;
 
 class SocialDashboard extends Component
 {
+    /** Actions a read-only (viewer) role may still call; every other action is refused for it. */
+    public const READ_ONLY_ACTIONS = ['setTimeframe'];
+
     public string $timeframe = '30d';
 
     #[Computed]

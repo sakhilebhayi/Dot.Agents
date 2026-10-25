@@ -62,5 +62,11 @@ class JetstreamServiceProvider extends ServiceProvider
             'create',
             'update',
         ])->description('Editor users have the ability to read, create, and update.');
+
+        // Read-only. Dot.Agents enforces it everywhere through App\Support\ReadOnlyAccess;
+        // InfoDot's viewer (and any role this app does not know) is mapped to it.
+        Jetstream::role('viewer', 'Viewer', [
+            'read',
+        ])->description('Viewer users can read everything but cannot create, update, or delete anything.');
     }
 }

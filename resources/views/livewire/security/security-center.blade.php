@@ -48,11 +48,13 @@
                     <p class="text-brand-purple-light text-sm">Real-time threat detection & autonomous remediation</p>
                 </div>
             </div>
+            @writable
             <button wire:click="runDISCheck" wire:loading.attr="disabled"
                 class="px-5 py-2.5 bg-yellow-400 hover:bg-yellow-300 text-gray-900 font-semibold text-sm rounded-xl transition-colors disabled:opacity-60">
                 <span wire:loading.remove wire:target="runDISCheck">▶ Run Health Check</span>
                 <span wire:loading wire:target="runDISCheck">Scanning...</span>
             </button>
+            @endwritable
         </div>
 
         {{-- Stats --}}
@@ -180,16 +182,20 @@
                             <td class="px-5 py-3">
                                 @if($event->status === 'open')
                                     <div class="flex gap-2 items-center">
+                                        @writable
                                         <button wire:click="resolveEvent({{ $event->id }})"
                                             class="text-xs text-brand-purple-mid hover:text-brand-purple dark:text-brand-purple-light font-medium">
                                             Resolve
                                         </button>
+                                        @endwritable
                                         @if($event->agent_deployment_id)
+                                            @writable
                                             <button wire:click="killDeployment({{ $event->agent_deployment_id }})"
                                                 wire:confirm="Immediately suspend this agent? This cannot be undone without manual reactivation."
                                                 class="text-xs text-red-600 hover:text-red-700 dark:text-red-400 font-medium">
                                                 Kill Agent
                                             </button>
+                                            @endwritable
                                         @endif
                                     </div>
                                 @endif
