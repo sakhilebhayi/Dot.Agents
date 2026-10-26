@@ -276,8 +276,9 @@
             <template x-if="selectedNodeData()">
                 <div class="space-y-3">
                     <div>
-                        <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Label</label>
+                        <label for="workflow-node-label" class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Label</label>
                         <input
+                            id="workflow-node-label"
                             type="text"
                             :value="selectedNodeData()?.label"
                             @input="updateNodeLabel($event.target.value)"

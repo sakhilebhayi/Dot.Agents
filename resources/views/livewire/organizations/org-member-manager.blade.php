@@ -98,7 +98,7 @@
                     </td>
                     <td class="px-6 py-4">
                         @if($member->id !== $this->organization->owner_id && auth()->id() !== $member->id)
-                            <select wire:change="updateRole({{ $member->id }}, $event.target.value)"
+                            <select aria-label="Role for {{ $member->name }}" wire:change="updateRole({{ $member->id }}, $event.target.value)"
                                 class="text-xs rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-brand-purple-mid py-1">
                                 @foreach(['viewer','member','admin','owner'] as $r)
                                     <option value="{{ $r }}" {{ $member->pivot->role === $r ? 'selected' : '' }}>{{ ucfirst($r) }}</option>

@@ -117,7 +117,7 @@
                  @click.outside="$wire.showCreateModal = false">
                 <div class="px-6 py-5 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
                     <h3 class="text-sm font-semibold text-gray-900 dark:text-white">New Workflow</h3>
-                    <button wire:click="$set('showCreateModal', false)"
+                    <button aria-label="Close" wire:click="$set('showCreateModal', false)"
                         class="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 rounded-lg">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>

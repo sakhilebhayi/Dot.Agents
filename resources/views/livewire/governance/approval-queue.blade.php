@@ -30,7 +30,7 @@
                     $riskColors = ['critical' => 'red', 'high' => 'orange', 'medium' => 'yellow', 'low' => 'green'];
                     $color = $riskColors[$approval->risk_level] ?? 'gray';
                 @endphp
-                <div wire:click="selectApproval({{ $approval->id }})"
+                <div role="button" tabindex="0" wire:click="selectApproval({{ $approval->id }})" wire:keydown.enter="selectApproval({{ $approval->id }})" wire:keydown.space.prevent="selectApproval({{ $approval->id }})"
                     class="bg-white dark:bg-gray-900 rounded-2xl border {{ $selectedApproval?->id === $approval->id ? 'border-brand-purple-light ring-2 ring-brand-purple-pale dark:ring-brand-purple-dark' : 'border-gray-200 dark:border-gray-700' }} p-5 cursor-pointer hover:border-brand-purple-light dark:hover:border-brand-purple-mid transition-all">
                     <div class="flex items-start justify-between gap-3">
                         <div class="flex-1 min-w-0">

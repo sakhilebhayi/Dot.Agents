@@ -20,7 +20,7 @@
                 </div>
             </div>
             <div class="flex items-center gap-2">
-                <button @click="showInfo = !showInfo"
+                <button aria-label="Toggle agent info" :aria-expanded="showInfo" @click="showInfo = !showInfo"
                     class="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -103,7 +103,7 @@
                         x-on:input="$el.style.height='auto'; $el.style.height=($el.scrollHeight)+'px'"
                     ></textarea>
                 </div>
-                <button type="submit"
+                <button type="submit" aria-label="Send message"
                     wire:loading.attr="disabled"
                     class="flex-shrink-0 w-10 h-10 bg-brand-purple hover:bg-brand-purple-dark disabled:opacity-50 text-white rounded-xl flex items-center justify-center transition-colors">
                     <svg class="w-4 h-4 rotate-90" fill="currentColor" viewBox="0 0 20 20">
