@@ -21,7 +21,7 @@
             {{-- Halt all workflows --}}
             <div class="flex-1 bg-red-900/40 rounded-xl p-4 border border-red-700/30">
                 <p class="text-xs text-red-300 mb-3 font-medium uppercase tracking-wide">Halt All Workflows</p>
-                <input wire:model="killSwitchConfirmation"
+                <input aria-label="Type: HALT WORKFLOWS" wire:model="killSwitchConfirmation"
                     type="text" placeholder="Type: HALT WORKFLOWS"
                     class="w-full bg-red-950 border border-red-600 text-white text-sm rounded-lg px-3 py-2 mb-3 placeholder-red-600 focus:outline-none focus:ring-2 focus:ring-red-500">
                 @error('killSwitchConfirmation')<p class="text-red-400 text-xs mb-2">{{ $message }}</p>@enderror
@@ -116,7 +116,7 @@
         <div class="px-5 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
             <h3 class="font-semibold text-gray-900 dark:text-white text-sm">Security Events</h3>
             <div class="flex gap-2">
-                <select wire:model.live="filterSeverity"
+                <select aria-label="Filterseverity" wire:model.live="filterSeverity"
                     class="text-xs rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">
                     <option value="">All Severities</option>
                     <option value="critical">Critical</option>
@@ -124,7 +124,7 @@
                     <option value="warning">Warning</option>
                     <option value="info">Info</option>
                 </select>
-                <select wire:model.live="filterType"
+                <select aria-label="Filtertype" wire:model.live="filterType"
                     class="text-xs rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">
                     <option value="">All Types</option>
                     <option value="prompt_injection">Prompt Injection</option>

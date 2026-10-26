@@ -32,14 +32,14 @@
         @writable
         <form wire:submit="invite" class="flex flex-wrap gap-4 items-end">
             <div class="flex-1 min-w-48">
-                <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Email Address</label>
-                <input wire:model="inviteEmail" type="email" placeholder="colleague@company.com"
+                <label for="livewire-organizations-org-member-manager-inviteemail" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Email Address</label>
+                <input id="livewire-organizations-org-member-manager-inviteemail" wire:model="inviteEmail" type="email" placeholder="colleague@company.com"
                     class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid">
                 @error('inviteEmail') <p class="mt-1 text-xs text-red-500">{{ $message }}</p> @enderror
             </div>
             <div class="w-40">
-                <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Role</label>
-                <select wire:model="inviteRole" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid">
+                <label for="livewire-organizations-org-member-manager-inviterole" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Role</label>
+                <select id="livewire-organizations-org-member-manager-inviterole" wire:model="inviteRole" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid">
                     <option value="viewer">Viewer</option>
                     <option value="member">Member</option>
                     <option value="admin">Admin</option>
@@ -98,7 +98,7 @@
                     </td>
                     <td class="px-6 py-4">
                         @if($member->id !== $this->organization->owner_id && auth()->id() !== $member->id)
-                            <select wire:change="updateRole({{ $member->id }}, $event.target.value)"
+                            <select aria-label="Role for {{ $member->name }}" wire:change="updateRole({{ $member->id }}, $event.target.value)"
                                 class="text-xs rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-brand-purple-mid py-1">
                                 @foreach(['viewer','member','admin','owner'] as $r)
                                     <option value="{{ $r }}" {{ $member->pivot->role === $r ? 'selected' : '' }}>{{ ucfirst($r) }}</option>

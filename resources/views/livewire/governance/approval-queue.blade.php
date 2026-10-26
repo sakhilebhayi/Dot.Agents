@@ -1,7 +1,7 @@
 <div class="space-y-6">
     {{-- Filters --}}
     <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 px-4 py-3 flex flex-wrap gap-3 items-center">
-        <select wire:model.live="filterStatus"
+        <select aria-label="Filterstatus" wire:model.live="filterStatus"
             class="text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-brand-purple-mid">
             <option value="">All Statuses</option>
             <option value="pending">Pending</option>
@@ -9,7 +9,7 @@
             <option value="rejected">Rejected</option>
             <option value="escalated">Escalated</option>
         </select>
-        <select wire:model.live="filterRisk"
+        <select aria-label="Filterrisk" wire:model.live="filterRisk"
             class="text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-brand-purple-mid">
             <option value="">All Risk Levels</option>
             <option value="critical">Critical</option>
@@ -30,7 +30,7 @@
                     $riskColors = ['critical' => 'red', 'high' => 'orange', 'medium' => 'yellow', 'low' => 'green'];
                     $color = $riskColors[$approval->risk_level] ?? 'gray';
                 @endphp
-                <div wire:click="selectApproval({{ $approval->id }})"
+                <div role="button" tabindex="0" wire:click="selectApproval({{ $approval->id }})" wire:keydown.enter="selectApproval({{ $approval->id }})" wire:keydown.space.prevent="selectApproval({{ $approval->id }})"
                     class="bg-white dark:bg-gray-900 rounded-2xl border {{ $selectedApproval?->id === $approval->id ? 'border-brand-purple-light ring-2 ring-brand-purple-pale dark:ring-brand-purple-dark' : 'border-gray-200 dark:border-gray-700' }} p-5 cursor-pointer hover:border-brand-purple-light dark:hover:border-brand-purple-mid transition-all">
                     <div class="flex items-start justify-between gap-3">
                         <div class="flex-1 min-w-0">
@@ -124,8 +124,8 @@
 
                     @if($selectedApproval->status === 'pending' && !$selectedApproval->isExpired())
                         <div class="mb-4">
-                            <label class="block text-xs text-gray-500 mb-1">Reviewer Notes</label>
-                            <textarea wire:model="reviewerNotes" rows="3"
+                            <label for="livewire-governance-approval-queue-reviewernotes" class="block text-xs text-gray-500 mb-1">Reviewer Notes</label>
+                            <textarea id="livewire-governance-approval-queue-reviewernotes" wire:model="reviewerNotes" rows="3"
                                 placeholder="Add notes or reasoning..."
                                 class="w-full text-xs rounded-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-brand-purple-mid"></textarea>
                         </div>

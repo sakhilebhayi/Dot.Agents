@@ -20,24 +20,24 @@
         <h3 class="font-semibold text-gray-900 dark:text-white text-sm">New Custom Skill</h3>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-                <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Name <span class="text-red-500">*</span></label>
-                <input wire:model="name" type="text" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid" placeholder="e.g. Inventory Lookup">
+                <label for="livewire-organizations-custom-skill-manager-name" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Name <span class="text-red-500">*</span></label>
+                <input id="livewire-organizations-custom-skill-manager-name" wire:model="name" type="text" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid" placeholder="e.g. Inventory Lookup">
                 @error('name') <p class="mt-1 text-xs text-red-500">{{ $message }}</p> @enderror
             </div>
             <div>
-                <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Timeout (seconds)</label>
-                <input wire:model="webhookTimeoutSeconds" type="number" min="1" max="120" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid">
+                <label for="livewire-organizations-custom-skill-manager-webhooktimeoutseconds" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Timeout (seconds)</label>
+                <input id="livewire-organizations-custom-skill-manager-webhooktimeoutseconds" wire:model="webhookTimeoutSeconds" type="number" min="1" max="120" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid">
                 @error('webhookTimeoutSeconds') <p class="mt-1 text-xs text-red-500">{{ $message }}</p> @enderror
             </div>
             <div class="sm:col-span-2">
-                <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Webhook URL <span class="text-red-500">*</span></label>
-                <input wire:model="webhookUrl" type="url" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid" placeholder="https://your-api.example.com/skills/inventory-lookup">
+                <label for="livewire-organizations-custom-skill-manager-webhookurl" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Webhook URL <span class="text-red-500">*</span></label>
+                <input id="livewire-organizations-custom-skill-manager-webhookurl" wire:model="webhookUrl" type="url" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid" placeholder="https://your-api.example.com/skills/inventory-lookup">
                 @error('webhookUrl') <p class="mt-1 text-xs text-red-500">{{ $message }}</p> @enderror
                 <p class="mt-1 text-xs text-gray-400">Called with <code>{ skill_key, input, context }</code> as JSON; expects <code>{ status, output, confidence, findings, recommendations }</code> back.</p>
             </div>
             <div class="sm:col-span-2">
-                <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Description</label>
-                <input wire:model="description" type="text" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid" placeholder="What does this skill do?">
+                <label for="livewire-organizations-custom-skill-manager-description" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Description</label>
+                <input id="livewire-organizations-custom-skill-manager-description" wire:model="description" type="text" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid" placeholder="What does this skill do?">
             </div>
         </div>
         <div class="flex justify-end gap-2 pt-2">

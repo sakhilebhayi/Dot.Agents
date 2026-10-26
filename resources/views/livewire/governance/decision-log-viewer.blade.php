@@ -18,21 +18,21 @@
 
     {{-- Filters row --}}
     <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 px-4 py-3 flex flex-wrap gap-3">
-        <select wire:model.live="filterRisk"
+        <select aria-label="Filterrisk" wire:model.live="filterRisk"
             class="text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-brand-purple-mid">
             <option value="">All Risk Levels</option>
             <option value="high">High Risk (≥70)</option>
             <option value="medium">Medium Risk (40-69)</option>
             <option value="low">Low Risk (&lt;40)</option>
         </select>
-        <select wire:model.live="filterDeployment"
+        <select aria-label="Filterdeployment" wire:model.live="filterDeployment"
             class="text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-brand-purple-mid">
             <option value="">All Agents</option>
             @foreach($this->deployments as $dep)
                 <option value="{{ $dep->id }}">{{ $dep->name }}</option>
             @endforeach
         </select>
-        <select wire:model.live="filterReviewRequired"
+        <select aria-label="Filterreviewrequired" wire:model.live="filterReviewRequired"
             class="text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-brand-purple-mid">
             <option value="">All Decisions</option>
             <option value="1">Requires Human Review</option>
@@ -47,7 +47,7 @@
         <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700 sticky top-0 bg-white dark:bg-gray-900">
                 <h3 class="font-semibold text-gray-900 dark:text-white text-sm">Decision Detail</h3>
-                <button wire:click="closeDetail" class="text-gray-400 hover:text-gray-600">
+                <button aria-label="Close detail" wire:click="closeDetail" class="text-gray-400 hover:text-gray-600">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
             </div>

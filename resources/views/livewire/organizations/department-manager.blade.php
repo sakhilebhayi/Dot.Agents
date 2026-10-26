@@ -28,13 +28,13 @@
         <form wire:submit="save" class="space-y-4">
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Name <span class="text-red-500">*</span></label>
-                    <input wire:model="formName" type="text" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid" placeholder="e.g. Marketing">
+                    <label for="livewire-organizations-department-manager-formname" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Name <span class="text-red-500">*</span></label>
+                    <input id="livewire-organizations-department-manager-formname" wire:model="formName" type="text" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid" placeholder="e.g. Marketing">
                     @error('formName') <p class="mt-1 text-xs text-red-500">{{ $message }}</p> @enderror
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Type</label>
-                    <select wire:model="formType" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid">
+                    <label for="livewire-organizations-department-manager-formtype" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Type</label>
+                    <select id="livewire-organizations-department-manager-formtype" wire:model="formType" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid">
                         <option value="">Select type</option>
                         <option value="business">Business</option>
                         <option value="technical">Technical</option>
@@ -45,12 +45,12 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Department Head</label>
-                    <input wire:model="formHeadName" type="text" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid" placeholder="Jane Smith">
+                    <label for="livewire-organizations-department-manager-formheadname" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Department Head</label>
+                    <input id="livewire-organizations-department-manager-formheadname" wire:model="formHeadName" type="text" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid" placeholder="Jane Smith">
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Description</label>
-                    <input wire:model="formDescription" type="text" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid" placeholder="Brief description…">
+                    <label for="livewire-organizations-department-manager-formdescription" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Description</label>
+                    <input id="livewire-organizations-department-manager-formdescription" wire:model="formDescription" type="text" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid" placeholder="Brief description…">
                 </div>
             </div>
             <div class="flex justify-end gap-2 pt-2">

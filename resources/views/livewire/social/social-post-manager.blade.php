@@ -24,8 +24,8 @@
             <h3 class="font-semibold text-gray-900 dark:text-white mb-4">Compose Post</h3>
             <div class="space-y-4">
                 <div>
-                    <label class="block text-xs font-medium text-gray-500 mb-1.5">Post Type</label>
-                    <select wire:model="composingPostType"
+                    <label for="livewire-social-social-post-manager-composingposttype" class="block text-xs font-medium text-gray-500 mb-1.5">Post Type</label>
+                    <select id="livewire-social-social-post-manager-composingposttype" wire:model="composingPostType"
                         class="w-full text-sm border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg px-3 py-2 focus:ring-2 focus:ring-brand-purple-light">
                         <option value="post">Standard Post</option>
                         <option value="reel">Reel / Short Video</option>
@@ -35,16 +35,16 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-gray-500 mb-1.5">Content</label>
-                    <textarea wire:model="composingContent"
+                    <label for="livewire-social-social-post-manager-composingcontent" class="block text-xs font-medium text-gray-500 mb-1.5">Content</label>
+                    <textarea id="livewire-social-social-post-manager-composingcontent" wire:model="composingContent"
                         rows="4"
                         placeholder="Write your post content..."
                         class="w-full text-sm border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg px-4 py-3 focus:ring-2 focus:ring-brand-purple-light resize-none"></textarea>
                     @error('composingContent') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-gray-500 mb-1.5">Schedule (optional)</label>
-                    <input type="datetime-local" wire:model="composingScheduledAt"
+                    <label for="livewire-social-social-post-manager-composingscheduledat" class="block text-xs font-medium text-gray-500 mb-1.5">Schedule (optional)</label>
+                    <input id="livewire-social-social-post-manager-composingscheduledat" type="datetime-local" wire:model="composingScheduledAt"
                         class="text-sm border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg px-3 py-2 focus:ring-2 focus:ring-brand-purple-light">
                     @error('composingScheduledAt') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                 </div>

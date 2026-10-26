@@ -33,19 +33,19 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div>
-                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Organization Name <span class="text-red-500">*</span></label>
-                    <input wire:model="name" type="text" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid focus:border-brand-purple-mid" placeholder="Acme Corp">
+                    <label for="livewire-organizations-organization-settings-name" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Organization Name <span class="text-red-500">*</span></label>
+                    <input id="livewire-organizations-organization-settings-name" wire:model="name" type="text" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid focus:border-brand-purple-mid" placeholder="Acme Corp">
                     @error('name') <p class="mt-1 text-xs text-red-500">{{ $message }}</p> @enderror
                 </div>
 
                 <div>
-                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Domain</label>
-                    <input wire:model="domain" type="text" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid focus:border-brand-purple-mid" placeholder="acme.com">
+                    <label for="livewire-organizations-organization-settings-domain" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Domain</label>
+                    <input id="livewire-organizations-organization-settings-domain" wire:model="domain" type="text" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid focus:border-brand-purple-mid" placeholder="acme.com">
                 </div>
 
                 <div>
-                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Industry</label>
-                    <select wire:model="industry" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid">
+                    <label for="livewire-organizations-organization-settings-industry" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Industry</label>
+                    <select id="livewire-organizations-organization-settings-industry" wire:model="industry" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid">
                         <option value="">Select industry</option>
                         @foreach(['Technology','Finance','Healthcare','Retail','Manufacturing','Education','Legal','Marketing','Real Estate','Other'] as $ind)
                             <option value="{{ $ind }}">{{ $ind }}</option>
@@ -54,8 +54,8 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Company Size</label>
-                    <select wire:model="size" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid">
+                    <label for="livewire-organizations-organization-settings-size" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Company Size</label>
+                    <select id="livewire-organizations-organization-settings-size" wire:model="size" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid">
                         <option value="">Select size</option>
                         <option value="1-10">1–10 employees</option>
                         <option value="11-50">11–50 employees</option>
@@ -73,16 +73,16 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
                 <div>
-                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Country</label>
-                    <input wire:model="country" type="text" maxlength="2" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid" placeholder="ZA">
+                    <label for="livewire-organizations-organization-settings-country" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Country</label>
+                    <input id="livewire-organizations-organization-settings-country" wire:model="country" type="text" maxlength="2" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid" placeholder="ZA">
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Timezone</label>
-                    <input wire:model="timezone" type="text" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid" placeholder="Africa/Johannesburg">
+                    <label for="livewire-organizations-organization-settings-timezone" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Timezone</label>
+                    <input id="livewire-organizations-organization-settings-timezone" wire:model="timezone" type="text" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid" placeholder="Africa/Johannesburg">
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Currency</label>
-                    <select wire:model="currency" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid">
+                    <label for="livewire-organizations-organization-settings-currency" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Currency</label>
+                    <select id="livewire-organizations-organization-settings-currency" wire:model="currency" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid">
                         <option value="USD">USD – US Dollar</option>
                         <option value="EUR">EUR – Euro</option>
                         <option value="GBP">GBP – British Pound</option>

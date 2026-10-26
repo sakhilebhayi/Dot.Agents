@@ -88,15 +88,15 @@
                             </p>
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <div>
-                                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">App / Client ID *</label>
-                                    <input wire:model="clientId" type="text" autocomplete="off" spellcheck="false"
+                                    <label for="livewire-organizations-social-credentials-clientid" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">App / Client ID *</label>
+                                    <input id="livewire-organizations-social-credentials-clientid" wire:model="clientId" type="text" autocomplete="off" spellcheck="false"
                                            class="w-full text-xs font-mono rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid focus:border-brand-purple-mid"
                                            placeholder="Client ID">
                                     @error('clientId') <p class="mt-1 text-xs text-red-500">{{ $message }}</p> @enderror
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">App / Client Secret *</label>
-                                    <input wire:model="clientSecret" type="password" autocomplete="new-password"
+                                    <label for="livewire-organizations-social-credentials-clientsecret" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">App / Client Secret *</label>
+                                    <input id="livewire-organizations-social-credentials-clientsecret" wire:model="clientSecret" type="password" autocomplete="new-password"
                                            class="w-full text-xs font-mono rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid focus:border-brand-purple-mid"
                                            placeholder="Client Secret">
                                     @error('clientSecret') <p class="mt-1 text-xs text-red-500">{{ $message }}</p> @enderror

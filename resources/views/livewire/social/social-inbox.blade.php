@@ -109,7 +109,7 @@
             {{-- Reply Box --}}
             <div class="px-6 py-4 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800">
                 <div class="flex items-end gap-3">
-                    <textarea wire:model="replyContent"
+                    <textarea aria-label="Type a reply" wire:model="replyContent"
                         rows="2"
                         placeholder="Type a reply..."
                         class="flex-1 resize-none rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-sm text-gray-900 dark:text-white px-4 py-3 focus:ring-2 focus:ring-brand-purple-light focus:border-transparent transition"

@@ -27,21 +27,21 @@
         <h3 class="font-semibold text-gray-900 dark:text-white text-sm">New Knowledge Base</h3>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-                <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Name <span class="text-red-500">*</span></label>
-                <input wire:model="baseName" type="text" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid" placeholder="e.g. Product Documentation">
+                <label for="livewire-organizations-knowledge-manager-basename" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Name <span class="text-red-500">*</span></label>
+                <input id="livewire-organizations-knowledge-manager-basename" wire:model="baseName" type="text" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid" placeholder="e.g. Product Documentation">
                 @error('baseName') <p class="mt-1 text-xs text-red-500">{{ $message }}</p> @enderror
             </div>
             <div>
-                <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Access Level</label>
-                <select wire:model="baseAccessLevel" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid">
+                <label for="livewire-organizations-knowledge-manager-baseaccesslevel" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Access Level</label>
+                <select id="livewire-organizations-knowledge-manager-baseaccesslevel" wire:model="baseAccessLevel" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid">
                     <option value="internal">Internal (agents only)</option>
                     <option value="restricted">Restricted (specific agents)</option>
                     <option value="public">Public</option>
                 </select>
             </div>
             <div class="sm:col-span-2">
-                <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Description</label>
-                <input wire:model="baseDescription" type="text" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid" placeholder="What is this knowledge base for?">
+                <label for="livewire-organizations-knowledge-manager-basedescription" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Description</label>
+                <input id="livewire-organizations-knowledge-manager-basedescription" wire:model="baseDescription" type="text" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid" placeholder="What is this knowledge base for?">
             </div>
         </div>
         <div class="flex justify-end gap-2 pt-2">
@@ -90,23 +90,23 @@
                 <div class="bg-white dark:bg-gray-900 rounded-2xl border border-brand-purple-pale dark:border-brand-purple-dark p-5 space-y-4">
                     <h4 class="font-semibold text-gray-900 dark:text-white text-sm">{{ $editingArticleId ? 'Edit Article' : 'New Article' }}</h4>
                     <div>
-                        <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Title <span class="text-red-500">*</span></label>
-                        <input wire:model="articleTitle" type="text" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid">
+                        <label for="livewire-organizations-knowledge-manager-articletitle" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Title <span class="text-red-500">*</span></label>
+                        <input id="livewire-organizations-knowledge-manager-articletitle" wire:model="articleTitle" type="text" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid">
                         @error('articleTitle') <p class="mt-1 text-xs text-red-500">{{ $message }}</p> @enderror
                     </div>
                     <div>
-                        <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Content <span class="text-red-500">*</span></label>
-                        <textarea wire:model="articleContent" rows="6" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid font-mono" placeholder="Write your knowledge article here…"></textarea>
+                        <label for="livewire-organizations-knowledge-manager-articlecontent" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Content <span class="text-red-500">*</span></label>
+                        <textarea id="livewire-organizations-knowledge-manager-articlecontent" wire:model="articleContent" rows="6" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid font-mono" placeholder="Write your knowledge article here…"></textarea>
                         @error('articleContent') <p class="mt-1 text-xs text-red-500">{{ $message }}</p> @enderror
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Summary</label>
-                            <input wire:model="articleSummary" type="text" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid">
+                            <label for="livewire-organizations-knowledge-manager-articlesummary" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Summary</label>
+                            <input id="livewire-organizations-knowledge-manager-articlesummary" wire:model="articleSummary" type="text" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid">
                         </div>
                         <div>
-                            <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Category</label>
-                            <input wire:model="articleCategory" type="text" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid" placeholder="e.g. Policy, FAQ">
+                            <label for="livewire-organizations-knowledge-manager-articlecategory" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Category</label>
+                            <input id="livewire-organizations-knowledge-manager-articlecategory" wire:model="articleCategory" type="text" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid" placeholder="e.g. Policy, FAQ">
                         </div>
                     </div>
                     <div class="flex justify-end gap-2 pt-1">
@@ -135,11 +135,11 @@
                                 </div>
                             </div>
                             <div class="flex gap-1 flex-shrink-0">
-                                <button wire:click="editArticle({{ $article->id }})" class="p-1.5 text-gray-400 hover:text-brand-purple-mid rounded-lg transition-colors">
+                                <button aria-label="Edit article" wire:click="editArticle({{ $article->id }})" class="p-1.5 text-gray-400 hover:text-brand-purple-mid rounded-lg transition-colors">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                                 </button>
                                 @writable
-                                <button wire:click="deleteArticle({{ $article->id }})" wire:confirm="Delete this article?" class="p-1.5 text-gray-400 hover:text-red-500 rounded-lg transition-colors">
+                                <button aria-label="Delete article" wire:click="deleteArticle({{ $article->id }})" wire:confirm="Delete this article?" class="p-1.5 text-gray-400 hover:text-red-500 rounded-lg transition-colors">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                                 </button>
                                 @endwritable

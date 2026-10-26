@@ -24,7 +24,7 @@
 
     {{-- Filters --}}
     <div class="flex flex-wrap items-center gap-3">
-        <select wire:model.live="intentLevel"
+        <select aria-label="Intentlevel" wire:model.live="intentLevel"
             class="text-sm border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg px-3 py-2 focus:ring-2 focus:ring-brand-purple-light">
             <option value="all">All Intent Levels</option>
             <option value="high_intent">High Intent</option>
@@ -33,7 +33,7 @@
             <option value="interested">Interested</option>
             <option value="browsing">Browsing</option>
         </select>
-        <select wire:model.live="platform"
+        <select aria-label="Platform" wire:model.live="platform"
             class="text-sm border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg px-3 py-2 focus:ring-2 focus:ring-brand-purple-light">
             <option value="all">All Platforms</option>
             <option value="facebook">Facebook</option>
@@ -42,7 +42,7 @@
             <option value="x">X</option>
             <option value="whatsapp">WhatsApp</option>
         </select>
-        <select wire:model.live="sortBy"
+        <select aria-label="Sortby" wire:model.live="sortBy"
             class="text-sm border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg px-3 py-2 focus:ring-2 focus:ring-brand-purple-light">
             <option value="lead_score">Sort by Lead Score</option>
             <option value="intent_score">Sort by Intent Score</option>
