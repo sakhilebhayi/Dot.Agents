@@ -1,7 +1,7 @@
 <div class="space-y-6">
     {{-- Filters --}}
     <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 px-4 py-3 flex flex-wrap gap-3 items-center">
-        <select wire:model.live="filterStatus"
+        <select aria-label="Filterstatus" wire:model.live="filterStatus"
             class="text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-brand-purple-mid">
             <option value="">All Statuses</option>
             <option value="pending">Pending</option>
@@ -9,7 +9,7 @@
             <option value="rejected">Rejected</option>
             <option value="escalated">Escalated</option>
         </select>
-        <select wire:model.live="filterRisk"
+        <select aria-label="Filterrisk" wire:model.live="filterRisk"
             class="text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-brand-purple-mid">
             <option value="">All Risk Levels</option>
             <option value="critical">Critical</option>
@@ -124,8 +124,8 @@
 
                     @if($selectedApproval->status === 'pending' && !$selectedApproval->isExpired())
                         <div class="mb-4">
-                            <label class="block text-xs text-gray-500 mb-1">Reviewer Notes</label>
-                            <textarea wire:model="reviewerNotes" rows="3"
+                            <label for="livewire-governance-approval-queue-reviewernotes" class="block text-xs text-gray-500 mb-1">Reviewer Notes</label>
+                            <textarea id="livewire-governance-approval-queue-reviewernotes" wire:model="reviewerNotes" rows="3"
                                 placeholder="Add notes or reasoning..."
                                 class="w-full text-xs rounded-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-brand-purple-mid"></textarea>
                         </div>

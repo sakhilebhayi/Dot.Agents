@@ -155,7 +155,7 @@
 
                 <div>
                     <p class="text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide mb-3">Autonomy Level</p>
-                    <select wire:model.number="editAutonomy"
+                    <select aria-label="Editautonomy" wire:model.number="editAutonomy"
                             class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid focus:border-brand-purple-mid">
                         @foreach($autonomy as $level => $levelInfo)
                             <option value="{{ $level }}">Level {{ $level }}: {{ $levelInfo['label'] }}</option>

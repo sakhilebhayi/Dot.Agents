@@ -146,15 +146,15 @@
                     </p>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">App / Client ID *</label>
-                            <input wire:model="advClientId" type="text" autocomplete="off" spellcheck="false"
+                            <label for="livewire-social-connect-platform-wizard-advclientid" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">App / Client ID *</label>
+                            <input id="livewire-social-connect-platform-wizard-advclientid" wire:model="advClientId" type="text" autocomplete="off" spellcheck="false"
                                    class="w-full text-sm font-mono rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid focus:border-brand-purple-mid"
                                    placeholder="App ID or Client ID">
                             @error('advClientId') <p class="mt-1 text-xs text-red-500">{{ $message }}</p> @enderror
                         </div>
                         <div>
-                            <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">App / Client Secret *</label>
-                            <input wire:model="advClientSecret" type="password" autocomplete="new-password"
+                            <label for="livewire-social-connect-platform-wizard-advclientsecret" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">App / Client Secret *</label>
+                            <input id="livewire-social-connect-platform-wizard-advclientsecret" wire:model="advClientSecret" type="password" autocomplete="new-password"
                                    class="w-full text-sm font-mono rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid focus:border-brand-purple-mid"
                                    placeholder="••••••••••••••••">
                             @error('advClientSecret') <p class="mt-1 text-xs text-red-500">{{ $message }}</p> @enderror

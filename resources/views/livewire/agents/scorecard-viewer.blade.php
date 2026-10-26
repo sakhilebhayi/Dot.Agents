@@ -12,7 +12,7 @@
                 </div>
             </div>
             <div class="flex items-center gap-3">
-                <select wire:model.live="period"
+                <select aria-label="Period" wire:model.live="period"
                     class="text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">
                     <option value="7d">Last 7 days</option>
                     <option value="30d" selected>Last 30 days</option>

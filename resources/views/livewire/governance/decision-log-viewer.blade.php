@@ -18,21 +18,21 @@
 
     {{-- Filters row --}}
     <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 px-4 py-3 flex flex-wrap gap-3">
-        <select wire:model.live="filterRisk"
+        <select aria-label="Filterrisk" wire:model.live="filterRisk"
             class="text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-brand-purple-mid">
             <option value="">All Risk Levels</option>
             <option value="high">High Risk (≥70)</option>
             <option value="medium">Medium Risk (40-69)</option>
             <option value="low">Low Risk (&lt;40)</option>
         </select>
-        <select wire:model.live="filterDeployment"
+        <select aria-label="Filterdeployment" wire:model.live="filterDeployment"
             class="text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-brand-purple-mid">
             <option value="">All Agents</option>
             @foreach($this->deployments as $dep)
                 <option value="{{ $dep->id }}">{{ $dep->name }}</option>
             @endforeach
         </select>
-        <select wire:model.live="filterReviewRequired"
+        <select aria-label="Filterreviewrequired" wire:model.live="filterReviewRequired"
             class="text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-brand-purple-mid">
             <option value="">All Decisions</option>
             <option value="1">Requires Human Review</option>

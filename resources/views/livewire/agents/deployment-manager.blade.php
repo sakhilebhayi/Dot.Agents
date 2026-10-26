@@ -16,11 +16,11 @@
     {{-- Filters --}}
     <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 px-4 py-3 flex flex-wrap gap-3">
         <div class="flex-1 min-w-48">
-            <input wire:model.live.debounce.300ms="search" type="search"
+            <input aria-label="Search deployments" wire:model.live.debounce.300ms="search" type="search"
                 placeholder="Search deployments..."
                 class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-brand-purple-mid">
         </div>
-        <select wire:model.live="filterStatus"
+        <select aria-label="Filterstatus" wire:model.live="filterStatus"
             class="text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-brand-purple-mid">
             <option value="">All Statuses</option>
             <option value="active">Active</option>

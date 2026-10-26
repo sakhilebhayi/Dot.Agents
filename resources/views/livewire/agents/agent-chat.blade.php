@@ -94,7 +94,7 @@
         <div class="px-5 py-4 border-t border-gray-200 dark:border-gray-700">
             <form wire:submit="sendMessage" class="flex gap-3 items-end">
                 <div class="flex-1">
-                    <textarea
+                    <textarea aria-label="Message"
                         wire:model="message"
                         rows="1"
                         placeholder="Message {{ $this->deployment?->agent?->name ?? 'Agent' }}..."
