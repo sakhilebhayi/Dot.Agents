@@ -5,9 +5,12 @@ namespace App\Providers;
 use App\Models\AgentCategory;
 use App\Models\AgentDepartment;
 use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Foundation\Events\DiagnosingHealth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
@@ -32,6 +35,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // /up answered 200 whenever PHP booted, even with the database down. The framework dispatches DiagnosingHealth
+        // before it renders the page: a failing query turns the answer into a 500 (the exception text is never shown).
+        Event::listen(DiagnosingHealth::class, fn () => DB::select('select 1'));
+
         // Enforce strong password policy platform-wide (min 12 chars, mixed case, numbers, symbols)
         // In testing, use a relaxed rule so test factories and Jetstream tests still pass.
         Password::defaults(function () {
