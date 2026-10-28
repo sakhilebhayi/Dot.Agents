@@ -8,6 +8,7 @@ use App\Providers\EventServiceProvider;
 use App\Providers\FortifyServiceProvider;
 use App\Providers\GovernanceEventServiceProvider;
 use App\Providers\GovernanceServiceProvider;
+use App\Providers\HealthCheckServiceProvider;
 use App\Providers\HorizonServiceProvider;
 use App\Providers\JetstreamServiceProvider;
 use App\Providers\PolicyServiceProvider;
@@ -16,6 +17,7 @@ use App\Providers\SocialServiceProvider;
 
 return [
     AppServiceProvider::class,
+    HealthCheckServiceProvider::class,
     PolicyServiceProvider::class,
     AgentServiceProvider::class,
     GovernanceServiceProvider::class,
