@@ -1,14 +1,18 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 /** Webhook headers can hold credentials. Plain JSON already stored is encrypted in place. */
 return new class extends Migration
 {
     public function up(): void
     {
+        Schema::table('agent_skills', fn (Blueprint $table) => $table->text('webhook_headers')->nullable()->change());
+
         DB::table('agent_skills')->whereNotNull('webhook_headers')->orderBy('id')->each(function (object $skill) {
             if (json_decode((string) $skill->webhook_headers) !== null) {
                 DB::table('agent_skills')->where('id', $skill->id)->update([
@@ -25,5 +29,7 @@ return new class extends Migration
                 'webhook_headers' => Crypt::decryptString((string) $skill->webhook_headers),
             ]);
         });
+
+        Schema::table('agent_skills', fn (Blueprint $table) => $table->json('webhook_headers')->nullable()->change());
     }
 };
