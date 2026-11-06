@@ -711,7 +711,7 @@ parameters:
 		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
 			identifier: property.notFound
-			count: 2
+			count: 1
 			path: app/Services/AI/PromptBuilderService.php
 
 		-
