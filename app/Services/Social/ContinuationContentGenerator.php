@@ -5,7 +5,6 @@ namespace App\Services\Social;
 use App\Models\AgentDeployment;
 use App\Models\SocialConversation;
 use App\Models\SocialMessage;
-use OpenAI\Laravel\Facades\OpenAI;
 
 /**
  * Continuation Content Generator.
@@ -76,20 +75,9 @@ Conversation continuation principles:
 Respond with JSON: {"content": "your message here", "strategy": "engagement_strategy_used", "confidence": 0-100}
 SYSTEM;
 
-        $messages = array_merge(
-            [['role' => 'system', 'content' => $systemPrompt]],
-            $recentMessages,
-        );
+        $messages = array_map(fn (array $message) => ['role' => $message['role'], 'text' => (string) $message['content']], $recentMessages);
 
-        $response = OpenAI::chat()->create([
-            'model' => $deployment->model_override ?? 'gpt-4o-mini',
-            'temperature' => 0.7,
-            'max_tokens' => 500,
-            'response_format' => ['type' => 'json_object'],
-            'messages' => $messages,
-        ]);
-
-        $raw = json_decode($response->choices[0]->message->content, true);
+        $raw = app(SocialModelCall::class)->json($systemPrompt, $messages, $deployment->model_override, 500);
 
         return [
             'content' => $raw['content'] ?? 'Thank you for your message. How can I assist you further?',

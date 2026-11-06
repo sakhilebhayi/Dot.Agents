@@ -3,6 +3,7 @@
 namespace App\Actions\Compliance;
 
 use App\Events\UserDataExported;
+use App\Models\AgentMemory;
 use App\Models\User;
 use App\Services\Governance\AuditService;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -62,6 +63,9 @@ class ExportUserDataAction
                     'event' => $log->event,
                     'created_at' => $log->created_at?->toISOString(),
                 ])
+                ->toArray(),
+            'memories' => AgentMemory::withoutGlobalScopes()->where('user_id', $subject->id)->get()
+                ->map(fn (AgentMemory $memory) => ['subject' => $memory->subject, 'content' => $memory->content, 'source' => $memory->source, 'created_at' => $memory->created_at?->toISOString()])
                 ->toArray(),
             'notifications' => $subject->notifications()
                 ->select(['id', 'type', 'data', 'read_at', 'created_at'])

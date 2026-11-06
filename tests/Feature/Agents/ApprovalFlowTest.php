@@ -21,6 +21,7 @@ use App\Models\AgentEffect;
 use App\Models\AgentRun;
 use App\Models\AgentToolPermission;
 use App\Models\ApprovalRule;
+use App\Models\DecisionLog;
 use App\Models\Organization;
 use App\Models\User;
 use App\Notifications\ApprovalAnsweredNotification;
@@ -560,5 +561,19 @@ class ApprovalFlowTest extends TestCase
             ->assertSee('All messages');
 
         $this->assertSame('Communication', ApprovalRule::firstOrFail()->category);
+    }
+
+    public function test_a_persons_answer_lands_in_the_decision_log_in_their_own_words(): void
+    {
+        $this->held();
+        $this->model->say('Understood.');
+
+        $this->answer('rejected', 'Wrong supplier');
+
+        $row = DecisionLog::firstOrFail();
+        $this->assertSame('Rejected', $row->decision_summary);
+        $this->assertSame('Wrong supplier', $row->reasoning);
+        $this->assertSame($this->approver->id, $row->reviewed_by);
+        $this->assertNull($row->confidence_score);
     }
 }

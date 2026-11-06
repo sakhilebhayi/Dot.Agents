@@ -1,3 +1,7 @@
+@import './signal/chat.css';
+@import './signal/org.css';
+@import './signal/governance.css';
+
 /* The Signal Box. Tokens and components for every signed-in page. See DESIGN.md. */
 :root {
     --ground: #17151e;

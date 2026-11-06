@@ -64,7 +64,7 @@ class AgentPlatformSeeder extends Seeder
                 'max_departments' => -1,
                 'max_workflows' => -1,
                 'monthly_token_quota' => 20000000,
-                'features' => ['Unlimited Agents', 'Digital Immune System', 'SSO', 'SAML', 'Custom Models', 'SLA', 'Dedicated Support', 'White Label'],
+                'features' => ['Unlimited Agents', 'Governance Suite', 'Workflows', 'API Access', 'Dedicated Support'],
                 'is_featured' => false,
                 'sort_order' => 3,
             ],

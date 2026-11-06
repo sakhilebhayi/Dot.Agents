@@ -1,4 +1,4 @@
 <x-layouts.platform>
-    <x-slot:header>Organization Settings</x-slot:header>
+    <x-slot:header>Business settings</x-slot:header>
     @livewire('organizations.organization-settings')
 </x-layouts.platform>

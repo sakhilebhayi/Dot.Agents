@@ -1,0 +1,21 @@
+/* The business pages: people, departments, API keys and custom skills. See DESIGN.md. */
+.org-stack { grid-template-columns: minmax(0, 1fr); }
+.org-row { flex-wrap: wrap; }
+.org-row .row-main { flex: 1 1 200px; }
+.org-face { flex: none; width: 28px; height: 28px; border-radius: 50%; object-fit: cover; }
+.org-role { flex: none; width: 168px; }
+.org-end { display: flex; flex: none; align-items: center; justify-content: flex-end; gap: 4px; }
+.org-slot { width: 64px; }
+.org-confirm { display: flex; flex: 1 0 100%; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; padding-top: 8px; border-top: 1px solid var(--rule); }
+.org-key { flex: 1; min-width: 0; gap: 8px; }
+.org-key b { font-weight: 500; }
+.org-key .btn { justify-self: start; }
+.org-token { display: block; padding: 8px 12px; border-radius: var(--radius); background: var(--raised); color: var(--text); font: 13px/20px var(--mono); overflow-wrap: anywhere; user-select: all; }
+.btn.org-busy { cursor: wait; }
+
+@media (max-width: 720px) {
+    .org-row .row-main { flex-basis: calc(100% - 40px); }
+    .org-row > .chip, .org-row > .lamp { margin-right: auto; }
+    .org-role { flex: 1 1 150px; width: auto; }
+    .org-slot { width: auto; }
+}

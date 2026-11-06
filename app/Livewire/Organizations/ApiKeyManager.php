@@ -33,7 +33,7 @@ class ApiKeyManager extends Component
     {
         return Auth::user()
             ->tokens()
-            ->where('name', 'like', 'org-%')
+            ->where('organization_id', session('current_organization_id'))
             ->orderByDesc('created_at')
             ->get()
             ->map(fn ($token) => [
@@ -80,7 +80,7 @@ class ApiKeyManager extends Component
 
     public function revokeToken(int $tokenId): void
     {
-        $token = Auth::user()->tokens()->find($tokenId);
+        $token = Auth::user()->tokens()->where('organization_id', session('current_organization_id'))->find($tokenId);
 
         if (! $token) {
             return;

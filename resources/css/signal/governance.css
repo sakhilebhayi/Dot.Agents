@@ -1,0 +1,58 @@
+/* Audit, decisions, retention, security and billing pages. Tokens only. See DESIGN.md. */
+.loading-bar { position: fixed; inset: 0 0 auto 0; z-index: 70; height: 2px; background: var(--running); animation: lamp 1.6s var(--ease) infinite; }
+
+/* A stack of cards: the track stays the page width so a wide table scrolls inside its own card */
+.grid.stack { grid-template-columns: minmax(0, 1fr); }
+.sheet-plate { grid-template-columns: minmax(0, 1fr); align-content: start; }
+
+/* Filters sit at the top of the card they filter */
+.filters { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; align-items: end; padding: 12px 16px; border-bottom: 1px solid var(--rule); }
+.filters .field { min-width: 0; margin: 0; }
+.filters .check-line { min-height: var(--control-h); }
+.filters-wide { grid-column: 1 / -1; }
+.card-head.has-tools { flex-wrap: wrap; padding-block: 8px; }
+.head-tools { display: flex; flex-wrap: wrap; gap: 8px; min-width: 0; }
+.head-tools .select { max-width: 100%; }
+
+/* Tables keep their width and scroll inside the card on a phone */
+.table.wide { min-width: 680px; }
+.cell-time { color: var(--muted); font: 400 12px/20px var(--mono); white-space: nowrap; }
+.cell-title { display: block; font-weight: 500; overflow-wrap: anywhere; }
+.cell-sub { display: block; max-width: 52ch; color: var(--muted); font-size: 12px; line-height: 16px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.cell-actions { display: flex; gap: 4px; }
+
+/* A row that carries sentences: it wraps instead of cutting them off */
+.row.long { flex-wrap: wrap; align-items: flex-start; padding-block: 10px; }
+.row.long .row-main { flex: 1 1 240px; }
+.row.long .row-main b, .row.long .row-main span { white-space: normal; overflow-wrap: anywhere; }
+.row-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+
+/* The emergency stop */
+.card.halt { border-color: var(--stop); }
+.halt-body { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 420px); gap: var(--gap); align-items: start; }
+.halt-form { display: flex; gap: 8px; }
+.halt-form .input { flex: 1; min-width: 0; }
+
+/* Plans */
+.current-plan { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+.current-plan h3 { font-size: 16px; line-height: 22px; font-weight: 600; }
+.plan-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.plans { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1px; overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius); background: var(--rule); }
+.plans .empty { grid-column: 1 / -1; background: var(--surface); }
+.plan { display: flex; flex-direction: column; gap: 12px; padding: 16px; background: var(--surface); }
+.plan-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.plan-top h2 { font-size: 16px; line-height: 22px; font-weight: 600; }
+.plan-price { color: var(--muted); }
+.plan-price b { color: var(--text); font: 500 20px/26px var(--mono); }
+.plan-note { color: var(--muted); font-size: 13px; }
+.plan-features { flex: 1; margin: 0; padding: 0; list-style: none; font-size: 13px; }
+.plan-features li { padding: 6px 0; border-top: 1px solid var(--rule); }
+.plan .btn { width: 100%; }
+.plan-current { display: flex; align-items: center; justify-content: center; height: var(--control-h); }
+.plans-foot { margin-top: var(--gap); }
+
+@media (max-width: 720px) {
+    .halt-body { grid-template-columns: minmax(0, 1fr); }
+    .halt-form { flex-wrap: wrap; }
+    .halt-form .input, .halt-form .btn { flex: 1 1 100%; }
+}

@@ -1,42 +1,41 @@
-<div>
-    @if (session('success'))
-        <div class="mb-4 rounded-2xl bg-green-50 dark:bg-green-900/30 p-4 text-sm text-green-700 dark:text-green-400">
-            {{ session('success') }}
-        </div>
+<x-sig.page title="Retention purges" sub="Rows past their retention window. Nothing is deleted until a person approves it.">
+    @if(session('success'))
+        <div class="notice clear" role="status">{{ session('success') }}</div>
     @endif
 
-    @if ($this->proposals->isEmpty())
-        <div class="rounded-2xl border border-dashed border-gray-300 dark:border-gray-700 p-8 text-center text-sm text-gray-500 dark:text-gray-400">
-            No retention purges awaiting review.
+    <section class="card" aria-label="Purges awaiting review">
+        <div class="card-head">
+            <h2>Awaiting review</h2>
+            <span class="muted num">{{ number_format($this->pendingCount) }}</span>
         </div>
-    @endif
 
-    @foreach ($this->proposals as $proposal)
-        <div class="mb-4 rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-5">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="font-semibold text-gray-900 dark:text-white">{{ class_basename($proposal->model_class) }}</p>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ $proposal->retention_summary }}</p>
+        @if($this->proposals->isEmpty())
+            <div class="empty">No retention purges awaiting review.</div>
+        @else
+            <div class="filters">
+                <label class="field filters-wide">
+                    <span>Reviewer notes (optional)</span>
+                    <input class="input" type="text" wire:model="reviewerNotes" placeholder="Saved with your next decision">
+                </label>
+            </div>
+
+            @foreach($this->proposals as $proposal)
+                <div class="row long" wire:key="proposal-{{ $proposal->id }}">
+                    <div class="row-main">
+                        <b>{{ class_basename($proposal->model_class) }}</b>
+                        <span>{{ $proposal->retention_summary }}</span>
+                    </div>
+                    <span class="chip hold"><span class="num">{{ number_format($proposal->eligible_count) }}</span> {{ Str::plural('row', $proposal->eligible_count) }} eligible</span>
+                    <div class="row-actions">
+                        <button type="button" class="btn small danger" wire:click="approve({{ $proposal->id }})" wire:confirm="Permanently delete {{ $proposal->eligible_count }} {{ class_basename($proposal->model_class) }} row(s)?">Approve purge</button>
+                        <button type="button" class="btn small" wire:click="reject({{ $proposal->id }})">Reject</button>
+                    </div>
                 </div>
-                <span class="rounded-full bg-amber-100 dark:bg-amber-900/30 px-3 py-1 text-xs font-medium text-amber-800 dark:text-amber-400">
-                    {{ $proposal->eligible_count }} row(s) eligible
-                </span>
-            </div>
+            @endforeach
+        @endif
 
-            <div class="mt-4 flex items-center gap-2">
-                <input aria-label="Reviewer notes" type="text" wire:model="reviewerNotes" placeholder="Reviewer notes (optional)"
-                    class="flex-1 rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm shadow-sm focus:border-brand-purple-light focus:ring-brand-purple-light" />
-                <button wire:click="approve({{ $proposal->id }})" wire:confirm="Permanently delete {{ $proposal->eligible_count }} {{ class_basename($proposal->model_class) }} row(s)?"
-                    class="rounded-xl bg-green-600 px-3 py-2 text-sm font-medium text-white hover:bg-green-700">
-                    Approve Purge
-                </button>
-                <button wire:click="reject({{ $proposal->id }})"
-                    class="rounded-xl bg-red-600 px-3 py-2 text-sm font-medium text-white hover:bg-red-700">
-                    Reject
-                </button>
-            </div>
-        </div>
-    @endforeach
-
-    {{ $this->proposals->links() }}
-</div>
+        @if($this->proposals->hasPages())
+            <div class="card-body">{{ $this->proposals->links() }}</div>
+        @endif
+    </section>
+</x-sig.page>

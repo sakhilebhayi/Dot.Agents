@@ -1,0 +1,71 @@
+/* The conversation with an agent, the scorecard and the notifications list. Tokens only, from signal.css. */
+
+/* The conversation */
+.chat-side .card-head + .row, .bell-panel .card-head + .row, .card-head + .score { border-top: 0; }
+.chat { display: flex; align-items: flex-start; gap: var(--gap); }
+.chat-panel { display: flex; flex-direction: column; flex: 1; min-width: 0; height: calc(100dvh - 184px); min-height: 360px; }
+.chat-log { display: flex; flex-direction: column; gap: 20px; flex: 1; min-height: 0; padding: 16px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--control) transparent; }
+.chat-empty { margin: auto 0; }
+.msg { max-width: min(68ch, 100%); }
+.msg.person { align-self: flex-end; max-width: min(56ch, 85%); padding: 8px 12px; border-radius: var(--radius); background: var(--raised); }
+.msg-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 8px; margin-bottom: 4px; color: var(--muted); font-size: 12px; line-height: 16px; }
+.msg-meta b { color: var(--text); font-size: 13px; font-weight: 600; }
+.msg-text { overflow-wrap: anywhere; }
+.chat-held { flex-wrap: wrap; margin: 0; }
+.chat-held a { text-underline-offset: 3px; }
+.chat-compose { padding: 12px 16px; border-top: 1px solid var(--border); }
+.chat-alert { margin-bottom: 8px; }
+.chat-form { display: flex; align-items: flex-end; gap: 8px; }
+.chat-form .textarea { flex: 1; min-width: 0; min-height: var(--control-h); max-height: 160px; resize: none; caret-color: var(--accent); }
+.chat-side { display: grid; gap: var(--gap); flex: none; width: 280px; }
+.chat-side .defs dd { overflow-wrap: anywhere; }
+.chat-side .defs dd:last-child { margin-bottom: 0; }
+.chat-end { padding-block: 12px; border-top: 1px solid var(--rule); }
+.chat-end .btn { width: 100%; }
+
+@media (max-width: 960px) {
+    .chat { flex-direction: column; align-items: stretch; }
+    .chat-panel { flex: none; height: calc(100dvh - 216px); }
+    .chat-side { order: -1; width: 100%; }
+}
+
+/* The scorecard */
+.score-period { width: auto; }
+.score-stats { margin-bottom: 0; }
+.score meter { flex: none; width: 120px; height: 4px; border: 0; border-radius: 2px; background: var(--raised); appearance: none; -webkit-appearance: none; }
+.score meter::-webkit-meter-bar { height: 4px; border: 0; border-radius: 2px; background: var(--raised); }
+.score meter::-webkit-meter-optimum-value { border-radius: 2px; background: var(--clear); }
+.score meter::-webkit-meter-suboptimum-value { border-radius: 2px; background: var(--hold); }
+.score meter::-webkit-meter-even-less-good-value { border-radius: 2px; background: var(--stop); }
+.score meter::-moz-meter-bar { border-radius: 2px; background: var(--clear); }
+.score meter:-moz-meter-sub-optimum::-moz-meter-bar { background: var(--hold); }
+.score meter:-moz-meter-sub-sub-optimum::-moz-meter-bar { background: var(--stop); }
+.score .row-main span { white-space: normal; }
+.score-figure { width: 56px; }
+.score-table td:first-child { min-width: 96px; }
+
+@media (max-width: 720px) {
+    .score { flex-wrap: wrap; padding-block: 8px; }
+    .score .row-main { flex-basis: calc(100% - 68px); }
+    .score meter { order: 3; width: 100%; }
+    .score-table th, .score-table td { padding-inline: 8px; }
+    .score-table th:first-child, .score-table td:first-child { padding-left: 16px; }
+    .score-table th:last-child, .score-table td:last-child { padding-right: 16px; }
+}
+
+/* Notifications */
+.bell { position: relative; flex: none; }
+.bell-count { color: var(--hold); font: 500 12px/16px var(--mono); font-variant-numeric: tabular-nums; }
+.bell-panel { position: absolute; top: calc(100% + 8px); right: 0; z-index: 40; width: 360px; max-height: min(460px, calc(100dvh - 72px)); overflow-y: auto; box-shadow: 0 12px 28px rgb(0 0 0 / 0.3); scrollbar-width: thin; scrollbar-color: var(--control) transparent; }
+.bell-panel .card-head { position: sticky; top: 0; z-index: 1; background: var(--surface); }
+.bell-item { align-items: flex-start; padding-block: 10px; }
+.bell-item.is-unread { box-shadow: inset 1px 0 0 var(--accent); }
+.bell-text { flex: 1; min-width: 0; color: var(--muted); }
+.bell-text b { display: block; color: var(--muted); font-weight: 500; overflow-wrap: anywhere; }
+.bell-item.is-unread .bell-text b { color: var(--text); font-weight: 600; }
+.bell-body { display: -webkit-box; margin-top: 2px; overflow: hidden; font-size: 13px; overflow-wrap: anywhere; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; }
+.bell-text time { display: block; margin-top: 2px; font-size: 12px; line-height: 16px; }
+
+@media (max-width: 480px) {
+    .bell-panel { position: fixed; top: 64px; left: 16px; right: 16px; width: auto; }
+}

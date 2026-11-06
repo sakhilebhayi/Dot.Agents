@@ -403,24 +403,6 @@ parameters:
 			path: app/Livewire/Billing/BillingSettings.php
 
 		-
-			message: '#^Access to an undefined property App\\Livewire\\Dashboard\\OperationsDashboard\:\:\$circuitBreakers\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Livewire/Dashboard/OperationsDashboard.php
-
-		-
-			message: '#^Access to an undefined property App\\Livewire\\Dashboard\\OperationsDashboard\:\:\$failureRate\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Livewire/Dashboard/OperationsDashboard.php
-
-		-
-			message: '#^Access to an undefined property App\\Livewire\\Dashboard\\OperationsDashboard\:\:\$organizationId\.$#'
-			identifier: property.notFound
-			count: 2
-			path: app/Livewire/Dashboard/OperationsDashboard.php
-
-		-
 			message: '#^Access to an undefined property App\\Livewire\\Organizations\\DepartmentManager\:\:\$organization\.$#'
 			identifier: property.notFound
 			count: 2
@@ -441,7 +423,7 @@ parameters:
 		-
 			message: '#^Access to an undefined property App\\Livewire\\Organizations\\OrgMemberManager\:\:\$organization\.$#'
 			identifier: property.notFound
-			count: 5
+			count: 7
 			path: app/Livewire/Organizations/OrgMemberManager.php
 
 		-
@@ -545,18 +527,6 @@ parameters:
 			identifier: property.notFound
 			count: 1
 			path: app/Services/AI/AgentReputationService.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\AgentTask\:\:\$failures\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Services/AI/EnterpriseBrainService.php
-
-		-
-			message: '#^Access to an undefined property App\\Models\\AgentTask\:\:\$task_count\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Services/AI/EnterpriseBrainService.php
 
 		-
 			message: '#^Offset ''pii'' on non\-empty\-array\<string, array\> on left side of \?\? always exists and is not nullable\.$#'

@@ -1,183 +1,111 @@
-<div class="flex h-[calc(100vh-6.5rem)] gap-4" x-data="{ showInfo: true }">
-    {{-- Chat Panel --}}
-    <div class="flex-1 flex flex-col bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-        {{-- Header --}}
-        <div class="flex items-center justify-between px-5 py-4 border-b border-gray-200 dark:border-gray-700">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-purple to-brand-purple-light flex items-center justify-center text-white font-bold text-sm">
-                    {{ substr($this->deployment?->agent?->name ?? 'AI', 0, 2) }}
-                </div>
-                <div>
-                    <h3 class="font-semibold text-gray-900 dark:text-white text-sm">
-                        {{ $this->deployment?->display_name }}
-                    </h3>
-                    <p class="text-xs text-gray-500 dark:text-gray-400">
-                        {{ ucfirst($this->deployment?->deployment_mode) }} Mode
-                        @if($this->deployment?->isAutonomous())
-                            &middot; <span class="text-emerald-600 dark:text-emerald-400">Autonomous</span>
-                        @endif
-                    </p>
-                </div>
-            </div>
-            <div class="flex items-center gap-2">
-                <button aria-label="Toggle agent info" :aria-expanded="showInfo" @click="showInfo = !showInfo"
-                    class="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                </button>
-                <button wire:click="newSession"
-                    class="p-2 text-gray-400 hover:text-brand-purple-mid dark:hover:text-brand-purple-light rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                    title="New Session">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                    </svg>
-                </button>
-            </div>
-        </div>
+@php
+    $agent = $this->deployment;
+    $level = \App\Services\Agents\AgentConfig::AUTONOMY[(int) $agent->autonomy_level] ?? null;
+    $thread = $this->chatMessages;
+    $lastReply = $thread->where('role', 'assistant')->last();
+    $department = $agent->department?->name ?? $agent->agent?->agentDepartment?->name;
+@endphp
 
-        {{-- Messages --}}
-        <div class="flex-1 overflow-y-auto p-5 space-y-4" id="chat-messages">
-            @if($this->chatMessages->isEmpty())
-                <div class="flex flex-col items-center justify-center h-full text-center py-12">
-                    <div class="w-16 h-16 rounded-2xl bg-brand-purple-pale dark:bg-brand-purple-deeper/30 flex items-center justify-center mb-4">
-                        <svg class="w-8 h-8 text-brand-purple-mid dark:text-brand-purple-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-                        </svg>
-                    </div>
-                    <h4 class="font-semibold text-gray-700 dark:text-gray-300 text-sm mb-1">Start a conversation</h4>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 max-w-xs">
-                        Ask {{ $this->deployment?->agent?->name }} anything related to {{ strtolower($this->deployment?->agent?->agentDepartment?->name ?? 'your department') }}.
-                    </p>
-                </div>
-            @else
-                @foreach($this->chatMessages as $msg)
-                    <div class="flex {{ $msg->role === 'user' ? 'justify-end' : 'justify-start' }} gap-3">
-                        @if($msg->role !== 'user')
-                            <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-brand-purple to-brand-purple-light flex items-center justify-center text-white text-xs font-bold flex-shrink-0 mt-1">
-                                AI
+<div x-data="{ showInfo: window.matchMedia('(min-width: 961px)').matches, alert: '' }" x-on:security-alert.window="alert = $event.detail.message">
+    <x-sig.page :title="$agent->display_name" :sub="$agent->role ?: $agent->agent?->name">
+        <x-slot:actions>
+            <button type="button" class="btn quiet" :aria-expanded="showInfo" @click="showInfo = !showInfo">Details</button>
+            <button type="button" class="btn" wire:click="newSession"><x-sig.icon name="plus" />New conversation</button>
+        </x-slot:actions>
+
+        <div class="chat">
+            <section class="card chat-panel" aria-label="Conversation">
+                <div class="chat-log" id="chat-messages" role="log" aria-live="polite"
+                    x-init="$el.scrollTop = $el.scrollHeight; new MutationObserver(() => $el.scrollTop = $el.scrollHeight).observe($el, { childList: true })">
+                    @if($thread->isEmpty())
+                        <div class="empty chat-empty">
+                            <b>Start a conversation</b>
+                            Ask {{ $agent->display_name }} anything related to {{ strtolower($department ?? 'your department') }}.
+                        </div>
+                    @else
+                        @foreach($thread as $msg)
+                            <div @class(['msg', 'person' => $msg->role === 'user']) wire:key="message-{{ $msg->id }}">
+                                <p class="msg-meta">
+                                    <b>{{ $msg->role === 'user' ? 'You' : $agent->display_name }}</b>
+                                    <time datetime="{{ $msg->created_at->toIso8601String() }}">{{ $msg->created_at->diffForHumans() }}</time>
+                                    @if($msg->token_count)
+                                        <span><span class="num">{{ number_format($msg->token_count) }}</span> tokens</span>
+                                    @endif
+                                    @if($msg->flagged)
+                                        <span class="chip stop">Flagged</span>
+                                    @endif
+                                </p>
+                                <div class="msg-text">{!! nl2br(e($msg->content)) !!}</div>
+                            </div>
+                        @endforeach
+
+                        @if($waitingForPerson)
+                            <p wire:poll.5s="pollForReply" class="notice hold chat-held" role="status">
+                                This agent has stopped and is waiting for a person. <a href="{{ route('governance.approvals') }}">See what it is asking</a>
+                            </p>
+                        @elseif($isTyping)
+                            <div wire:poll.1500ms="pollForReply" class="chat-working" role="status">
+                                <span class="lamp running"><i aria-hidden="true"></i>Working on a reply</span>
                             </div>
                         @endif
-                        <div class="max-w-lg">
-                            <div class="{{ $msg->role === 'user' ? 'bg-brand-purple-mid text-white rounded-2xl rounded-tr-sm' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-2xl rounded-tl-sm' }} px-4 py-3 text-sm">
-                                {!! nl2br(e($msg->content)) !!}
-                            </div>
-                            <div class="flex items-center gap-2 mt-1 {{ $msg->role === 'user' ? 'justify-end' : '' }}">
-                                <span class="text-xs text-gray-400">{{ $msg->created_at->diffForHumans() }}</span>
-                                @if($msg->token_count)
-                                    <span class="text-xs text-gray-400">&middot; {{ number_format($msg->token_count) }} tokens</span>
-                                @endif
-                                @if($msg->flagged)
-                                    <span class="text-xs text-red-500 font-medium">⚠ Flagged</span>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-                @endforeach
+                    @endif
+                </div>
 
-                @if($waitingForPerson)
-                    <p wire:poll.5s="pollForReply" class="notice hold">
-                        This agent has stopped and is waiting for a person. <a href="{{ route('governance.approvals') }}">See what it is asking</a>
-                    </p>
-                @elseif($isTyping)
-                    <div wire:poll.1500ms="pollForReply" class="flex justify-start gap-3">
-                        <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-brand-purple to-brand-purple-light flex items-center justify-center text-white text-xs font-bold flex-shrink-0 mt-1">AI</div>
-                        <div class="bg-gray-100 dark:bg-gray-800 rounded-2xl rounded-tl-sm px-4 py-3">
-                            <div class="flex gap-1 items-center h-4">
-                                <div class="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style="animation-delay:0ms"></div>
-                                <div class="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style="animation-delay:150ms"></div>
-                                <div class="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style="animation-delay:300ms"></div>
-                            </div>
-                        </div>
+                <div class="chat-compose">
+                    <div class="notice stop chat-alert" role="alert" x-show="alert" x-text="alert" x-cloak></div>
+                    <form wire:submit="sendMessage" class="chat-form" @submit="alert = ''">
+                        <textarea class="textarea" aria-label="Message"
+                            wire:model="message"
+                            rows="1"
+                            placeholder="Message {{ $agent->display_name }}"
+                            x-on:keydown.enter.prevent.exact="alert = ''; $wire.sendMessage(); $el.style.height = 'auto'"
+                            x-on:input="$el.style.height = 'auto'; $el.style.height = $el.scrollHeight + 'px'"
+                        ></textarea>
+                        <button type="submit" class="btn primary" wire:loading.attr="disabled" wire:target="sendMessage">Send</button>
+                    </form>
+                    @error('message')<p class="error">{{ $message }}</p>@enderror
+                    <p class="hint">Enter sends. Shift and Enter starts a new line.</p>
+                </div>
+            </section>
+
+            <aside class="chat-side" x-show="showInfo" x-cloak aria-label="About this conversation">
+                <section class="card" aria-label="This agent">
+                    <div class="card-head"><h2>This agent</h2></div>
+                    <div class="card-body">
+                        <dl class="defs">
+                            <dt>Autonomy</dt>
+                            <dd>{{ $level ? "{$level[0]}. {$level[1]}" : 'Not set' }}</dd>
+                            <dt>Department</dt>
+                            <dd>{{ $department ?? 'None' }}</dd>
+                            <dt>Model used</dt>
+                            <dd @class(['mono' => $lastReply?->model_used])>{{ $lastReply?->model_used ?? 'No reply yet' }}</dd>
+                        </dl>
                     </div>
+                </section>
+
+                @if($sessionId)
+                    @php
+                        $sess = $this->session;
+                        $cost = max((float) $sess?->cost, (float) $thread->sum('cost'));
+                    @endphp
+                    <section class="card" aria-label="This conversation">
+                        <div class="card-head"><h2>This conversation</h2></div>
+                        <div class="row"><div class="row-main">Messages</div><span class="row-end num">{{ number_format($thread->count()) }}</span></div>
+                        <div class="row"><div class="row-main">Tokens used</div><span class="row-end num">{{ number_format($sess?->token_count ?? 0) }}</span></div>
+                        <div class="row">
+                            <div class="row-main">Cost</div>
+                            @if($cost > 0)
+                                <span class="row-end num">{{ number_format($cost, 4) }}</span>
+                            @else
+                                <span class="row-end">{{ $lastReply ? 'No price on file' : 'Nothing yet' }}</span>
+                            @endif
+                        </div>
+                        <div class="card-body chat-end">
+                            <button type="button" class="btn danger small" wire:click="endSession">End conversation</button>
+                        </div>
+                    </section>
                 @endif
-            @endif
+            </aside>
         </div>
-
-        {{-- Input --}}
-        <div class="px-5 py-4 border-t border-gray-200 dark:border-gray-700">
-            <form wire:submit="sendMessage" class="flex gap-3 items-end">
-                <div class="flex-1">
-                    <textarea aria-label="Message"
-                        wire:model="message"
-                        rows="1"
-                        placeholder="Message {{ $this->deployment?->agent?->name ?? 'Agent' }}..."
-                        class="w-full resize-none rounded-xl border-0 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 text-sm px-4 py-3 focus:ring-2 focus:ring-brand-purple-mid focus:bg-white dark:focus:bg-gray-700 transition-colors"
-                        x-on:keydown.enter.prevent.exact="$wire.sendMessage()"
-                        x-on:input="$el.style.height='auto'; $el.style.height=($el.scrollHeight)+'px'"
-                    ></textarea>
-                </div>
-                <button type="submit" aria-label="Send message"
-                    wire:loading.attr="disabled"
-                    class="flex-shrink-0 w-10 h-10 bg-brand-purple hover:bg-brand-purple-dark disabled:opacity-50 text-white rounded-xl flex items-center justify-center transition-colors">
-                    <svg class="w-4 h-4 rotate-90" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"/>
-                    </svg>
-                </button>
-            </form>
-            <p class="text-xs text-gray-400 mt-2 text-center">
-                Confidence threshold: {{ $this->deployment?->confidence_threshold }}% &middot;
-                Mode: {{ ucfirst($this->deployment?->deployment_mode) }}
-            </p>
-        </div>
-    </div>
-
-    {{-- Info Sidebar --}}
-    <div x-show="showInfo" x-transition class="w-72 flex-shrink-0 space-y-4">
-        <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-5">
-            <h4 class="font-semibold text-gray-900 dark:text-white text-sm mb-3">Agent Configuration</h4>
-            <dl class="space-y-2.5 text-xs">
-                <div class="flex justify-between">
-                    <dt class="text-gray-500">AI Model</dt>
-                    <dd class="font-mono text-gray-700 dark:text-gray-300">{{ $this->deployment?->agent?->primary_model }}</dd>
-                </div>
-                <div class="flex justify-between">
-                    <dt class="text-gray-500">Department</dt>
-                    <dd class="text-gray-700 dark:text-gray-300">{{ $this->deployment?->agent?->agentDepartment?->name }}</dd>
-                </div>
-                <div class="flex justify-between">
-                    <dt class="text-gray-500">Confidence Threshold</dt>
-                    <dd class="text-gray-700 dark:text-gray-300">{{ $this->deployment?->confidence_threshold }}%</dd>
-                </div>
-                <div class="flex justify-between">
-                    <dt class="text-gray-500">Human Approval</dt>
-                    <dd class="text-gray-700 dark:text-gray-300">
-                        {{ $this->deployment?->requires_human_approval ? 'Required' : 'Not required' }}
-                    </dd>
-                </div>
-            </dl>
-        </div>
-
-        @if($sessionId)
-        <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-5">
-            <h4 class="font-semibold text-gray-900 dark:text-white text-sm mb-3">Session Statistics</h4>
-            @php $sess = $this->session; @endphp
-            <dl class="space-y-2.5 text-xs">
-                <div class="flex justify-between">
-                    <dt class="text-gray-500">Messages</dt>
-                    <dd class="font-semibold text-gray-700 dark:text-gray-300">{{ $sess?->message_count ?? 0 }}</dd>
-                </div>
-                <div class="flex justify-between">
-                    <dt class="text-gray-500">Tokens Used</dt>
-                    <dd class="font-semibold text-gray-700 dark:text-gray-300">{{ number_format($sess?->token_count ?? 0) }}</dd>
-                </div>
-                <div class="flex justify-between">
-                    <dt class="text-gray-500">Session Cost</dt>
-                    <dd class="font-semibold text-gray-700 dark:text-gray-300">${{ number_format($sess?->cost ?? 0, 4) }}</dd>
-                </div>
-            </dl>
-            <button wire:click="endSession"
-                class="w-full mt-3 text-xs text-red-600 hover:text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg py-1.5 transition-colors">
-                End Session
-            </button>
-        </div>
-        @endif
-    </div>
+    </x-sig.page>
 </div>
-
-<script nonce="{{ \Illuminate\Support\Facades\Vite::cspNonce() }}">
-document.addEventListener('livewire:updated', () => {
-    const el = document.getElementById('chat-messages');
-    if (el) el.scrollTop = el.scrollHeight;
-});
-</script>

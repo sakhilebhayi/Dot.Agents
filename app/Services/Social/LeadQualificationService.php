@@ -4,7 +4,6 @@ namespace App\Services\Social;
 
 use App\Models\SocialConversation;
 use Illuminate\Support\Facades\Log;
-use OpenAI\Laravel\Facades\OpenAI;
 use Throwable;
 
 class LeadQualificationService
@@ -34,14 +33,7 @@ class LeadQualificationService
             ->pluck('content')
             ->implode("\n---\n");
 
-        $response = OpenAI::chat()->create([
-            'model' => 'gpt-4o-mini',
-            'temperature' => 0.1,
-            'response_format' => ['type' => 'json_object'],
-            'messages' => [
-                [
-                    'role' => 'system',
-                    'content' => <<<'SYSTEM'
+        $raw = app(SocialModelCall::class)->json(<<<'SYSTEM'
 You are a sales intent scoring engine. Analyze customer messages for purchase intent.
 
 Respond with JSON:
@@ -59,16 +51,7 @@ Scoring guide:
 - 50-74: considering (comparing, evaluating)
 - 75-89: ready_to_buy (asking pricing, availability, next steps)
 - 90-100: high_intent (ready now, requesting purchase/demo/quote)
-SYSTEM,
-                ],
-                [
-                    'role' => 'user',
-                    'content' => "Conversation history (last 5 messages):\n{$history}\n\nLatest message:\n{$latestMessage}",
-                ],
-            ],
-        ]);
-
-        $raw = json_decode($response->choices[0]->message->content, true);
+SYSTEM, [['role' => 'user', 'text' => "Conversation history (last 5 messages):\n{$history}\n\nLatest message:\n{$latestMessage}"]]);
 
         return [
             'intent_score' => (float) ($raw['intent_score'] ?? 0),

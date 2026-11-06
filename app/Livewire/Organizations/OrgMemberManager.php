@@ -3,8 +3,8 @@
 namespace App\Livewire\Organizations;
 
 use App\Models\Organization;
-use App\Models\User;
 use App\Services\Governance\AuditService;
+use App\Services\Organizations\PersonInvitations;
 use App\Support\OrgRoles;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Validate;
@@ -40,6 +40,12 @@ class OrgMemberManager extends Component
             ->get();
     }
 
+    #[Computed]
+    public function waiting()
+    {
+        return app(PersonInvitations::class)->waiting($this->organization);
+    }
+
     public function invite(): void
     {
         $this->validate();
@@ -48,31 +54,30 @@ class OrgMemberManager extends Component
         $this->authorize('update', $org);
         $this->assertMayAssign($this->inviteRole);
 
-        $user = User::where('email', $this->inviteEmail)->first();
-
-        if (! $user) {
-            $this->addError('inviteEmail', 'No account found with that email address.');
+        if ($org->users()->where('email', $this->inviteEmail)->exists()) {
+            $this->addError('inviteEmail', 'This person is already in the business.');
 
             return;
         }
 
-        if ($org->users()->where('user_id', $user->id)->exists()) {
-            $this->addError('inviteEmail', 'This user is already a member.');
+        $sent = app(PersonInvitations::class)->send($org, $this->inviteEmail, $this->inviteRole, auth()->user());
 
-            return;
-        }
+        session()->flash('member_success', $sent['mailed'] ? "Invitation sent to {$this->inviteEmail}." : null);
+        session()->flash('member_link', $sent['mailed'] ? null : $sent['link']);
 
-        $org->users()->attach($user->id, [
-            'role' => $this->inviteRole,
-            'is_primary' => false,
-            'joined_at' => now(),
-        ]);
-
-        unset($this->members);
+        unset($this->waiting);
         $this->inviteEmail = '';
         $this->inviteRole = OrgRoles::OPERATOR;
         $this->showInviteForm = false;
-        session()->flash('member_success', 'Member added successfully.');
+    }
+
+    public function cancelInvitation(int $id): void
+    {
+        $org = $this->organization;
+        $this->authorize('update', $org);
+
+        app(PersonInvitations::class)->cancel($org, $id);
+        unset($this->waiting);
     }
 
     public function confirmRemove(int $userId): void

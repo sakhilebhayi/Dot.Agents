@@ -45,7 +45,7 @@ class SecurityCenterTest extends TestCase
 
         Livewire::test(SecurityCenter::class)
             ->assertStatus(200)
-            ->assertSee('Security Events');
+            ->assertSee('Security events');
     }
 
     public function test_security_center_page_requires_authentication(): void
