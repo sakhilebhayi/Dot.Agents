@@ -131,15 +131,6 @@ class HealthCheckService
     {
         try {
             $size = Queue::size('default');
-            $horizonRunning = $this->isHorizonRunning();
-
-            if (! $horizonRunning) {
-                return [
-                    'status' => self::DEGRADED,
-                    'pending_jobs' => $size,
-                    'message' => 'Horizon supervisor is not running — jobs will not be processed',
-                ];
-            }
 
             $status = $size > 500 ? self::DEGRADED : self::HEALTHY;
 
@@ -238,10 +229,5 @@ class HealthCheckService
         }
 
         return self::HEALTHY;
-    }
-
-    private function isHorizonRunning(): bool
-    {
-        return Cache::get('horizon:status') === 'running';
     }
 }
