@@ -20,7 +20,10 @@ use Livewire\Attributes\Computed;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
 
-/** @property-read AgentDeployment $agent */
+/**
+ * @property-read AgentDeployment $agent
+ * @property-read \Illuminate\Support\Collection<int, AgentTestCase> $cases
+ */
 class AgentTestBench extends Component
 {
     public const READ_ONLY_ACTIONS = [];

@@ -11,6 +11,7 @@ use Illuminate\Support\Str;
  *
  * @property array<string, mixed>|null $settings
  * @property ?string $secret
+ * @property \Illuminate\Support\Carbon|null $next_run_at
  */
 class AgentTrigger extends Model
 {

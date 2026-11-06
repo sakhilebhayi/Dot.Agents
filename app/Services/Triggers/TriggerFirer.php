@@ -23,7 +23,7 @@ class TriggerFirer
 
     public function fire(AgentTrigger $trigger, string $key, ?string $content = null): AgentRun|WorkflowExecution|null
     {
-        $request = $this->request($trigger, $content);
+        $request = $this->wording($trigger, $content);
         $idempotency = "trigger:{$trigger->id}:{$key}";
 
         try {
@@ -43,7 +43,7 @@ class TriggerFirer
         return $work;
     }
 
-    private function request(AgentTrigger $trigger, ?string $content): string
+    private function wording(AgentTrigger $trigger, ?string $content): string
     {
         $instruction = trim((string) $trigger->instruction) ?: "Carry out your work for the trigger \"{$trigger->name}\".";
 

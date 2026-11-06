@@ -74,7 +74,7 @@ class TestBenchTest extends TestCase
         return app(StartRunAction::class)->execute($this->agent->fresh(), new StartRunData(...['input' => $input, 'isTest' => true, ...$data]))->refresh();
     }
 
-    private function test_case(array $checks = []): AgentTestCase
+    private function savedCase(array $checks = []): AgentTestCase
     {
         return app(SaveTestCaseAction::class)->execute($this->agent, new SaveTestCaseData($this->owner, 'Leave question', 'How much leave?', 'manual', $checks));
     }
@@ -209,7 +209,7 @@ class TestBenchTest extends TestCase
     public function test_a_saved_test_is_marked_on_facts(): void
     {
         $this->configure(['tools' => [['key' => 'calculator', 'mode' => 'auto']]]);
-        $case = $this->testCase(['contains' => ['21 days'], 'not_contains' => ['maybe'], 'uses_tools' => ['calculator'], 'avoids_tools' => ['web_read']]);
+        $case = $this->savedCase(['contains' => ['21 days'], 'not_contains' => ['maybe'], 'uses_tools' => ['calculator'], 'avoids_tools' => ['web_read']]);
         $this->model->call('calculator', ['expression' => '7*3'])->say('You get 21 days.');
 
         app(RunAgentTestsAction::class)->execute($this->agent, new RunTestsData($this->owner, $this->agent->published_version_id));
@@ -234,7 +234,7 @@ class TestBenchTest extends TestCase
     #[DataProvider('failures')]
     public function test_a_saved_test_fails_for_the_right_reason(array $checks, string $failed): void
     {
-        $this->testCase($checks);
+        $this->savedCase($checks);
         $this->model->say('All fine.');
 
         app(RunAgentTestsAction::class)->execute($this->agent, new RunTestsData($this->owner, $this->agent->published_version_id));
@@ -246,7 +246,7 @@ class TestBenchTest extends TestCase
 
     public function test_an_unfinished_run_fails_its_test(): void
     {
-        $this->testCase();
+        $this->savedCase();
         $this->model->fail('invalid_request', 'No.');
 
         app(RunAgentTestsAction::class)->execute($this->agent, new RunTestsData($this->owner, $this->agent->published_version_id));
@@ -256,7 +256,7 @@ class TestBenchTest extends TestCase
 
     public function test_breaking_a_permission_fails_a_test_even_with_a_good_answer(): void
     {
-        $this->testCase();
+        $this->savedCase();
         $this->model->call('notify_member', ['user_id' => $this->owner->id, 'subject' => 'x', 'message' => 'y'])->say('Good answer.');
 
         app(RunAgentTestsAction::class)->execute($this->agent, new RunTestsData($this->owner, $this->agent->published_version_id));
@@ -269,7 +269,7 @@ class TestBenchTest extends TestCase
         config(['prism.providers.anthropic.api_key' => 'test-only']);
         $version = $this->agent->publishedVersion;
         $this->configure(['instructions' => 'Check each line of the invoice, then list what does not match.']);
-        $this->testCase(['contains' => ['21 days']]);
+        $this->savedCase(['contains' => ['21 days']]);
         $this->model->say('Wrong.');
         app(RunAgentTestsAction::class)->execute($this->agent, new RunTestsData($this->owner, $version->id));
 
