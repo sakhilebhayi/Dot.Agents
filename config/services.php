@@ -119,6 +119,13 @@ return [
         'token' => env('DOT_MEMORY_API_TOKEN'),
     ],
 
+    'files' => [ // DOT_SERVICE_SECRET_AGENTS on Dot.Files
+        'url' => env('FILES_API_URL', 'https://files.infodot.co.za'),
+        'secret' => env('FILES_PLATFORM_SECRET'),
+        'platform' => env('FILES_PLATFORM_KEY', 'agents'),
+        'folder' => env('FILES_FOLDER', 'Dot.Agents'),
+    ],
+
     'dot_brain' => [
         // Local-monorepo assumption: Dot.Brain has no live API today, so charters
         // are read straight off the sibling checkout's filesystem. A real
@@ -127,7 +134,7 @@ return [
         'charters_path' => env('DOT_BRAIN_CHARTERS_PATH', base_path('../Dot.Brain/agents')),
 
         // Provisional colony runtime contract bounds ("runc:provisional") applied
-        // to every uncharted agent run — see AgentOrchestrationService::executeTask().
+        // to every uncharted agent run.
         'provisional_wall_clock_ms' => env('DOT_BRAIN_PROVISIONAL_WALL_CLOCK_MS', 60000),
         'provisional_max_tool_calls' => env('DOT_BRAIN_PROVISIONAL_MAX_TOOL_CALLS', 5),
     ],

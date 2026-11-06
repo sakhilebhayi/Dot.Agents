@@ -46,6 +46,7 @@ final class AgentConfig
             'errors' => ['on_failure' => 'stop'],
             'output' => ['format' => 'markdown'],
             'reporting' => ['on_failure' => true, 'on_approval' => true, 'on_completion' => false],
+            'template' => ['key' => null, 'version' => null],
         ];
     }
 

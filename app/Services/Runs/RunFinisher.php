@@ -5,6 +5,7 @@ namespace App\Services\Runs;
 use App\Events\AgentTaskCompleted;
 use App\Events\AgentTaskFailed;
 use App\Jobs\AdvanceWorkflow;
+use App\Jobs\ReportRunToDotMemory;
 use App\Models\AgentApproval;
 use App\Models\AgentMessage;
 use App\Models\AgentRun;
@@ -103,6 +104,10 @@ class RunFinisher
 
         $this->events->runEnded($run);
         $this->budget->check($run->organization_id);
+
+        if (! $run->is_test) {
+            ReportRunToDotMemory::dispatch($run->id, $run->organization_id);
+        }
         $this->tests->runEnded($run);
     }
 

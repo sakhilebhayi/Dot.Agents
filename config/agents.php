@@ -50,5 +50,6 @@ return [
         BuiltIn\KnowledgeSearch::class,
         BuiltIn\RememberFact::class,
         BuiltIn\DelegateTask::class,
+        BuiltIn\SaveToFiles::class,
     ],
 ];

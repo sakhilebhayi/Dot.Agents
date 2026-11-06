@@ -11,10 +11,16 @@
             <a class="btn" href="{{ route('agents.test', $agent) }}">Test</a>
             <a class="btn quiet" href="{{ route('agents.export', $agent) }}">Export</a>
             <button type="button" class="btn quiet" wire:click="duplicate">Duplicate</button>
+            <button type="button" class="btn quiet" wire:click="saveAsTemplate">Save as template</button>
         @endcan
         <a class="btn" href="{{ route('agents.scorecard', $agent) }}">Scorecard</a>
         @if($agent->status === 'active')<a class="btn primary" href="{{ route('agents.chat', $agent) }}">Talk</a>@endif
     </x-slot:actions>
+
+    @if(session('profile'))<div class="notice clear" role="status">{{ session('profile') }}</div>@endif
+    @if($this->templateUpdate)
+        <div class="notice hold" role="status">Version {{ $this->templateUpdate }} of the template this agent came from is available. This agent has not changed.</div>
+    @endif
 
     @if($agent->status !== 'active')
         <div class="notice hold" role="status">{{ $agent->name }} is {{ $agent->status }}, so it is not taking work.</div>

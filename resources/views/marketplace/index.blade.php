@@ -1,4 +1,4 @@
 <x-layouts.platform>
-    <x-slot:header>Agent Marketplace</x-slot:header>
-    @livewire('marketplace.agent-marketplace')
+    <x-slot:header>Templates and tools</x-slot:header>
+    @livewire('marketplace.template-library')
 </x-layouts.platform>

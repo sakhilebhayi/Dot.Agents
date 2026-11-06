@@ -7,7 +7,6 @@ use App\Livewire\Agents\DeploymentManager;
 use App\Livewire\Agents\ScorecardViewer;
 use App\Livewire\Dashboard\AgentDashboard;
 use App\Livewire\Governance\ApprovalQueue;
-use App\Livewire\Marketplace\AgentMarketplace;
 use App\Livewire\NotificationBell;
 use App\Livewire\Organizations\ApiKeyManager;
 use App\Livewire\Organizations\CustomSkillManager;
@@ -24,7 +23,6 @@ use App\Livewire\Social\SocialInbox;
 use App\Livewire\Social\SocialPostManager;
 use App\Livewire\Workflows\WorkflowBuilder;
 use App\Livewire\Workflows\WorkflowList;
-use App\Models\Agent;
 use App\Models\AgentApproval;
 use App\Models\AgentDeployment;
 use App\Models\AgentSkill;
@@ -145,35 +143,6 @@ class ViewerReadOnlyLivewireTest extends TestCase
         $this->as($this->editor, AgentChat::class, ['deploymentId' => $deployment->id])->assertOk();
         $this->assertDatabaseHas('agent_sessions', ['agent_deployment_id' => $deployment->id, 'user_id' => $this->editor->id]);
     }
-
-    // ── marketplace ──────────────────────────────────────────────────────
-
-    public function test_deploying_from_the_marketplace(): void
-    {
-        $agent = Agent::factory()->create();
-
-        $this->as($this->viewer, AgentMarketplace::class)->call('startDeploy', $agent->id)->assertForbidden();
-        $this->as($this->viewer, AgentMarketplace::class)
-            ->set('deployingAgentId', $agent->id)
-            ->set('deployForm.deployment_name', 'Sneaky')
-            ->call('deploy')
-            ->assertForbidden();
-        $this->assertDatabaseMissing('agent_deployments', ['name' => 'Sneaky']);
-    }
-
-    public function test_browsing_the_marketplace_still_works_for_a_viewer(): void
-    {
-        $agent = Agent::factory()->create();
-
-        $this->as($this->viewer, AgentMarketplace::class)
-            ->call('openPreview', $agent->id)
-            ->assertOk()
-            ->call('closePreview')
-            ->call('clearFilters')
-            ->assertOk();
-    }
-
-    // ── workflows ────────────────────────────────────────────────────────
 
     public function test_creating_and_deleting_workflows(): void
     {
