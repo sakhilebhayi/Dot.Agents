@@ -38,6 +38,7 @@
         ],
         'Workforce' => [
             ['agents.deployments', 'agents.*', 'agents', 'Agents'],
+            ['agents.teams', 'agents.teams', 'team', 'Teams'],
             ['org.departments', 'org.departments*', 'team', 'Departments'],
             ['marketplace', 'marketplace*', 'template', 'Templates'],
         ],

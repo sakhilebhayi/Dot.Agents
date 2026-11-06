@@ -4,8 +4,8 @@ return [
     // 'mock' is the safe default so no environment silently starts making
     // real, billed model calls until this is deliberately set to a real
     // provider key (openai|anthropic|gemini|ollama) with credentials below
-    // actually configured. AgentModelCaller checks this before ever calling
-    // Prism -- see App\Services\AI\AgentModelCaller::callModel().
+    // actually configured. The run engine checks this before ever calling
+    // Prism -- see App\Services\Models\PrismGateway.
     'default_provider' => env('AI_PROVIDER', 'mock'),
 
     'prism_server' => [

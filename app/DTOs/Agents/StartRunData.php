@@ -18,5 +18,8 @@ readonly class StartRunData
         public ?string $idempotencyKey = null,
         public bool $isTest = false,
         public ?int $versionId = null,
+        public int $taint = 0,
+        /** @var array{name: string, arguments: array<string, mixed>}|null A tool step: one call, through every gate, and no model. */
+        public ?array $directCall = null,
     ) {}
 }

@@ -5,6 +5,7 @@ namespace App\Actions\Security;
 use App\Actions\Concerns\LogsActionErrors;
 use App\Events\KillSwitchActivated;
 use App\Models\AgentDeployment;
+use App\Models\AgentRun;
 use App\Models\AgentWorkflow;
 use App\Models\Organization;
 use App\Models\WorkflowExecution;
@@ -94,8 +95,15 @@ class EmergencyKillSwitchAction
             // 1. Mark running executions as aborted
             $affected = WorkflowExecution::withoutGlobalScope('organization')
                 ->where('organization_id', $organization->id)
-                ->where('status', 'running')
+                ->whereIn('status', WorkflowExecution::OPEN)
                 ->update(['status' => 'aborted', 'error_message' => "Halted by kill switch: {$reason}", 'completed_at' => now()]);
+
+            // The agent runs under them stop at their next step, including any waiting on a person.
+            AgentRun::withoutGlobalScope('organization')
+                ->where('organization_id', $organization->id)
+                ->whereNotNull('workflow_execution_id')
+                ->whereIn('status', AgentRun::OPEN)
+                ->update(['cancel_requested_at' => now(), 'status' => AgentRun::QUEUED]);
 
             // 2. Disable all active workflows
             AgentWorkflow::withoutGlobalScope('organization')

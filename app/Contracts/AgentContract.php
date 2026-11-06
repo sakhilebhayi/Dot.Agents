@@ -6,7 +6,7 @@ namespace App\Contracts;
  * AgentContract — formal interface for all Dot.Agents skill implementations.
  *
  * Every AI agent skill class MUST implement this interface to be:
- *   1. Loadable by the AgentOrchestrationService
+ *   1. Loadable by the run engine
  *   2. Subject to governance hooks (delusion detection, confidence scoring)
  *   3. Eligible for listing in the Agent Marketplace
  *   4. Auditable via the AuditService

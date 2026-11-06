@@ -96,6 +96,7 @@ Route::middleware([
     Route::prefix('my-agents')->name('agents.')->group(function () {
         Route::get('/', fn () => view('agents.index'))->name('deployments');
         Route::get('/new', fn () => view('agents.create'))->name('create');
+        Route::get('/teams', fn () => view('agents.teams'))->name('teams');
         Route::get('/{deployment}', function (AgentDeployment $deployment) {
             abort_unless(Gate::allows('view', $deployment), 403);
 

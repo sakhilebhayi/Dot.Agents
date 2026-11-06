@@ -505,60 +505,6 @@ parameters:
 			path: app/Livewire/Social/SocialPostManager.php
 
 		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$agent_key\.$#'
-			identifier: property.notFound
-			count: 2
-			path: app/Livewire/Workflows/WorkflowBuilder.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$condition\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Livewire/Workflows/WorkflowBuilder.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$from_node_uuid\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Livewire/Workflows/WorkflowBuilder.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$label\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Livewire/Workflows/WorkflowBuilder.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$position_x\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Livewire/Workflows/WorkflowBuilder.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$position_y\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Livewire/Workflows/WorkflowBuilder.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$to_node_uuid\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Livewire/Workflows/WorkflowBuilder.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$uuid\.$#'
-			identifier: property.notFound
-			count: 2
-			path: app/Livewire/Workflows/WorkflowBuilder.php
-
-		-
-			message: '#^Parameter \#1 \$callback of method Illuminate\\Database\\Eloquent\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:map\(\) contains unresolvable type\.$#'
-			identifier: argument.unresolvableType
-			count: 2
-			path: app/Livewire/Workflows/WorkflowBuilder.php
-
-		-
 			message: '#^Access to an undefined property App\\Livewire\\Workflows\\WorkflowList\:\:\$workflows\.$#'
 			identifier: property.notFound
 			count: 1
@@ -619,58 +565,10 @@ parameters:
 			path: app/Services/AI/EnterpriseBrainService.php
 
 		-
-			message: '#^Parameter \#1 \$nodes of method App\\Services\\AI\\Workflow\\WorkflowGraphResolver\:\:resolveStartNodes\(\) expects Illuminate\\Support\\Collection\<string, App\\Models\\WorkflowNode\>, Illuminate\\Database\\Eloquent\\Collection\<\(int\|string\), Illuminate\\Database\\Eloquent\\Model\> given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Services/AI/GraphWorkflowEngineService.php
-
-		-
 			message: '#^Offset ''pii'' on non\-empty\-array\<string, array\> on left side of \?\? always exists and is not nullable\.$#'
 			identifier: nullCoalesce.offset
 			count: 1
 			path: app/Services/AI/OutputModerationService.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$content\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Services/AI/PromptBuilderService.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$role\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Services/AI/PromptBuilderService.php
-
-		-
-			message: '#^Parameter \#1 \$callback of method Illuminate\\Database\\Eloquent\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:map\(\) contains unresolvable type\.$#'
-			identifier: argument.unresolvableType
-			count: 1
-			path: app/Services/AI/PromptBuilderService.php
-
-		-
-			message: '#^Parameter \#1 \$workflow of method App\\Services\\AI\\WorkflowEngineService\:\:runSteps\(\) expects App\\Models\\AgentWorkflow, Illuminate\\Database\\Eloquent\\Model given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Services/AI/WorkflowEngineService.php
-
-		-
-			message: '#^Property App\\Services\\AI\\WorkflowEngineService\:\:\$orchestrator is never read, only written\.$#'
-			identifier: property.onlyWritten
-			count: 1
-			path: app/Services/AI/WorkflowEngineService.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$uuid\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Services/AI/WorkflowRiskScoringService.php
-
-		-
-			message: '#^Parameter \#1 \$callback of method Illuminate\\Support\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:filter\(\) expects \(callable\(Illuminate\\Database\\Eloquent\\Model, int\)\: bool\)\|null, Closure\(App\\Models\\WorkflowNode\)\: bool given\.$#'
-			identifier: argument.type
-			count: 2
-			path: app/Services/AI/WorkflowRiskScoringService.php
 
 		-
 			message: '#^Parameter \#1 \$array \(list\<array\{level\: string, title\: string, fix\: string\}\>\) to function array_filter does not contain falsy values, the array will always stay the same\.$#'

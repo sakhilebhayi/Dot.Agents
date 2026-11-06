@@ -60,11 +60,13 @@ class AgentWorkflow extends Model
     // Graph relationships
     // ──────────────────────────────────────────────
 
+    /** @return HasMany<WorkflowNode, $this> */
     public function nodes(): HasMany
     {
         return $this->hasMany(WorkflowNode::class, 'workflow_id');
     }
 
+    /** @return HasMany<WorkflowConnection, $this> */
     public function connections(): HasMany
     {
         return $this->hasMany(WorkflowConnection::class, 'workflow_id');

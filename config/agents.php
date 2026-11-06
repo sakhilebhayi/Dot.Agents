@@ -49,5 +49,6 @@ return [
         BuiltIn\NotifyMember::class,
         BuiltIn\KnowledgeSearch::class,
         BuiltIn\RememberFact::class,
+        BuiltIn\DelegateTask::class,
     ],
 ];
