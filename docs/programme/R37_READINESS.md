@@ -2,6 +2,10 @@
 
 Brief: `requirements/dot-agents-transformation.md`. Audit and plan: `R37_AUDIT.md`. Research: `R37_RESEARCH.md`.
 
+## State at delivery
+
+Deployed 2026-11-06 as `022531a`, run 42285188111. All 18 migrations ran and `/ready` reports ok. That run ended red at its smoke check, which still expected `/login` to answer 200. With `ECOSYSTEM_SSO_ONLY` on the host it now sends people to InfoDot with a 302, so the check was out of date and has been corrected. The step after it, the probe of the application folder, was skipped, so those paths were probed by hand instead.
+
 ## The honest summary
 
 Dot.Agents now does work. An agent runs in steps on a journal, uses only tools it was given, stops for a person when it should, and leaves a record of all of it.
@@ -172,7 +176,7 @@ The three busiest pages are tested so that their query count does not grow with 
 
 1. Set `AI_PROVIDER` and a provider key on the host, with a monthly budget, and watch one real run.
 2. Load real model prices with `agents:set-price`, with a source. Until then costs show as unknown.
-3. Add the new cron line by deploying, and confirm the deploy log shows three lines.
+3. Done at deploy: the three cron commands are in `~/.dot-cron.d/agents.cron` for the shared runner.
 4. Get a copy of the backups off the host, then run a restore on a copy and time it.
 5. Mail settings on the host, so invitations and approval notices arrive.
 6. `FILES_PLATFORM_SECRET`, Dot.Memory settings and `GUARDIAN_TOKEN` when integration secrets are done.
