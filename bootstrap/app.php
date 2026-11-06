@@ -23,6 +23,8 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
+    // Listeners are registered by hand in the event providers. Discovery on top ran each of them twice.
+    ->withEvents(discover: false)
     ->withMiddleware(function (Middleware $middleware): void {
         // Correlation ID on every request — must be first for log context
         $middleware->prepend(CorrelationIdMiddleware::class);

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Scopes\SharedOrOwnScope;
 use App\Support\TaggableCache;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -32,6 +33,7 @@ class Agent extends Model
         'certification_score', 'trust_score', 'trust_tier', 'certified_at',
         'performance_score', 'competencies', 'cost_tier',
         'maturity_level', 'dwca_certified_at', 'dwca_certification_level',
+        'organization_id', 'created_by', 'template',
     ];
 
     protected $casts = [
@@ -67,11 +69,13 @@ class Agent extends Model
         'is_beta' => 'boolean',
         'competencies' => 'array',
         'dwca_certified_at' => 'datetime',
+        'template' => 'array',
     ];
 
     protected static function boot(): void
     {
         parent::boot();
+        static::addGlobalScope(new SharedOrOwnScope);
         static::creating(function (self $agent) {
             if (empty($agent->uuid)) {
                 $agent->uuid = (string) Str::uuid();
