@@ -163,4 +163,5 @@
     </div>
 
     <livewire:workflows.workflow-executions :workflow-id="$workflow->id" />
+    <div class="flow-runs"><livewire:agents.agent-triggers target-type="workflow" :target-id="$workflow->id" /></div>
 </div>

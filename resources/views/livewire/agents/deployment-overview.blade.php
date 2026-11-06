@@ -59,6 +59,7 @@
                 </section>
             @endif
 
+            <livewire:agents.agent-triggers target-type="agent" :target-id="$agent->id" />
             <livewire:agents.agent-versions :deployment-id="$agent->id" />
         </div>
 

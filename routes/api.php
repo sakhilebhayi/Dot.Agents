@@ -4,14 +4,20 @@ use App\Http\Controllers\Api\HealthController;
 use App\Http\Controllers\Api\V1\AgentController;
 use App\Http\Controllers\Api\V1\DeploymentController;
 use App\Http\Controllers\Api\V1\DeploymentSkillController;
+use App\Http\Controllers\Api\V1\RunController;
 use App\Http\Controllers\Api\V1\SkillApprovalController;
 use App\Http\Controllers\Api\V1\SkillCatalogController;
 use App\Http\Controllers\Api\V1\SkillExecutionController;
+use App\Http\Controllers\Api\V1\WorkflowRunController;
+use App\Http\Controllers\TriggerWebhookController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 // Public health probe — no authentication, used by load balancers and CI/CD pipelines
 Route::get('/health', HealthController::class)->name('api.health');
+
+// Where other systems start work. Authenticated by a signature, not a session.
+Route::post('/hooks/{uuid}', TriggerWebhookController::class)->middleware('throttle:60,1')->name('api.hooks');
 
 // All API routes are versioned under /v1 with auth:sanctum + org.context; `writable` refuses
 // every non-GET request from a read-only (viewer) role, whatever abilities its token carries
@@ -24,6 +30,13 @@ Route::prefix('v1')->name('api.v1.')->middleware(['auth:sanctum', 'org.context',
             'current_team_id', 'created_at',
         ])
     ))->name('me');
+
+    // Starting and following work
+    Route::post('/deployments/{deployment}/runs', [RunController::class, 'store'])->middleware('throttle:ai-execution')->name('runs.store');
+    Route::get('/runs/{run}', [RunController::class, 'show'])->name('runs.show');
+    Route::post('/runs/{run}/cancel', [RunController::class, 'cancel'])->name('runs.cancel');
+    Route::post('/workflows/{workflow}/runs', [WorkflowRunController::class, 'store'])->middleware('throttle:ai-execution')->name('workflows.runs.store');
+    Route::get('/workflow-runs/{uuid}', [WorkflowRunController::class, 'show'])->name('workflows.runs.show');
 
     // Agent marketplace catalog (read-only) — rate limited to prevent bulk enumeration
     Route::prefix('agents')->name('agents.')->middleware('throttle:120,1')->group(function () {

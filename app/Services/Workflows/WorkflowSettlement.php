@@ -5,6 +5,7 @@ namespace App\Services\Workflows;
 use App\Models\AgentRun;
 use App\Models\WorkflowExecution;
 use App\Models\WorkflowStep;
+use App\Services\Triggers\BusinessEvents;
 use Illuminate\Support\Collection;
 
 /**
@@ -13,6 +14,8 @@ use Illuminate\Support\Collection;
  */
 class WorkflowSettlement
 {
+    public function __construct(private readonly BusinessEvents $events) {}
+
     /**
      * Brings a step up to date with its run.
      *
@@ -101,6 +104,8 @@ class WorkflowSettlement
             'output_data' => ['results' => $ends->where('status', WorkflowStep::COMPLETED)->map(fn (WorkflowStep $step) => ['step' => $step->label, 'result' => $step->output])->values()->all()],
             'completed_at' => now(),
         ]);
+
+        $this->events->raise($execution->organization_id, 'workflow.finished', $execution->uuid, "{$execution->workflow?->name} ended as {$status}.");
     }
 
     /** @param  array<string, mixed>  $node */

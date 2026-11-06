@@ -12,6 +12,7 @@ use App\Models\AgentRunStep;
 use App\Models\AgentTask;
 use App\Services\AI\OutputModerationService;
 use App\Services\Governance\AuditService;
+use App\Services\Triggers\BusinessEvents;
 use Illuminate\Support\Str;
 
 /** The last step of every run: what the person sees, what is kept, and the truth about how it ended. */
@@ -24,6 +25,7 @@ class RunFinisher
         private readonly AuditService $audit,
         private readonly OutputChannels $channels,
         private readonly DelegationReturn $delegation,
+        private readonly BusinessEvents $events,
     ) {}
 
     public function complete(AgentRun $run, string $text, bool $cutOff = false): void
@@ -94,6 +96,8 @@ class RunFinisher
         if ($run->workflow_execution_id !== null) {
             AdvanceWorkflow::dispatch($run->workflow_execution_id, $run->organization_id);
         }
+
+        $this->events->runEnded($run);
     }
 
     /**
