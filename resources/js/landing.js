@@ -71,3 +71,14 @@ if (demo) {
 
     seen.observe(demo);
 }
+
+/* The page is one run. Each section lights up as the run reaches it. Without script the line stays drawn and grey. */
+const stops = document.querySelectorAll('[data-reach]');
+const reached = new IntersectionObserver((entries) => entries.forEach((entry) => {
+    if (entry.isIntersecting) {
+        entry.target.classList.add('reached');
+        reached.unobserve(entry.target);
+    }
+}), { rootMargin: '0px 0px -35% 0px' });
+
+stops.forEach((stop) => reached.observe(stop));

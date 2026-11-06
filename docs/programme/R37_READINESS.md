@@ -34,6 +34,8 @@ Design: impeccable (polish, audit and the detector on every new stylesheet), des
 
 The Signal Box, recorded in `DESIGN.md`: a signal box at night, a run as a line with stops, gold for what is held. Every signed-in page uses it apart from the social pack, which stays in its older look and off the main navigation.
 
+The public page was scored by a separate critic reading screenshots alone, who gave it 6.7 and said it repeated one section shape. It was reworked from that list: the signal line now runs the length of the page, with a real agent card, a drawn workflow and a dial showing the same invoice at each autonomy level. It has not been rescored. There is no proof from a real business on it, because none exists yet.
+
 Rebuilt: command centre, runs, run detail, agents, agent setup, creation, versions, test bench, triggers, chat, scorecard, approvals, approval rules, workflows, builder, teams, knowledge, memory, decisions, audit log, retention, security, people, departments, business settings, API keys, custom tools, usage, billing, plans, your account, sign-in and its neighbours, terms, policy, consent, error pages and the public landing page.
 
 Checks on the signed-in pages: axe (WCAG 2 A and AA) found no violations in the final check of 14 pages at 1280 wide and 13 at 375 wide, after fixing what it found along the way. No page scrolls sideways at either width. That is in the dark theme. The light theme was checked on a sample of pages, not all of them.
