@@ -30,9 +30,13 @@
                 <span class="roster-actions">
                     @if($dep->status === 'active')
                         <a class="btn quiet small" href="{{ route('agents.chat', $dep) }}">Talk</a>
-                        <button type="button" class="btn quiet small" wire:click="pauseDeployment({{ $dep->id }})" wire:confirm="Pause {{ $dep->name }}? Work under way stops at its next step.">Pause</button>
+                        @can('update', $dep)
+                            <button type="button" class="btn quiet small" wire:click="pauseDeployment({{ $dep->id }})" wire:confirm="Pause {{ $dep->name }}? Work under way stops at its next step.">Pause</button>
+                        @endcan
                     @elseif($dep->status === 'paused')
-                        <button type="button" class="btn quiet small" wire:click="resumeDeployment({{ $dep->id }})">Resume</button>
+                        @can('update', $dep)
+                            <button type="button" class="btn quiet small" wire:click="resumeDeployment({{ $dep->id }})">Resume</button>
+                        @endcan
                     @elseif($dep->status === 'draft')
                         <a class="btn quiet small" href="{{ route('agents.setup', $dep) }}">Set up</a>
                     @endif

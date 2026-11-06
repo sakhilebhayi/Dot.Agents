@@ -17,6 +17,7 @@ use Livewire\Attributes\Computed;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
 
+/** @property-read AgentDeployment $agent */
 class AgentSetup extends Component
 {
     public const READ_ONLY_ACTIONS = [];

@@ -296,13 +296,13 @@ class AgentCreationTest extends TestCase
         $version = $agent->versions()->create(['organization_id' => $agent->organization_id, 'number' => 2, 'state' => 'draft', 'config' => AgentConfig::normalise(['instructions' => 'Check each line of the invoice, then list what does not match.'])]);
         $review = fn (AgentConfigVersion $v) => app(AgentConfigReview::class)->review($agent, $v->settings(), $v)['verdict'];
 
-        $this->testRun($agent, $agent->publishedVersion, AgentRun::COMPLETED);
+        $this->recordRun($agent, $agent->publishedVersion, AgentRun::COMPLETED);
         $this->assertSame('untested', $review($version));
 
-        $this->testRun($agent, $version, AgentRun::FAILED);
+        $this->recordRun($agent, $version, AgentRun::FAILED);
         $this->assertSame('untested', $review($version));
 
-        $this->testRun($agent, $version, AgentRun::COMPLETED);
+        $this->recordRun($agent, $version, AgentRun::COMPLETED);
         $this->assertSame('ready', $review($version));
     }
 
@@ -356,7 +356,7 @@ class AgentCreationTest extends TestCase
         return $base;
     }
 
-    private function test_run(AgentDeployment $agent, AgentConfigVersion $version, string $status): void
+    private function recordRun(AgentDeployment $agent, AgentConfigVersion $version, string $status): void
     {
         AgentRun::create(['organization_id' => $agent->organization_id, 'agent_deployment_id' => $agent->id, 'config_version_id' => $version->id, 'trigger_type' => 'test', 'status' => $status, 'input' => 'x', 'limits' => [], 'is_test' => true]);
     }
