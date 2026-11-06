@@ -13,11 +13,22 @@ class AgentMemory extends Model
 {
     use HasFactory, HasOrganizationScope, SoftDeletes;
 
+    public const SCOPE_PERSON = 'person';
+
+    public const SCOPE_AGENT = 'agent';
+
+    public const SCOPE_BUSINESS = 'business';
+
+    public const ACTIVE = 'active';
+
+    /** Waiting for a person. Nothing proposed reaches a model. */
+    public const PROPOSED = 'proposed';
+
     protected $fillable = [
         'uuid', 'agent_deployment_id', 'organization_id', 'user_id',
         'memory_type', 'memory_category', 'subject', 'content', 'context',
         'tags', 'importance_score', 'confidence_score', 'access_count',
-        'last_accessed_at', 'expires_at', 'is_verified',
+        'last_accessed_at', 'expires_at', 'is_verified', 'scope', 'status', 'agent_run_id', 'source',
     ];
 
     protected $casts = [

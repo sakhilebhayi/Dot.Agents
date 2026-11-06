@@ -3,6 +3,7 @@
 namespace App\Actions\Organizations;
 
 use App\Events\KnowledgeArticleSaved;
+use App\Jobs\IndexKnowledgeArticle;
 use App\Models\KnowledgeArticle;
 use App\Models\Organization;
 use App\Services\Governance\AuditService;
@@ -28,6 +29,8 @@ class SaveKnowledgeArticleAction
             'summary' => $data['summary'] ?? null,
             'category' => $data['category'] ?? null,
             'is_published' => true,
+            'source_type' => 'manual',
+            'index_status' => 'pending',
         ];
 
         if ($existingId) {
@@ -46,6 +49,8 @@ class SaveKnowledgeArticleAction
         );
 
         event(new KnowledgeArticleSaved($article, ! $existingId));
+
+        IndexKnowledgeArticle::dispatch($article);
 
         return $article;
     }

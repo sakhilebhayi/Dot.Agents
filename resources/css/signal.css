@@ -254,6 +254,7 @@ a.row:hover, button.row:hover { background: var(--raised); }
 .history time { font-size: 12px; line-height: 20px; }
 .rule-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; align-items: end; }
 .rule-form .field { margin: 0; }
+.rule-form .btn { grid-column: 1 / -1; justify-self: start; }
 
 @media (max-width: 900px) {
     .desk { grid-template-columns: minmax(0, 1fr); }
@@ -263,3 +264,12 @@ a.row:hover, button.row:hover { background: var(--raised); }
     .history li { grid-template-columns: minmax(0, 1fr); gap: 0; }
     .pairs > div { grid-template-columns: minmax(0, 1fr); gap: 2px; }
 }
+
+/* Memory */
+.memory { padding: 12px 16px; border-top: 1px solid var(--rule); }
+.memory:first-child { border-top: 0; }
+.memory-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.memory-head b { font-weight: 500; }
+.memory-text { margin-top: 4px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.memory-source { margin-top: 4px; font-size: 12px; line-height: 16px; }
+.memory-actions { margin-top: 8px; }

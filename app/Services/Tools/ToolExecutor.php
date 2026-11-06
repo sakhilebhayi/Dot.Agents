@@ -46,15 +46,16 @@ class ToolExecutor
             return;
         }
 
-        $this->succeeded($run, $effect, $definition, $output->content);
+        $this->succeeded($run, $effect, $definition, $output);
     }
 
-    private function succeeded(AgentRun $run, AgentEffect $effect, ToolDefinition $tool, string $content): void
+    private function succeeded(AgentRun $run, AgentEffect $effect, ToolDefinition $tool, ToolOutput $output): void
     {
-        $content = Str::limit($this->moderation->redactSecrets($content), self::MAX_RESULT, ' [cut short]');
+        $content = Str::limit($this->moderation->redactSecrets($output->content), self::MAX_RESULT, ' [cut short]');
+        $untrusted = $tool->untrustedOutput || $output->untrusted;
 
         // The run is marked before the model can see what came back.
-        if ($tool->untrustedOutput) {
+        if ($untrusted) {
             RunTaint::add($run, RunTaint::UNTRUSTED);
         }
 
@@ -64,9 +65,9 @@ class ToolExecutor
 
         $effect->update(['status' => AgentEffect::DONE, 'result' => ['content' => $content]]);
 
-        $signal = $tool->untrustedOutput && $this->audit->detectPromptInjection($content, $run->deployment);
+        $signal = $untrusted && $this->audit->detectPromptInjection($content, $run->deployment);
 
-        $this->journal->result($run, $effect, $tool->label, $this->asData($tool->key, $content), ['signal' => $signal, 'version' => $tool->version]);
+        $this->journal->result($run, $effect, $tool->label, $this->asData($tool->key, $content), ['signal' => $signal, 'version' => $tool->version, 'sources' => $output->sources]);
         $this->audit->logAgentAction($run->deployment, 'tool_used', ['run' => $run->uuid, 'tool' => $tool->key, 'version' => $tool->version, 'effect' => $effect->id]);
     }
 

@@ -6,17 +6,19 @@ use App\Actions\Organizations\DeleteKnowledgeArticleAction;
 use App\Actions\Organizations\SaveKnowledgeArticleAction;
 use App\Actions\Organizations\SaveKnowledgeBaseAction;
 use App\DTOs\Organizations\DeleteKnowledgeArticleData;
+use App\Jobs\IndexKnowledgeArticle;
 use App\Models\KnowledgeArticle;
 use App\Models\KnowledgeBase;
 use App\Models\Organization;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\On;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 
 class KnowledgeManager extends Component
 {
     /** Actions a read-only (viewer) role may still call; every other action is refused for it. */
-    public const READ_ONLY_ACTIONS = ['selectBase'];
+    public const READ_ONLY_ACTIONS = ['selectBase', 'refreshArticles'];
 
     public ?int $activeBaseId = null;
 
@@ -163,6 +165,22 @@ class KnowledgeManager extends Component
         app(DeleteKnowledgeArticleAction::class)->execute($this->organization, DeleteKnowledgeArticleData::fromId($id));
         unset($this->articles);
         session()->flash('kb_success', 'Article deleted.');
+    }
+
+    #[On('knowledge-changed')]
+    public function refreshArticles(): void
+    {
+        unset($this->articles, $this->knowledgeBases);
+    }
+
+    public function reindex(int $id): void
+    {
+        $article = KnowledgeArticle::where('organization_id', $this->organization->id)->findOrFail($id);
+
+        abort_unless(auth()->user()->canInOrganization('knowledge.manage', $article->organization_id), 403);
+
+        IndexKnowledgeArticle::dispatch($article);
+        unset($this->articles);
     }
 
     private function resetArticleForm(): void

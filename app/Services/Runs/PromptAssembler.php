@@ -2,6 +2,7 @@
 
 namespace App\Services\Runs;
 
+use App\Models\AgentMemory;
 use App\Models\AgentMessage;
 use App\Models\AgentRun;
 use App\Models\AgentRunStep;
@@ -14,6 +15,8 @@ use App\Services\Agents\AgentConfig;
  */
 class PromptAssembler
 {
+    public function __construct(private readonly MemoryRecall $memories, private readonly Journal $journal) {}
+
     private const HISTORY = 20;
 
     private const RULES = <<<'TEXT'
@@ -45,7 +48,7 @@ class PromptAssembler
     /** @return list<array<string, mixed>> */
     public function messages(AgentRun $run): array
     {
-        $messages = [...$this->history($run), ['role' => 'user', 'text' => (string) $run->input]];
+        $messages = [...$this->memory($run), ...$this->history($run), ['role' => 'user', 'text' => (string) $run->input]];
 
         foreach (AgentRunStep::where('agent_run_id', $run->id)->orderBy('sequence')->get() as $step) {
             $message = $step->payload['message'] ?? null;
@@ -66,6 +69,29 @@ class PromptAssembler
         }
 
         return $messages;
+    }
+
+    /** @return list<array<string, mixed>> Recalled once a run, so every turn sees the same thing. */
+    private function memory(AgentRun $run): array
+    {
+        $recalled = AgentRunStep::where('agent_run_id', $run->id)->where('kind', AgentRunStep::SYSTEM)->where('title', 'Recalled what it knows')->first()?->payload['text']
+            ?? $this->recall($run);
+
+        return $recalled === null ? [] : [['role' => 'user', 'text' => "Things remembered from earlier work. Check them before relying on them.\n<data source=\"memory\">\n{$recalled}\n</data>"]];
+    }
+
+    private function recall(AgentRun $run): ?string
+    {
+        $recalled = $this->memories->for($run);
+
+        if ($recalled === null) {
+            return null;
+        }
+
+        $this->journal->write($run, AgentRunStep::SYSTEM, 'Recalled what it knows', ['payload' => $recalled]);
+        AgentMemory::whereIn('id', $recalled['ids'])->increment('access_count');
+
+        return $recalled['text'];
     }
 
     private function outputRule(string $format): string

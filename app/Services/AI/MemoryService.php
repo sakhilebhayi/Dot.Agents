@@ -2,38 +2,23 @@
 
 namespace App\Services\AI;
 
-use App\Jobs\EmbedAgentMemoryJob;
 use App\Models\AgentDeployment;
 use App\Models\AgentMemory;
-use Illuminate\Support\Facades\App;
 
 class MemoryService
 {
-    /**
-     * Retrieve memories relevant to the current input.
-     *
-     * Delegates to VectorMemoryService (Level 5 — semantic cosine-similarity search)
-     * which falls back to keyword scoring when embeddings are unavailable.
-     *
-     * Late-resolved to avoid circular service provider bootstrap issues.
-     */
+    /** Memories an old workflow step may read: accepted, and never one that belongs to a person. */
     public function getRelevantMemories(AgentDeployment $deployment, string $input, int $limit = 5): array
     {
-        /** @var VectorMemoryService $vectorService */
-        $vectorService = App::make(VectorMemoryService::class);
-
-        return $vectorService->getRelevantMemories($deployment, $input, $limit);
+        return $this->keywordSearch($deployment, $input, $limit);
     }
 
-    /**
-     * Keyword-based fallback search (used by VectorMemoryService when OpenAI is unavailable).
-     *
-     * @internal Called only from VectorMemoryService::getRelevantMemories() as fallback.
-     */
     public function keywordSearch(AgentDeployment $deployment, string $input, int $limit = 5): array
     {
         $memories = AgentMemory::where('agent_deployment_id', $deployment->id)
             ->active()
+            ->where('status', AgentMemory::ACTIVE)
+            ->where('scope', '!=', AgentMemory::SCOPE_PERSON)
             ->orderByDesc('importance_score')
             ->take($limit * 3)
             ->get();
@@ -126,9 +111,6 @@ class MemoryService
             'agent_deployment_id' => $deployment->id,
             'organization_id' => $deployment->organization_id,
         ], $data));
-
-        // Queue embedding generation asynchronously (non-blocking)
-        EmbedAgentMemoryJob::dispatch($memory)->onQueue('agent-tasks');
 
         return $memory;
     }

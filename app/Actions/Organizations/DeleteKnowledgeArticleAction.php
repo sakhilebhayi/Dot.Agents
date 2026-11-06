@@ -10,6 +10,7 @@ use App\Models\KnowledgeArticle;
 use App\Models\Organization;
 use App\Services\Governance\AuditService;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 
 class DeleteKnowledgeArticleAction
 {
@@ -23,6 +24,12 @@ class DeleteKnowledgeArticleAction
             ->findOrFail($data->articleId);
 
         $title = $article->title;
+        $article->chunks()->delete();
+
+        if ($article->file_path !== null) {
+            Storage::disk('local')->delete($article->file_path);
+        }
+
         $article->delete();
 
         $this->auditService->logUserAction(

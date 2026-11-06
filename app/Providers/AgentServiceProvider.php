@@ -19,7 +19,6 @@ use App\Services\AI\ResponseProcessorService;
 use App\Services\AI\SkillExecutionPipeline;
 use App\Services\AI\SkillRegistryService;
 use App\Services\AI\ToolPermissionService;
-use App\Services\AI\VectorMemoryService;
 use App\Services\AI\Workflow\WorkflowGraphResolver;
 use App\Services\AI\WorkflowRiskScoringService;
 use App\Services\Governance\AgentCharterLoader;
@@ -75,12 +74,6 @@ class AgentServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton(AgentPluginService::class);
-
-        $this->app->singleton(VectorMemoryService::class, function ($app) {
-            return new VectorMemoryService(
-                $app->make(MemoryService::class),
-            );
-        });
 
         $this->app->singleton(EnterpriseConstitutionService::class);
         $this->app->singleton(ExecutiveCouncilService::class);
