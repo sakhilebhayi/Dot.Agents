@@ -42,7 +42,7 @@ class LogDeploymentAudit implements ShouldQueue
             message: "A new agent has been deployed in {$deployment->deployment_mode} mode.",
             severity: 'info',
             data: ['deployment_id' => $deployment->id],
-            actionUrl: "/agents/{$deployment->id}"
+            actionUrl: "/my-agents/{$deployment->id}"
         );
     }
 

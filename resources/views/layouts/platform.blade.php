@@ -30,7 +30,7 @@
 @php
     $viewer = auth()->user();
     $organization = $viewer?->organizations()->where('organizations.id', \App\Support\TenantContext::id())->first();
-    $waiting = \App\Models\AgentApproval::query()->where('status', 'pending')->count();
+    $waiting = $organization ? \App\Models\AgentApproval::query()->where('status', 'pending')->count() : 0;
     $nav = [
         'Today' => [
             ['dashboard', 'dashboard', 'panel', 'Command centre'],
@@ -46,6 +46,7 @@
         'Build' => [
             ['workflows.index', 'workflows.*', 'workflow', 'Workflows'],
             ['org.knowledge', 'org.knowledge*', 'knowledge', 'Knowledge'],
+            ['org.skills', 'org.skills*', 'tool', 'Custom tools'],
         ],
         'Oversight' => [
             ['org.memory', 'org.memory*', 'memory', 'Memory'],
@@ -57,6 +58,7 @@
             ['org.members', 'org.members*', 'people', 'People'],
             ['usage', 'usage', 'usage', 'Usage'],
             ['billing.index', 'billing.*', 'billing', 'Billing'],
+            ['org.settings', 'org.settings*', 'settings', 'Settings'],
         ],
     ];
 @endphp

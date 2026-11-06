@@ -1,70 +1,24 @@
-<x-guest-layout>
-    <div>
-        <h1 class="text-2xl font-bold text-[#111111] font-display mb-1">Create your account</h1>
-        <p class="text-sm text-[#909088] mb-8">Set up your organization's workforce platform</p>
+<x-guest-layout title="Create an account">
+    <h1>Create an account</h1>
 
-        <x-validation-errors class="mb-5 da-alert da-alert-critical" />
+    <x-auth.problems />
 
-        <form method="POST" action="{{ route('register') }}" class="space-y-5">
-            @csrf
+    <form method="POST" action="{{ route('register') }}">
+        @csrf
+        <x-auth.field name="name" label="Full name" :value="old('name')" required autofocus autocomplete="name" />
+        <x-auth.field name="email" label="Work email" type="email" :value="old('email')" required autocomplete="username" />
+        <x-auth.field name="password" label="Password" type="password" required autocomplete="new-password" />
+        <x-auth.field name="password_confirmation" label="Confirm password" type="password" required autocomplete="new-password" />
 
-            <div>
-                <x-label for="name" value="Full Name" />
-                <x-input id="name" type="text" name="name"
-                         :value="old('name')"
-                         required autofocus autocomplete="name"
-                         placeholder="Jane Smith" />
-            </div>
+        @if (Laravel\Jetstream\Jetstream::hasTermsAndPrivacyPolicyFeature())
+            <label class="check">
+                <input name="terms" type="checkbox" required>
+                <span>I agree to the <a href="{{ route('terms.show') }}" target="_blank">terms of service</a> and <a href="{{ route('policy.show') }}" target="_blank">privacy policy</a></span>
+            </label>
+        @endif
 
-            <div>
-                <x-label for="email" value="Work Email" />
-                <x-input id="email" type="email" name="email"
-                         :value="old('email')"
-                         required autocomplete="username"
-                         placeholder="you@company.com" />
-            </div>
+        <button type="submit" class="button solid">Create account</button>
+    </form>
 
-            <div>
-                <x-label for="password" value="Password" />
-                <x-input id="password" type="password" name="password"
-                         required autocomplete="new-password"
-                         placeholder="Min. 8 characters" />
-            </div>
-
-            <div>
-                <x-label for="password_confirmation" value="Confirm Password" />
-                <x-input id="password_confirmation" type="password" name="password_confirmation"
-                         required autocomplete="new-password"
-                         placeholder="Repeat password" />
-            </div>
-
-            @if (Laravel\Jetstream\Jetstream::hasTermsAndPrivacyPolicyFeature())
-                <div class="flex items-start gap-2.5">
-                    <input id="terms" name="terms" type="checkbox"
-                           class="mt-0.5 w-4 h-4 rounded border-[#d0d0c8] text-brand-purple
-                                  focus:ring-brand-purple/20 focus:ring-2 cursor-pointer"
-                           required>
-                    <label for="terms" class="text-sm text-[#555550] cursor-pointer leading-snug">
-                        I agree to the
-                        <a href="{{ route('terms.show') }}" target="_blank"
-                           class="text-brand-purple hover:text-brand-purple-mid transition-colors">Terms of Service</a>
-                        and
-                        <a href="{{ route('policy.show') }}" target="_blank"
-                           class="text-brand-purple hover:text-brand-purple-mid transition-colors">Privacy Policy</a>
-                    </label>
-                </div>
-            @endif
-
-            <button type="submit" class="da-btn-primary w-full py-2.5 text-sm font-semibold">
-                Create Account
-            </button>
-        </form>
-
-        <p class="mt-6 text-center text-sm text-[#909088]">
-            Already have an account?
-            <a href="{{ route('login') }}" class="text-brand-purple font-medium hover:text-brand-purple-mid transition-colors">
-                Sign in
-            </a>
-        </p>
-    </div>
+    <p class="auth-more">Already have an account? <a href="{{ route('login') }}">Sign in</a></p>
 </x-guest-layout>

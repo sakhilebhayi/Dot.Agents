@@ -5,6 +5,7 @@ namespace App\Services\Approvals;
 use App\DTOs\Governance\ProcessApprovalData;
 use App\Events\ApprovalProcessed;
 use App\Models\AgentApproval;
+use App\Models\DecisionLog;
 use App\Models\User;
 use App\Services\Governance\AuditService;
 use App\Services\Tools\ToolArguments;
@@ -43,6 +44,8 @@ class ApprovalDecision
         $this->desk->record($approval, $actor, $edited === null ? $data->decision : 'approved_with_changes', $data->reviewerNotes);
         $this->audit->logUserAction(event: "approval.{$data->decision}", description: "Approval {$approval->uuid}: {$data->decision}", subject: $approval, metadata: ['notes' => $data->reviewerNotes, 'edited' => $edited !== null]);
 
+        $this->log($approval, $actor, $data);
+
         match ($data->decision) {
             'approved' => $this->resume->approved($approval, $edited),
             'rejected' => $this->resume->declined($approval, 'rejected', 'A person said no'.$this->because($data->reviewerNotes)),
@@ -52,6 +55,22 @@ class ApprovalDecision
         ApprovalProcessed::dispatch($approval->refresh());
 
         return $approval;
+    }
+
+    /** The decision log holds what people decided about agent work, in plain words. */
+    private function log(AgentApproval $approval, User $actor, ProcessApprovalData $data): void
+    {
+        DecisionLog::create([
+            'organization_id' => $approval->organization_id,
+            'agent_deployment_id' => $approval->agent_deployment_id,
+            'decision_type' => 'approval',
+            'title' => $approval->title,
+            'decision_summary' => ucfirst(str_replace('_', ' ', $data->decision)),
+            'reasoning' => (string) $data->reviewerNotes,
+            'human_reviewed' => true,
+            'reviewed_by' => $actor->id,
+            'reviewed_at' => now(),
+        ]);
     }
 
     /**

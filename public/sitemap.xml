@@ -11,18 +11,6 @@
     </url>
 
     <url>
-        <loc>https://agents.infodot.co.za/login</loc>
-        <changefreq>monthly</changefreq>
-        <priority>0.5</priority>
-    </url>
-
-    <url>
-        <loc>https://agents.infodot.co.za/register</loc>
-        <changefreq>monthly</changefreq>
-        <priority>0.7</priority>
-    </url>
-
-    <url>
         <loc>https://agents.infodot.co.za/terms</loc>
         <changefreq>yearly</changefreq>
         <priority>0.3</priority>

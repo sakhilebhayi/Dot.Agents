@@ -4,6 +4,8 @@ Brief: `requirements/dot-agents-transformation.md`. Research: `R37_RESEARCH.md`.
 
 Method: code read end to end, 1,276 existing tests run, scratch probes against the engine, and the seeded app used in a browser at desktop and phone width. No model has been called, because no key is available. `feature-completion-ledger.md` is history: several of its "working" rows only meant the page renders.
 
+**This is the state found on 2026-11-06, before the rebuild. The state at delivery is in `R37_READINESS.md`.**
+
 ## The short version
 
 Dot.Agents has a large, well-tested surface and almost nothing at its centre. It can hold a conversation with a model. It cannot do work.

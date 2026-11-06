@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\Api\HealthController;
 use App\Http\Controllers\Api\V1\AgentController;
 use App\Http\Controllers\Api\V1\DeploymentController;
 use App\Http\Controllers\Api\V1\DeploymentSkillController;
@@ -12,9 +11,6 @@ use App\Http\Controllers\Api\V1\WorkflowRunController;
 use App\Http\Controllers\TriggerWebhookController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
-// Public health probe — no authentication, used by load balancers and CI/CD pipelines
-Route::get('/health', HealthController::class)->name('api.health');
 
 // Where other systems start work. Authenticated by a signature, not a session.
 Route::post('/hooks/{uuid}', TriggerWebhookController::class)->middleware('throttle:60,1')->name('api.hooks');

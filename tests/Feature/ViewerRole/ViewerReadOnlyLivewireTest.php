@@ -23,6 +23,7 @@ use App\Livewire\Social\SocialInbox;
 use App\Livewire\Social\SocialPostManager;
 use App\Livewire\Workflows\WorkflowBuilder;
 use App\Livewire\Workflows\WorkflowList;
+use App\Mail\PersonInvitationEmail;
 use App\Models\AgentApproval;
 use App\Models\AgentDeployment;
 use App\Models\AgentSkill;
@@ -36,6 +37,7 @@ use App\Models\SocialConversation;
 use App\Models\SocialLead;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
 use Livewire\Livewire;
 use Spatie\Permission\Models\Role;
@@ -189,8 +191,9 @@ class ViewerReadOnlyLivewireTest extends TestCase
         $this->assertFalse($this->organization->users()->where('users.id', $newcomer->id)->exists());
         $this->assertSame('owner', $this->organization->users()->where('users.id', $this->editor->id)->first()->pivot->role);
 
-        $this->as($this->editor, OrgMemberManager::class)->set('inviteEmail', $newcomer->email)->call('invite');
-        $this->assertTrue($this->organization->users()->where('users.id', $newcomer->id)->exists());
+        Mail::fake();
+        $this->as($this->editor, OrgMemberManager::class)->set('inviteEmail', $newcomer->email)->call('invite')->assertHasNoErrors();
+        Mail::assertSent(PersonInvitationEmail::class);
     }
 
     public function test_departments(): void

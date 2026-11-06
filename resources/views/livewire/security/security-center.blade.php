@@ -1,216 +1,142 @@
-<div class="space-y-6">
-    {{-- Flash message --}}
-    @if(session('status'))
-        <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-xl p-4 text-green-800 dark:text-green-300 text-sm font-medium">
-            {{ session('status') }}
-        </div>
-    @endif
-
-    {{-- Emergency Kill Switches --}}
-    <div class="bg-red-950 border border-red-700/40 rounded-2xl p-6 text-white">
-        <div class="flex items-center gap-3 mb-4">
-            <div class="w-9 h-9 rounded-xl bg-red-700/50 flex items-center justify-center">
-                <svg class="w-5 h-5 text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
-            </div>
-            <div>
-                <h2 class="font-bold text-base text-red-200">Emergency Kill Switches</h2>
-                <p class="text-red-400 text-xs">Use only in active incidents. All actions are permanently logged.</p>
-            </div>
-        </div>
-        <div class="flex flex-col sm:flex-row gap-4">
-            {{-- Halt all workflows --}}
-            <div class="flex-1 bg-red-900/40 rounded-xl p-4 border border-red-700/30">
-                <p class="text-xs text-red-300 mb-3 font-medium uppercase tracking-wide">Halt All Workflows</p>
-                <input aria-label="Type: HALT WORKFLOWS" wire:model="killSwitchConfirmation"
-                    type="text" placeholder="Type: HALT WORKFLOWS"
-                    class="w-full bg-red-950 border border-red-600 text-white text-sm rounded-lg px-3 py-2 mb-3 placeholder-red-600 focus:outline-none focus:ring-2 focus:ring-red-500">
-                @error('killSwitchConfirmation')<p class="text-red-400 text-xs mb-2">{{ $message }}</p>@enderror
-                <button wire:click="killAllWorkflows" wire:loading.attr="disabled" wire:confirm="This will immediately halt all running workflows. Confirm?"
-                    class="w-full py-2 bg-red-600 hover:bg-red-500 disabled:opacity-60 text-white text-sm font-semibold rounded-lg transition-colors">
-                    <span wire:loading.remove wire:target="killAllWorkflows">⛔ Halt All Workflows</span>
-                    <span wire:loading wire:target="killAllWorkflows">Halting...</span>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    {{-- DIS Control Panel --}}
-    <div class="bg-gradient-to-br from-gray-900 to-brand-purple-deeper dark:from-gray-950 dark:to-brand-purple-deeper rounded-2xl border border-brand-purple-dark/30 p-6 text-white">
-        <div class="flex items-center justify-between mb-5">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-brand-purple/50 flex items-center justify-center">
-                    <svg class="w-5 h-5 text-brand-purple-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-                    </svg>
-                </div>
-                <div>
-                    <h2 class="font-bold text-lg">Digital Immune System</h2>
-                    <p class="text-brand-purple-light text-sm">Real-time threat detection & autonomous remediation</p>
-                </div>
-            </div>
-            @writable
-            <button wire:click="runDISCheck" wire:loading.attr="disabled"
-                class="px-5 py-2.5 bg-yellow-400 hover:bg-yellow-300 text-gray-900 font-semibold text-sm rounded-xl transition-colors disabled:opacity-60">
-                <span wire:loading.remove wire:target="runDISCheck">▶ Run Health Check</span>
-                <span wire:loading wire:target="runDISCheck">Scanning...</span>
+<x-sig.page title="Security" sub="Problems found in your agents and what was done about them. A health check runs every 15 minutes and can suspend an agent by itself.">
+    @writable
+        <x-slot:actions>
+            <button type="button" class="btn primary" wire:click="runDISCheck" wire:loading.attr="disabled">
+                <span wire:loading.remove wire:target="runDISCheck">Run health check</span>
+                <span wire:loading wire:target="runDISCheck">Checking</span>
             </button>
-            @endwritable
-        </div>
+        </x-slot:actions>
+    @endwritable
 
-        {{-- Stats --}}
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-            @foreach([
-                ['Events (24h)', $this->stats['total_24h'], 'purple'],
-                ['Critical Open', $this->stats['critical'], 'red'],
-                ['Auto-Remediated', $this->stats['auto_remediated'], 'emerald'],
-                ['Quarantined', $this->stats['quarantined'], 'orange'],
-            ] as [$label, $value, $color])
-                <div class="bg-white/5 rounded-xl p-4 text-center">
-                    <div class="text-3xl font-bold text-white">{{ $value }}</div>
-                    <div class="text-xs text-brand-purple-light mt-1">{{ $label }}</div>
-                </div>
-            @endforeach
-        </div>
-    </div>
-
-    {{-- DIS Report (shown after running) --}}
-    @if($disReport)
-        <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-6">
-            <h3 class="font-semibold text-gray-900 dark:text-white text-sm mb-4">
-                DIS Health Check Report
-                <span class="ml-2 text-xs text-gray-400">{{ $disReport['total_agents'] ?? 0 }} agents checked &middot; {{ count($disReport['events'] ?? []) }} events</span>
-            </h3>
-
-            @if(!empty($disReport['events']))
-                <div class="space-y-2 mb-4">
-                    @foreach($disReport['events'] as $event)
-                        <div class="flex items-start gap-3 p-3 rounded-xl
-                            {{ in_array($event['severity'] ?? '', ['critical', 'error']) ? 'bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800' : 'bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-200 dark:border-yellow-800' }}">
-                            <span class="text-sm">{{ ($event['severity'] ?? '') === 'critical' ? '🔴' : '⚠️' }}</span>
-                            <div>
-                                <p class="text-xs text-gray-700 dark:text-gray-300">{{ $event['message'] ?? ucwords(str_replace('_', ' ', $event['type'] ?? 'Unknown issue')) }}</p>
-                                @if(!empty($event['recommendation']))
-                                    <p class="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{{ $event['recommendation'] }}</p>
-                                @endif
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-            @else
-                <div class="flex items-center gap-2 p-3 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 rounded-xl mb-4">
-                    <span class="text-emerald-600 dark:text-emerald-400">✓</span>
-                    <p class="text-sm text-emerald-700 dark:text-emerald-400">All agents healthy. No threats detected.</p>
-                </div>
-            @endif
-
-            @if(($disReport['quarantined'] ?? 0) > 0)
-                <div class="text-xs text-brand-purple dark:text-brand-purple-light bg-brand-purple-pale dark:bg-brand-purple-deeper/20 rounded-lg px-3 py-2">
-                    ⚡ {{ $disReport['quarantined'] }} agent(s) automatically quarantined.
-                </div>
-            @endif
-        </div>
+    @if(session('status'))
+        <div class="notice clear" role="status">{{ session('status') }}</div>
     @endif
 
-    {{-- Security Events --}}
-    <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
-        <div class="px-5 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
-            <h3 class="font-semibold text-gray-900 dark:text-white text-sm">Security Events</h3>
-            <div class="flex gap-2">
-                <select aria-label="Filterseverity" wire:model.live="filterSeverity"
-                    class="text-xs rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">
-                    <option value="">All Severities</option>
-                    <option value="critical">Critical</option>
-                    <option value="error">Error</option>
-                    <option value="warning">Warning</option>
-                    <option value="info">Info</option>
-                </select>
-                <select aria-label="Filtertype" wire:model.live="filterType"
-                    class="text-xs rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">
-                    <option value="">All Types</option>
-                    <option value="prompt_injection">Prompt Injection</option>
-                    <option value="agent_drift">Agent Drift</option>
-                    <option value="delusion_detected">Delusion Detected</option>
-                    <option value="permission_abuse">Permission Abuse</option>
-                    <option value="autonomy_violation">Autonomy Violation</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="overflow-x-auto">
-            <table class="w-full text-xs">
-                <thead>
-                    <tr class="border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50">
-                        <th class="text-left px-5 py-3 text-gray-500 font-medium">Timestamp</th>
-                        <th class="text-left px-5 py-3 text-gray-500 font-medium">Event Type</th>
-                        <th class="text-left px-5 py-3 text-gray-500 font-medium">Severity</th>
-                        <th class="text-left px-5 py-3 text-gray-500 font-medium">Status</th>
-                        <th class="text-left px-5 py-3 text-gray-500 font-medium">Auto-Remediated</th>
-                        <th class="text-left px-5 py-3 text-gray-500 font-medium">Action</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
-                    @forelse($this->events as $event)
-                        @php
-                            $sevColors = ['critical' => 'red', 'error' => 'orange', 'warning' => 'yellow', 'info' => 'blue'];
-                            $sevColor = $sevColors[$event->severity] ?? 'gray';
-                        @endphp
-                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/30">
-                            <td class="px-5 py-3 font-mono text-gray-400">{{ $event->created_at->format('M j H:i:s') }}</td>
-                            <td class="px-5 py-3">
-                                <span class="font-medium text-gray-900 dark:text-white">{{ ucwords(str_replace('_', ' ', $event->event_type)) }}</span>
-                                @if($event->description)
-                                    <p class="text-gray-400 mt-0.5 line-clamp-1">{{ $event->description }}</p>
-                                @endif
-                            </td>
-                            <td class="px-5 py-3">
-                                <span class="inline-flex items-center px-2 py-0.5 rounded-full font-medium bg-{{ $sevColor }}-100 text-{{ $sevColor }}-700 dark:bg-{{ $sevColor }}-900/30 dark:text-{{ $sevColor }}-400">
-                                    {{ ucfirst($event->severity) }}
-                                </span>
-                            </td>
-                            <td class="px-5 py-3">
-                                <span class="{{ $event->status === 'resolved' ? 'text-emerald-600 dark:text-emerald-400' : 'text-orange-600 dark:text-orange-400' }} font-medium">
-                                    {{ ucfirst($event->status) }}
-                                </span>
-                            </td>
-                            <td class="px-5 py-3 text-center">
-                                @if($event->auto_remediated)
-                                    <span class="text-emerald-600 dark:text-emerald-400">✓</span>
-                                @else
-                                    <span class="text-gray-400">—</span>
-                                @endif
-                            </td>
-                            <td class="px-5 py-3">
-                                @if($event->status === 'open')
-                                    <div class="flex gap-2 items-center">
-                                        @writable
-                                        <button wire:click="resolveEvent({{ $event->id }})"
-                                            class="text-xs text-brand-purple-mid hover:text-brand-purple dark:text-brand-purple-light font-medium">
-                                            Resolve
-                                        </button>
-                                        @endwritable
-                                        @if($event->agent_deployment_id)
-                                            @writable
-                                            <button wire:click="killDeployment({{ $event->agent_deployment_id }})"
-                                                wire:confirm="Immediately suspend this agent? This cannot be undone without manual reactivation."
-                                                class="text-xs text-red-600 hover:text-red-700 dark:text-red-400 font-medium">
-                                                Kill Agent
-                                            </button>
-                                            @endwritable
-                                        @endif
-                                    </div>
-                                @endif
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="6" class="px-5 py-8 text-center text-gray-400">No security events found.</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-        <div class="px-5 py-4 border-t border-gray-200 dark:border-gray-700">
-            {{ $this->events->links() }}
-        </div>
+    <div class="stats">
+        <div class="stat"><span>Events in 24 hours</span><b>{{ number_format($this->stats['total_24h']) }}</b></div>
+        <div class="stat"><span>Critical and open</span><b>{{ number_format($this->stats['critical']) }}</b></div>
+        <div class="stat"><span>Suspended agents</span><b>{{ number_format($this->stats['quarantined']) }}</b></div>
     </div>
-</div>
+
+    <div class="grid stack">
+        @if($disReport)
+            @php
+                $checked = $disReport['total_agents'] ?? 0;
+                $found = $disReport['events'] ?? [];
+            @endphp
+            <section class="card" aria-label="Health check report" role="status">
+                <div class="card-head has-tools">
+                    <h2>Health check report</h2>
+                    <span class="muted"><span class="num">{{ $checked }}</span> {{ Str::plural('agent', $checked) }} checked, <span class="num">{{ count($found) }}</span> {{ Str::plural('event', count($found)) }}</span>
+                </div>
+
+                @forelse($found as $event)
+                    <div class="row long">
+                        <span @class(['chip', 'stop' => in_array($event['severity'] ?? '', ['critical', 'error']), 'hold' => ! in_array($event['severity'] ?? '', ['critical', 'error'])])>{{ ucfirst($event['severity'] ?? 'warning') }}</span>
+                        <div class="row-main">
+                            <b>{{ $event['message'] ?? ucfirst(str_replace('_', ' ', $event['type'] ?? 'Unknown issue')) }}</b>
+                            @if(!empty($event['recommendation']))<span>{{ str_replace(" \u{2014} ", ': ', $event['recommendation']) }}</span>@endif
+                        </div>
+                    </div>
+                @empty
+                    <div class="empty">{{ $checked > 0 ? 'The check found no problems.' : 'No active agents to check.' }}</div>
+                @endforelse
+
+                @if(($disReport['quarantined'] ?? 0) > 0)
+                    <div class="row long">
+                        <span class="lamp stop"><i aria-hidden="true"></i><span class="num">{{ $disReport['quarantined'] }}</span> {{ Str::plural('agent', $disReport['quarantined']) }} suspended automatically</span>
+                    </div>
+                @endif
+            </section>
+        @endif
+
+        <section class="card halt" aria-label="Halt all workflows">
+            <div class="card-head"><h2>Halt all workflows</h2></div>
+            <div class="card-body halt-body">
+                <p class="muted">Stops every running workflow and pauses every active one. Use only in an active incident. Every halt is recorded in the audit log.</p>
+                @writable
+                <div>
+                    <div class="halt-form">
+                        <input class="input" type="text" aria-label="Type: HALT WORKFLOWS" wire:model="killSwitchConfirmation" placeholder="Type: HALT WORKFLOWS" autocomplete="off">
+                        <button type="button" class="btn danger" wire:click="killAllWorkflows" wire:loading.attr="disabled" wire:confirm="This will immediately halt all running workflows. Confirm?">
+                            <span wire:loading.remove wire:target="killAllWorkflows">Halt all workflows</span>
+                            <span wire:loading wire:target="killAllWorkflows">Halting</span>
+                        </button>
+                    </div>
+                    @error('killSwitchConfirmation')<p class="error">{{ $message }}</p>@enderror
+                </div>
+                @endwritable
+            </div>
+        </section>
+
+        <section class="card" aria-label="Security events">
+            <div class="card-head has-tools">
+                <h2>Security events</h2>
+                <div class="head-tools">
+                    <select class="select desk-filter" aria-label="Severity" wire:model.live="filterSeverity">
+                        <option value="">All severities</option>
+                        <option value="critical">Critical</option>
+                        <option value="error">Error</option>
+                        <option value="warning">Warning</option>
+                        <option value="info">Info</option>
+                    </select>
+                    <select class="select desk-filter" aria-label="Type" wire:model.live="filterType">
+                        <option value="">All types</option>
+                        <option value="prompt_injection">Prompt injection</option>
+                        <option value="agent_drift">Agent drift</option>
+                        <option value="delusion_detected">Delusion detected</option>
+                        <option value="permission_abuse">Permission abuse</option>
+                        <option value="autonomy_violation">Autonomy violation</option>
+                    </select>
+                </div>
+            </div>
+
+            @if($this->events->isEmpty())
+                <div class="empty">No security events found.</div>
+            @else
+                <div class="table-scroll" tabindex="0" role="region" aria-label="Table, scrolls sideways">
+                    <table class="table wide">
+                        <thead>
+                            <tr><th>Time</th><th>Event</th><th>Severity</th><th>Status</th><th>Action</th></tr>
+                        </thead>
+                        <tbody>
+                            @foreach($this->events as $event)
+                                @php
+                                    $severityTone = ['critical' => 'stop', 'error' => 'stop', 'warning' => 'hold'][$event->severity] ?? '';
+                                    $statusLamp = ['open' => 'hold', 'investigating' => 'running', 'resolved' => 'clear'][$event->status] ?? 'off';
+                                @endphp
+                                <tr wire:key="event-{{ $event->id }}">
+                                    <td class="cell-time">{{ $event->created_at->format('M j H:i:s') }}</td>
+                                    <td>
+                                        <span class="cell-title">{{ ucfirst(str_replace('_', ' ', $event->event_type)) }}</span>
+                                        @if($event->description)<span class="cell-sub" title="{{ $event->description }}">{{ $event->description }}</span>@endif
+                                    </td>
+                                    <td><span class="chip {{ $severityTone }}">{{ ucfirst($event->severity) }}</span></td>
+                                    <td><span class="lamp {{ $statusLamp }}"><i aria-hidden="true"></i>{{ ucfirst(str_replace('_', ' ', $event->status)) }}</span></td>
+                                    <td>
+                                        @if($event->status === 'open')
+                                            <div class="cell-actions">
+                                                @writable
+                                                    <button type="button" class="btn small" wire:click="resolveEvent({{ $event->id }})">Resolve</button>
+                                                @endwritable
+                                                @if($event->agent_deployment_id)
+                                                    @writable
+                                                        <button type="button" class="btn small danger" wire:click="killDeployment({{ $event->agent_deployment_id }})" wire:confirm="Immediately suspend this agent? This cannot be undone without manual reactivation.">Suspend agent</button>
+                                                    @endwritable
+                                                @endif
+                                            </div>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @endif
+
+            @if($this->events->hasPages())
+                <div class="card-body">{{ $this->events->links() }}</div>
+            @endif
+        </section>
+    </div>
+</x-sig.page>

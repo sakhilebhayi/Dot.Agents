@@ -7,10 +7,9 @@ use App\Models\Organization;
 use App\Models\SocialAccount;
 use App\Models\SocialConversation;
 use App\Models\SocialMessage;
+use App\Services\Models\ScriptedGateway;
 use App\Services\Social\ContinuationContentGenerator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use OpenAI\Laravel\Facades\OpenAI;
-use OpenAI\Responses\Chat\CreateResponse;
 use Tests\TestCase;
 
 class ContinuationContentGeneratorTest extends TestCase
@@ -57,23 +56,11 @@ class ContinuationContentGeneratorTest extends TestCase
         ]);
     }
 
-    private function fakeAiResponse(array $overrides = []): void
+    private function fakeAiResponse(array $reply = ['content' => 'Happy to help you book a demo!', 'strategy' => 'schedule_demo', 'confidence' => 91]): ScriptedGateway
     {
-        OpenAI::fake([
-            CreateResponse::fake([
-                'choices' => [
-                    [
-                        'message' => [
-                            'content' => json_encode(array_merge([
-                                'content' => 'Happy to help you book a demo!',
-                                'strategy' => 'schedule_demo',
-                                'confidence' => 91,
-                            ], $overrides)),
-                        ],
-                    ],
-                ],
-            ]),
-        ]);
+        config(['prism.default_provider' => 'scripted']);
+
+        return app(ScriptedGateway::class)->say((string) json_encode((object) $reply));
     }
 
     public function test_generate_returns_parsed_ai_content(): void
@@ -96,13 +83,7 @@ class ContinuationContentGeneratorTest extends TestCase
 
     public function test_generate_falls_back_to_defaults_when_ai_response_omits_fields(): void
     {
-        OpenAI::fake([
-            CreateResponse::fake([
-                'choices' => [
-                    ['message' => ['content' => json_encode([])]],
-                ],
-            ]),
-        ]);
+        $this->fakeAiResponse([]);
         $inbound = $this->inboundMessage();
 
         $result = app(ContinuationContentGenerator::class)->generate(
@@ -120,7 +101,7 @@ class ContinuationContentGeneratorTest extends TestCase
 
     public function test_disclosure_instruction_is_included_only_when_required(): void
     {
-        $this->fakeAiResponse();
+        $model = $this->fakeAiResponse();
         $inbound = $this->inboundMessage();
 
         app(ContinuationContentGenerator::class)->generate(
@@ -131,16 +112,12 @@ class ContinuationContentGeneratorTest extends TestCase
             shouldDiscloseAi: true,
         );
 
-        OpenAI::chat()->assertSent(function (string $method, array $parameters) {
-            $systemMessage = $parameters['messages'][0]['content'];
-
-            return str_contains($systemMessage, 'naturally disclose you are an AI assistant');
-        });
+        $this->assertStringContainsString('naturally disclose you are an AI assistant', $model->requests[0]->system);
     }
 
     public function test_disclosure_instruction_is_omitted_when_not_required(): void
     {
-        $this->fakeAiResponse();
+        $model = $this->fakeAiResponse();
         $inbound = $this->inboundMessage();
 
         app(ContinuationContentGenerator::class)->generate(
@@ -151,17 +128,13 @@ class ContinuationContentGeneratorTest extends TestCase
             shouldDiscloseAi: false,
         );
 
-        OpenAI::chat()->assertSent(function (string $method, array $parameters) {
-            $systemMessage = $parameters['messages'][0]['content'];
-
-            return ! str_contains($systemMessage, 'naturally disclose you are an AI assistant');
-        });
+        $this->assertStringNotContainsString('naturally disclose you are an AI assistant', $model->requests[0]->system);
     }
 
     public function test_deployment_model_override_is_used_when_set(): void
     {
         $this->deployment->update(['model_override' => 'gpt-4o']);
-        $this->fakeAiResponse();
+        $model = $this->fakeAiResponse();
         $inbound = $this->inboundMessage();
 
         app(ContinuationContentGenerator::class)->generate(
@@ -172,7 +145,7 @@ class ContinuationContentGeneratorTest extends TestCase
             shouldDiscloseAi: false,
         );
 
-        OpenAI::chat()->assertSent(fn (string $method, array $parameters) => $parameters['model'] === 'gpt-4o');
+        $this->assertSame('gpt-4o', $model->requests[0]->model);
     }
 
     public function test_recent_conversation_history_is_replayed_in_order(): void
@@ -203,7 +176,7 @@ class ContinuationContentGeneratorTest extends TestCase
 
         $inbound = $this->inboundMessage('second turn');
 
-        $this->fakeAiResponse();
+        $model = $this->fakeAiResponse();
 
         app(ContinuationContentGenerator::class)->generate(
             conversation: $this->conversation,
@@ -213,14 +186,10 @@ class ContinuationContentGeneratorTest extends TestCase
             shouldDiscloseAi: false,
         );
 
-        OpenAI::chat()->assertSent(function (string $method, array $parameters) {
-            // system prompt + 3 replayed turns (first turn, first reply, second/inbound turn)
-            $this->assertCount(4, $parameters['messages']);
-            $this->assertSame(['role' => 'user', 'content' => 'first turn'], $parameters['messages'][1]);
-            $this->assertSame(['role' => 'assistant', 'content' => 'first reply'], $parameters['messages'][2]);
-            $this->assertSame(['role' => 'user', 'content' => 'second turn'], $parameters['messages'][3]);
-
-            return true;
-        });
+        $this->assertSame([
+            ['role' => 'user', 'text' => 'first turn'],
+            ['role' => 'assistant', 'text' => 'first reply'],
+            ['role' => 'user', 'text' => 'second turn'],
+        ], $model->requests[0]->messages);
     }
 }

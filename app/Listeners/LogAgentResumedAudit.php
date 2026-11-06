@@ -39,7 +39,7 @@ class LogAgentResumedAudit implements ShouldQueue
             message: 'The deployment has been resumed and will process new tasks.',
             severity: 'info',
             data: ['deployment_id' => $deployment->id],
-            actionUrl: "/agents/{$deployment->id}"
+            actionUrl: "/my-agents/{$deployment->id}"
         );
     }
 

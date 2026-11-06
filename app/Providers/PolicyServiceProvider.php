@@ -173,6 +173,11 @@ class PolicyServiceProvider extends ServiceProvider
         Gate::policy(AgentApproval::class, AgentApprovalPolicy::class);
         Gate::policy(AgentTask::class, AgentTaskPolicy::class);
         Gate::policy(AgentRun::class, AgentRunPolicy::class);
+
+        // A person's own data is theirs alone to take or erase.
+        Gate::define('export-own-data', fn (User $user, User $requester, User $subject) => $user->is($requester) && $requester->is($subject));
+        Gate::define('erase-own-data', fn (User $user, User $requester, User $subject) => $user->is($requester) && $requester->is($subject));
+
         Gate::policy(AgentWorkflow::class, AgentWorkflowPolicy::class);
         Gate::policy(AgentScorecard::class, AgentScorecardPolicy::class);
         Gate::policy(AgentSession::class, AgentSessionPolicy::class);

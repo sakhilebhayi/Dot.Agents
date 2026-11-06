@@ -40,10 +40,10 @@ return [
             'busy_timeout' => (int) env('DB_BUSY_TIMEOUT', 15000),
             'prefix' => '',
             'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
-            'busy_timeout' => null,
             'journal_mode' => null,
             'synchronous' => null,
-            'transaction_mode' => 'DEFERRED',
+            // Take the write lock at the start: a deferred transaction that upgrades later fails at once, whatever the wait.
+            'transaction_mode' => 'IMMEDIATE',
         ],
 
         'mysql' => [

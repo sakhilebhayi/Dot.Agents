@@ -380,4 +380,13 @@ class InfoDotRedeemTest extends TestCase
 
         $this->assertNotSame($before, session()->getId());
     }
+
+    public function test_a_wildcard_api_key_is_not_a_way_into_a_browser_session(): void
+    {
+        $token = $this->localToken(User::factory()->create(), ['*']);
+
+        $this->post(route('auth.ecosystem'), ['token' => $token], $this->fromInfodot());
+
+        $this->assertGuest();
+    }
 }

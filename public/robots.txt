@@ -1,13 +1,9 @@
 User-agent: *
 Allow: /
 Disallow: /dashboard
-Disallow: /admin
-Disallow: /horizon
-Disallow: /pulse
 Disallow: /login
 Disallow: /register
+Disallow: /api/
 Disallow: /user/
-Disallow: /teams/
 
-# Sitemap
 Sitemap: https://agents.infodot.co.za/sitemap.xml

@@ -4,7 +4,8 @@ use App\Http\Controllers\Auth\EcosystemAuthController;
 use App\Http\Controllers\BillingController;
 use App\Http\Controllers\CspReportController;
 use App\Http\Controllers\GuardianHealthController;
-use App\Http\Controllers\HealthCheckController;
+use App\Http\Controllers\InvitationController;
+use App\Http\Controllers\PrivacyController;
 use App\Http\Controllers\ReadyController;
 use App\Http\Controllers\SchedulerProbeController;
 use App\Http\Controllers\SocialAccountController;
@@ -35,14 +36,6 @@ Route::post('/auth/ecosystem', [EcosystemAuthController::class, 'handle'])
 // the visitor is sent to the normal sign-in page and the token in the URL is never read.
 Route::get('/auth/ecosystem', [EcosystemAuthController::class, 'legacy']);
 
-Route::get('/health', [HealthCheckController::class, 'ping'])->name('health.ping');
-
-// Authenticated detailed health report — for internal monitoring dashboards
-
-Route::middleware(['auth:sanctum', config('jetstream.auth_session')])->group(function () {
-    Route::get('/health/detailed', [HealthCheckController::class, 'detailed'])->name('health.detailed');
-});
-
 // Landing page
 
 Route::get('/', function () {
@@ -62,6 +55,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     ->group(function () {
         Route::get('/', fn () => view('consent.show'))->name('show');
         Route::post('/', function () {
+            request()->validate(['accept' => ['accepted']]);
+
             /** @var User $user */
             $user = Auth::user();
             $records = $user->consent_records ?? [];
@@ -76,6 +71,11 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
                 ->with('success', 'Thank you for accepting the platform terms.');
         })->name('accept');
     });
+
+// An invitation is opened by someone who may not belong to any business yet, so it sits outside the tenant group.
+Route::get('/invitations/{token}', [InvitationController::class, 'show'])->middleware('throttle:30,1')->name('invitations.show');
+Route::post('/invitations/{token}', [InvitationController::class, 'accept'])
+    ->middleware(['auth:sanctum', config('jetstream.auth_session'), 'throttle:30,1'])->name('invitations.accept');
 
 Route::middleware([
     'auth:sanctum',
@@ -139,6 +139,10 @@ Route::middleware([
     })->name('runs.show');
     Route::get('/usage', fn () => view('usage.index'))->name('usage');
 
+    // A person's own data
+    Route::post('/privacy/export', [PrivacyController::class, 'export'])->middleware('throttle:5,60')->name('privacy.export');
+    Route::post('/privacy/erase', [PrivacyController::class, 'erase'])->middleware('throttle:5,60')->name('privacy.erase');
+
     // Workflows
     Route::prefix('workflows')->name('workflows.')->group(function () {
         Route::get('/', fn () => view('workflows.index'))->name('index');
@@ -170,6 +174,7 @@ Route::middleware([
         Route::get('/knowledge', fn () => view('org.knowledge'))->name('knowledge');
         Route::get('/memory', fn () => view('org.memory'))->name('memory');
         Route::get('/skills', fn () => view('org.skills'))->name('skills');
+        Route::get('/api-keys', fn () => view('org.api-keys'))->name('api-keys');
         Route::get('/settings', fn () => view('org.settings'))->name('settings');
     });
 

@@ -6,7 +6,6 @@ use App\DTOs\Social\SentimentAnalysisData;
 use App\Models\SocialConversation;
 use App\Models\SocialSentimentScore;
 use Illuminate\Support\Facades\Log;
-use OpenAI\Laravel\Facades\OpenAI;
 use Throwable;
 
 class SentimentAnalysisService
@@ -61,14 +60,7 @@ class SentimentAnalysisService
 
     private function callAI(string $text): array
     {
-        $response = OpenAI::chat()->create([
-            'model' => 'gpt-4o-mini',
-            'temperature' => 0.1,
-            'response_format' => ['type' => 'json_object'],
-            'messages' => [
-                [
-                    'role' => 'system',
-                    'content' => <<<'SYSTEM'
+        $raw = app(SocialModelCall::class)->json(<<<'SYSTEM'
 You are a precise sentiment analysis engine for customer communications.
 Analyze the provided text and respond with a JSON object containing:
 {
@@ -79,16 +71,7 @@ Analyze the provided text and respond with a JSON object containing:
   "topics": array of detected topic strings (e.g. ["pricing", "delivery"]),
   "emotions": array of detected emotion strings
 }
-SYSTEM,
-                ],
-                [
-                    'role' => 'user',
-                    'content' => "Analyze the sentiment of this customer message:\n\n{$text}",
-                ],
-            ],
-        ]);
-
-        $raw = json_decode($response->choices[0]->message->content, true);
+SYSTEM, [['role' => 'user', 'text' => "Analyze the sentiment of this customer message:\n\n{$text}"]]);
 
         return [
             'sentiment' => $this->normalizeSentiment($raw['sentiment'] ?? 'neutral'),

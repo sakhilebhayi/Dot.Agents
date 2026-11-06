@@ -3,6 +3,7 @@
 namespace App\Actions\Compliance;
 
 use App\Events\UserDataErased;
+use App\Models\AgentMemory;
 use App\Models\User;
 use App\Services\Governance\AuditService;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -33,9 +34,6 @@ class EraseUserDataAction
     {
         Gate::authorize('erase-own-data', [$requester, $subject]);
 
-        // Log before erasure while we still have the email
-        $originalEmail = $subject->email;
-
         DB::transaction(function () use ($subject) {
             $anonymisedEmail = 'erased-'.$subject->id.'@deleted.dotagents.com';
             $anonymisedName = 'Erased User #'.$subject->id;
@@ -60,11 +58,15 @@ class EraseUserDataAction
 
             // Anonymise notifications (may contain PII in data payload)
             $subject->notifications()->delete();
+
+            // What agents kept about this person goes with them.
+            AgentMemory::withoutGlobalScopes()->where('user_id', $subject->id)->forceDelete();
+            $subject->favouriteAgents()->detach();
         });
 
         $this->auditService->logUserAction(
             event: 'compliance.data_erased',
-            description: "GDPR right-to-erasure executed for user {$subject->id} (original email: {$originalEmail}) by user {$requester->id}",
+            description: "Erased the personal data of user {$subject->id}",
             subject: $subject,
         );
 

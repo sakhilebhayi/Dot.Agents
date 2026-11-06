@@ -79,9 +79,10 @@ trait HandlesEcosystemHandoff
     {
         $accessToken = PersonalAccessToken::findToken($token);
 
+        // The ability is named outright: a wildcard API key must not turn into a browser session.
         if (
             ! $accessToken
-            || ! $accessToken->can('ecosystem:read')
+            || ! in_array('ecosystem:read', (array) $accessToken->abilities, true)
             || ($accessToken->expires_at && $accessToken->expires_at->isPast())
         ) {
             return null;
