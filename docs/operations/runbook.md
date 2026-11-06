@@ -4,7 +4,7 @@ Production is `https://agents.infodot.co.za`: one Laravel app on shared cPanel h
 
 ## What runs
 
-Three cron lines, installed by the deploy inside the shared crontab block (see [deploying](../deployment-cpanel.md)):
+Three commands run every minute. On this host the deploy writes them to `~/.dot-cron.d/agents.cron` for the shared cron runner, and none stay in the crontab. On a host with no runner they go in the shared crontab block instead (see [deploying](../deployment-cpanel.md)):
 
 | Line | Does |
 |---|---|

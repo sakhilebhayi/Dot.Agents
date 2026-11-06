@@ -23,6 +23,7 @@ img { display: block; }
 .bar nav { display: flex; align-items: center; gap: 24px; font-size: 15px; }
 .bar nav a:not(.button) { color: var(--muted); text-decoration: none; }
 .bar nav a:not(.button):hover { color: var(--ink); }
+.bar nav a { white-space: nowrap; }
 
 .button { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 18px; border: 1px solid var(--control); border-radius: 6px; background: none; color: var(--ink); font: 500 15px var(--sans); text-decoration: none; cursor: pointer; transition: translate 160ms var(--ease), background 160ms; }
 .button:hover { background: var(--raised); translate: 0 -1px; }
@@ -161,6 +162,7 @@ h1 span { color: var(--gold); }
 @media (max-width: 860px) {
     body { font-size: 16px; }
     .bar nav a:not(.button):not(.signin) { display: none; }
+    .bar nav { gap: 12px; }
     .split, .hero-top { grid-template-columns: minmax(0, 1fr); }
     .run { --indent: 32px; }
     .hero-signin { display: none; }
