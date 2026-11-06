@@ -26,7 +26,8 @@ class AgentDeployment extends Model
         'risk_tolerance', 'allowed_actions', 'restricted_actions',
         'data_access_scope', 'custom_kpis', 'notification_config',
         'integration_config', 'metadata', 'deployed_at', 'last_active_at',
-        'decommissioned_at', 'paused_at',
+        'decommissioned_at', 'paused_at', 'role', 'responsibility', 'owner_id',
+        'published_version_id', 'autonomy_level',
     ];
 
     protected $casts = [
@@ -61,9 +62,37 @@ class AgentDeployment extends Model
         });
     }
 
+    /** @return BelongsTo<Organization, $this> */
     public function organization(): BelongsTo
     {
         return $this->belongsTo(Organization::class);
+    }
+
+    public function owner(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'owner_id');
+    }
+
+    /** @return HasMany<AgentConfigVersion, $this> */
+    public function versions(): HasMany
+    {
+        return $this->hasMany(AgentConfigVersion::class);
+    }
+
+    /** @return BelongsTo<AgentConfigVersion, $this> */
+    public function publishedVersion(): BelongsTo
+    {
+        return $this->belongsTo(AgentConfigVersion::class, 'published_version_id');
+    }
+
+    /**
+     * The version being worked on, if one is open.
+     *
+     * @return HasOne<AgentConfigVersion, $this>
+     */
+    public function draftVersion(): HasOne
+    {
+        return $this->hasOne(AgentConfigVersion::class)->where('state', AgentConfigVersion::DRAFT)->latestOfMany('number');
     }
 
     public function agent(): BelongsTo

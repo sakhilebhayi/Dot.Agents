@@ -6,8 +6,10 @@ use App\Actions\Concerns\LogsActionErrors;
 use App\DTOs\Agents\DeployAgentData;
 use App\Events\AgentDeployed;
 use App\Models\Agent;
+use App\Models\AgentConfigVersion;
 use App\Models\AgentDeployment;
 use App\Models\Department;
+use App\Services\Agents\AgentConfig;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
@@ -54,11 +56,30 @@ class DeployAgentAction
                 'status' => 'active',
             ]);
 
+            $this->firstVersion($deployment, $data);
+
             $deployment->agent()->increment('total_deployments');
 
             event(new AgentDeployed($deployment));
 
             return $deployment;
         }, context: ['organization_id' => $data->organizationId, 'agent_id' => $data->agentId]);
+    }
+
+    /** A template goes live straight from its own setup, as version 1. */
+    private function firstVersion(AgentDeployment $deployment, DeployAgentData $data): void
+    {
+        $version = AgentConfigVersion::create([
+            'organization_id' => $data->organizationId,
+            'agent_deployment_id' => $deployment->id,
+            'number' => 1,
+            'state' => AgentConfigVersion::PUBLISHED,
+            'config' => AgentConfig::normalise(['instructions' => $data->customInstructions] + ($deployment->agent->template ?? [])),
+            'created_by' => $data->deployedBy,
+            'published_by' => $data->deployedBy,
+            'published_at' => now(),
+        ]);
+
+        $deployment->update(['published_version_id' => $version->id, 'owner_id' => $data->deployedBy]);
     }
 }
