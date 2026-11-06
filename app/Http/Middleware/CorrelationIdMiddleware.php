@@ -22,9 +22,9 @@ class CorrelationIdMiddleware
 {
     public function handle(Request $request, Closure $next): Response
     {
-        $correlationId = $request->header('X-Correlation-ID')
-            ?? $request->header('X-Request-ID')
-            ?? (string) Str::uuid();
+        // A caller's id goes into logs and the response, so only an id that looks like one is kept.
+        $supplied = $request->header('X-Correlation-ID') ?? $request->header('X-Request-ID');
+        $correlationId = is_string($supplied) && preg_match('/^[A-Za-z0-9-]{8,64}$/', $supplied) ? $supplied : (string) Str::uuid();
 
         // Attach to request so controllers/services can read it via request()
         $request->headers->set('X-Correlation-ID', $correlationId);

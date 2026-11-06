@@ -5,6 +5,7 @@ namespace App\Actions\Agents;
 use App\Actions\Concerns\LogsActionErrors;
 use App\DTOs\Agents\DeployAgentData;
 use App\Events\AgentDeployed;
+use App\Models\Agent;
 use App\Models\AgentDeployment;
 use App\Models\Department;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -31,6 +32,7 @@ class DeployAgentAction
     {
         return $this->runAction(function () use ($data) {
             Gate::authorize('create', [AgentDeployment::class, $data->organizationId]);
+            Gate::authorize('deploy', Agent::findOrFail($data->agentId));
 
             if ($data->departmentId !== null) {
                 Department::withoutGlobalScopes()

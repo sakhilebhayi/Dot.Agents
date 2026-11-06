@@ -2,8 +2,10 @@
 
 use App\Http\Controllers\Auth\EcosystemAuthController;
 use App\Http\Controllers\BillingController;
+use App\Http\Controllers\CspReportController;
 use App\Http\Controllers\GuardianHealthController;
 use App\Http\Controllers\HealthCheckController;
+use App\Http\Controllers\ReadyController;
 use App\Http\Controllers\SchedulerProbeController;
 use App\Http\Controllers\SocialAccountController;
 use App\Http\Controllers\SocialOAuthController;
@@ -12,14 +14,18 @@ use App\Http\Middleware\AuthenticateGuardian;
 use App\Models\AgentDeployment;
 use App\Models\AgentWorkflow;
 use App\Models\User;
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
+use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
+use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Laravel\Fortify\Features;
 
 // ── Health Checks ─────────────────────────────────────────────────────────────
 // Public ping — used by load balancers and uptime monitors
 Route::post('/auth/ecosystem', [EcosystemAuthController::class, 'handle'])
+    ->middleware('throttle:30,1')
     ->withoutMiddleware(['Illuminate\Foundation\Http\Middleware\PreventRequestForgery', 'Illuminate\Foundation\Http\Middleware\VerifyCsrfToken', 'Illuminate\Foundation\Http\Middleware\ValidateCsrfToken'])->name('auth.ecosystem');
 
 // Links minted before the token moved into a POST body carried it in the URL. They are no longer honoured:
@@ -171,16 +177,23 @@ Route::middleware([
 
 // Stripe webhook — must be outside auth middleware + CSRF exempt (handled in VerifyCsrfToken)
 
-Route::post('/webhooks/stripe', [BillingController::class, 'webhook'])->name('stripe.webhook');
+Route::post('/webhooks/stripe', [BillingController::class, 'webhook'])->middleware('throttle:120,1')->name('stripe.webhook');
 
 // Social platform webhooks — must be outside auth middleware + CSRF exempt (handled in VerifyCsrfToken)
 
 Route::get('/social/webhooks/{platform}', [SocialWebhookController::class, 'verify'])->name('social.webhooks.verify');
-Route::post('/social/webhooks/{platform}', [SocialWebhookController::class, 'receive'])->name('social.webhooks.receive');
+Route::post('/social/webhooks/{platform}', [SocialWebhookController::class, 'receive'])->middleware('throttle:300,1')->name('social.webhooks.receive');
 
 // Public liveness probe for the cron scheduler and queue worker, watched from GitHub every
 // 15 minutes by .github/workflows/scheduler-watchdog.yml.
 Route::get('/up/scheduler', SchedulerProbeController::class)->name('up.scheduler');
+Route::get('/ready', ReadyController::class)->name('ready');
+
+// Violation reports need no session or forgery token. The controller keeps only the directive and blocked host.
+Route::post('/csp-report', CspReportController::class)
+    ->withoutMiddleware([PreventRequestForgery::class, StartSession::class, ShareErrorsFromSession::class])
+    ->middleware('throttle:60,1,csp-report')
+    ->name('csp.report');
 
 // Guardian observability report for Dot.Brain (dot-guardian/v1): operational
 // detail, so behind a bearer token (fails closed with 503 when none is

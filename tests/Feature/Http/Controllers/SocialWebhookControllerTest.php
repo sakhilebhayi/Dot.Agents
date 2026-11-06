@@ -6,6 +6,7 @@ use App\Jobs\GenerateSocialResponseJob;
 use App\Models\AgentDeployment;
 use App\Models\Organization;
 use App\Models\SocialAccount;
+use App\Models\SocialMessage;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
@@ -212,5 +213,19 @@ class SocialWebhookControllerTest extends TestCase
         return $this->postJson('/social/webhooks/facebook', $payload, [
             'X-Hub-Signature-256' => 'sha256='.$signature,
         ]);
+    }
+
+    public function test_a_redelivered_message_is_recorded_once(): void
+    {
+        Queue::fake();
+
+        $organization = Organization::factory()->create();
+        SocialAccount::factory()->create(['organization_id' => $organization->id, 'platform' => 'facebook', 'platform_account_id' => 'page_1']);
+        $payload = $this->buildPayload('page_1', 'psid_abc', 'mid.same', 'hello');
+
+        $this->postSignedWebhook($payload)->assertOk();
+        $this->postSignedWebhook($payload)->assertOk();
+
+        $this->assertSame(1, SocialMessage::withoutGlobalScopes()->where('platform_message_id', 'mid.same')->count());
     }
 }

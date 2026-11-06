@@ -45,6 +45,9 @@ class ProductionDemoSeeder extends Seeder
 
     public function run(): void
     {
+        // These accounts have passwords in a public repository.
+        abort_if(app()->isProduction(), 500, 'Demo accounts are never seeded in production. Seed the catalogue with AgentPlatformSeeder.');
+
         $this->command->info('▶  ProductionDemoSeeder starting …');
 
         // Admin user must exist before org (owner_id FK constraint)

@@ -48,8 +48,6 @@ class HandleStripeWebhookAction
 
             return;
         }
-        // Mark as processed for 48 hours (covers Stripe's 24h retry window + buffer)
-        Cache::put($cacheKey, true, 172800);
 
         match ($event->type) {
             'checkout.session.completed' => $this->handleCheckoutCompleted($event->data->object),
@@ -59,6 +57,9 @@ class HandleStripeWebhookAction
             'customer.subscription.deleted' => $this->handleSubscriptionDeleted($event->data->object),
             default => Log::info('StripeWebhook: unhandled event type', ['type' => $event->type]),
         };
+
+        // Marked only once handled, so a failure is retried by Stripe. 48 hours covers its retry window.
+        Cache::put($cacheKey, true, 172800);
     }
 
     private function handleCheckoutCompleted(object $session): void
@@ -98,6 +99,8 @@ class HandleStripeWebhookAction
                     'metadata' => ['stripe_session_id' => $session->id],
                 ]
             );
+
+            $organization->update(['plan' => $plan->slug]);
         });
 
         Log::info('StripeWebhook: subscription activated', [

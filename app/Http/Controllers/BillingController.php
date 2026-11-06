@@ -7,6 +7,7 @@ use App\Actions\Billing\HandleStripeWebhookAction;
 use App\Models\Organization;
 use App\Models\SubscriptionPlan;
 use App\Services\Billing\StripeService;
+use App\Support\TenantContext;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -92,7 +93,7 @@ class BillingController extends Controller
             return response('Webhook error', 400);
         }
 
-        $this->handleWebhook->execute($event);
+        TenantContext::system(fn () => $this->handleWebhook->execute($event));
 
         return response('OK', 200);
     }

@@ -175,8 +175,9 @@ class TenantBoundaryTest extends TestCase
         [$a, $orgA] = $this->business();
         [, $orgB] = $this->business();
         $department = Department::withoutGlobalScopes()->forceCreate(['organization_id' => $orgB->id, 'name' => 'Theirs', 'slug' => 'theirs']);
-        $agent = Agent::factory()->create();
+        $agent = Agent::factory()->create(['status' => 'active']);
         $this->actingAs($a);
+        session(['current_organization_id' => $orgA->id]);
 
         $this->expectException(ModelNotFoundException::class);
 

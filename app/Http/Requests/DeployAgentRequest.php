@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use App\DTOs\Agents\DeployAgentData;
 use App\Models\AgentDeployment;
 use App\Services\Governance\AuditService;
+use App\Support\TenantContext;
 use App\Support\TenantRules;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -13,7 +14,7 @@ class DeployAgentRequest extends FormRequest
     public function authorize(): bool
     {
         return $this->user()?->tokenCan('deploy-agents')
-            || $this->user()?->can('create', AgentDeployment::class);
+            || $this->user()?->can('create', [AgentDeployment::class, (int) TenantContext::id()]);
     }
 
     public function rules(): array

@@ -286,17 +286,16 @@
                     <span class="w-8 h-8 rounded-lg bg-[#150f2e] text-[#f0c23a] text-xs font-black flex items-center justify-center flex-shrink-0">8</span>
                     <h2 class="text-xl font-black font-display text-[#111111]">Security</h2>
                 </div>
-                <p class="mb-4">We implement enterprise-grade security controls to protect your data:</p>
+                <p class="mb-4">We use these controls to protect your data:</p>
                 <div class="grid sm:grid-cols-2 gap-3 mb-4">
                     @foreach([
-                        'Encryption in transit (TLS 1.3) and at rest (AES-256)',
+                        'Encryption in transit, and of credentials and agent instructions in storage',
                         'Multi-factor authentication support',
-                        'Strict multi-tenant data isolation at database level',
-                        'Role-based access control with least-privilege enforcement',
-                        'Continuous security monitoring and threat detection',
-                        'Automated vulnerability scanning',
+                        'Each business\'s data kept apart by application controls, tested on every release',
+                        'Role-based access with seven roles',
+                        'Scheduled security monitoring',
+                        'Automated dependency scanning',
                         'Encrypted storage of social API tokens and credentials',
-                        'Regular third-party security assessments',
                     ] as $item)
                         <div class="flex items-start gap-2.5 bg-green-50 border border-green-100 rounded-lg px-3 py-2.5">
                             <svg class="w-3.5 h-3.5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">

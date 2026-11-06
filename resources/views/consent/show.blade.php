@@ -64,7 +64,7 @@
                     {{-- Key points --}}
                     <div class="bg-gray-50 rounded-xl border border-gray-100 divide-y divide-gray-100">
                         @foreach([
-                            ['icon' => 'M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z', 'title' => 'Data Security', 'body' => 'All data is encrypted at rest and in transit. We never sell or share your data with third parties.'],
+                            ['icon' => 'M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z', 'title' => 'Data Security', 'body' => 'Data is encrypted in transit, and credentials and agent instructions are encrypted in storage. We never sell your data.'],
                             ['icon' => 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4', 'title' => 'AI Governance', 'body' => 'All AI agent actions are logged, auditable, and subject to human-in-the-loop approval workflows.'],
                             ['icon' => 'M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3', 'title' => 'GDPR & POPIA Compliance', 'body' => 'You retain rights to access, correct, and delete your personal data at any time via organization settings.'],
                         ] as $point)
@@ -104,11 +104,9 @@
                         @enderror
 
                         <div class="mt-5 flex items-center justify-between">
-                            <a href="{{ route('logout') }}"
-                               onclick="event.preventDefault(); document.getElementById('consent-logout').submit();"
-                               class="text-sm text-gray-400 hover:text-gray-600 transition-colors">
+                            <button type="submit" form="consent-logout" class="text-sm text-gray-500 hover:text-gray-700 transition-colors">
                                 Sign out instead
-                            </a>
+                            </button>
                             <button type="submit"
                                     class="inline-flex items-center gap-2 px-6 py-2.5 bg-[#1e1660] hover:bg-[#3d2ea0] text-white text-sm font-semibold rounded-xl transition-colors shadow-sm">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

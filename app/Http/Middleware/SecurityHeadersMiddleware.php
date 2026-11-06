@@ -22,29 +22,31 @@ class SecurityHeadersMiddleware
 
         $response = $next($request);
 
-        // Strict Transport Security — force HTTPS for 1 year including subdomains
-        $response->headers->set(
-            'Strict-Transport-Security',
-            'max-age=31536000; includeSubDomains; preload'
-        );
+        // HTTPS only, for this host alone: the sister platforms set their own.
+        if ($request->isSecure() && (int) config('security.hsts_seconds') > 0) {
+            $response->headers->set('Strict-Transport-Security', 'max-age='.(int) config('security.hsts_seconds'));
+        }
 
         // Content Security Policy
         // - 'unsafe-eval' is required by Alpine.js v3 (uses new Function() to evaluate expressions)
         // - 'unsafe-inline' in style-src is required by Alpine.js x-show (injects style="display:none")
-        // - Livewire 3 uses Alpine internally; removing either will break all wire:click / x-data
+        // - img-src is closed on purpose: an image URL is how text an agent read could leave the page. Nothing
+        //   here loads a remote image except the avatar service and the marketing photograph.
         $csp = implode('; ', [
             "default-src 'self'",
-            "script-src 'self' 'nonce-{$nonce}' 'unsafe-eval' https://cdn.jsdelivr.net",
+            "script-src 'self' 'nonce-{$nonce}' 'unsafe-eval'",
+            "script-src-attr 'none'",
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
             "font-src 'self' https://fonts.gstatic.com data:",
-            "img-src 'self' data: blob: https:",
-            "connect-src 'self' wss: https:",
+            "img-src 'self' data: blob: https://ui-avatars.com https://images.unsplash.com",
+            "connect-src 'self'",
             "frame-ancestors 'none'",
+            "object-src 'none'",
             "base-uri 'self'",
-            "form-action 'self'",
-            'upgrade-insecure-requests',
+            "form-action 'self' https:",
+            'report-uri /csp-report',
         ]);
-        $response->headers->set('Content-Security-Policy', $csp);
+        $response->headers->set(config('security.csp_report_only') ? 'Content-Security-Policy-Report-Only' : 'Content-Security-Policy', $csp);
 
         // Clickjacking protection
         $response->headers->set('X-Frame-Options', 'DENY');
