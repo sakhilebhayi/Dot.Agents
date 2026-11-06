@@ -3,33 +3,28 @@
 namespace App\Livewire\Workflows;
 
 use App\Actions\Workflows\SaveWorkflowAction;
+use App\Actions\Workflows\StartWorkflowAction;
 use App\Actions\Workflows\UpdateWorkflowStatusAction;
 use App\DTOs\Workflows\SaveWorkflowData;
+use App\DTOs\Workflows\StartWorkflowData;
 use App\Livewire\Concerns\ManagesWorkflowCanvas;
-use App\Models\Agent;
+use App\Models\AgentDeployment;
 use App\Models\AgentWorkflow;
-use App\Services\AI\GraphWorkflowEngineService;
-use App\Services\Governance\AuditService;
+use App\Services\Tools\ToolCatalogue;
+use App\Services\Workflows\EdgeCondition;
+use App\Services\Workflows\WorkflowValidator;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
+use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
-/**
- * WorkflowBuilder — visual graph canvas component.
- *
- * Responsibilities:
- *  – Persist nodes and connections on save
- *  – Provide the Alpine.js canvas with the current graph state as JSON
- *  – Trigger graph execution
- *  – Remain thin: no business logic beyond CRUD of canvas state
- */
+/** The workflow diagram. The diagram itself lives in the browser; this keeps it, checks it and runs it. */
 class WorkflowBuilder extends Component
 {
     use ManagesWorkflowCanvas;
 
     /** Actions a read-only (viewer) role may still call; every other action is refused for it. */
-    public const READ_ONLY_ACTIONS = ['toJSON'];
+    public const READ_ONLY_ACTIONS = [];
 
     public AgentWorkflow $workflow;
 
@@ -44,10 +39,6 @@ class WorkflowBuilder extends Component
 
     public string $flashType = 'success';
 
-    // ──────────────────────────────────────────────
-    // Lifecycle
-    // ──────────────────────────────────────────────
-
     public function mount(int $workflowId): void
     {
         $this->workflow = AgentWorkflow::where('organization_id', session('current_organization_id'))
@@ -56,103 +47,42 @@ class WorkflowBuilder extends Component
         $this->loadGraph();
     }
 
-    // ──────────────────────────────────────────────
-    // Computed
-    // ──────────────────────────────────────────────
-
-    #[Computed]
-    public function availableAgents()
-    {
-        // Cache agent catalog for 5 minutes — used in canvas palette, rarely changes
-        return Cache::remember('workflow_available_agents', 300, fn () => Agent::active()
-            ->orderBy('name')
-            ->get(['id', 'slug', 'name', 'category_id'])
-            ->toArray()
-        );
-    }
-
-    // ──────────────────────────────────────────────
-    // Persistence
-    // ──────────────────────────────────────────────
-
     /**
      * Persist the current canvas state to the database.
      */
     public function save(): void
     {
-        if ($this->hasSuspiciousNodeInput()) {
-            return;
-        }
+        $this->persist();
 
-        app(SaveWorkflowAction::class)->execute(
-            $this->workflow,
-            new SaveWorkflowData($this->workflow->id, Auth::id(), $this->nodes, $this->connections)
-        );
-
-        $this->flashMessage = 'Workflow saved as draft.';
+        $this->flashMessage = 'Saved.';
         $this->flashType = 'success';
 
-        $this->dispatch('graph-saved');
     }
 
-    /**
-     * Publish the workflow — saves the graph then sets status to 'active'.
-     */
+    /** Publishing saves the diagram, and a workflow that cannot work is not published. */
     public function publish(): void
     {
         if (empty($this->nodes)) {
-            $this->flashMessage = 'Add at least one agent node before publishing.';
+            $this->flashMessage = 'Add at least one step before publishing.';
             $this->flashType = 'warning';
 
             return;
         }
 
-        if ($this->hasSuspiciousNodeInput()) {
+        $this->persist();
+
+        if ($problems = $this->problems()) {
+            $this->flashMessage = $problems[0];
+            $this->flashType = 'warning';
+
             return;
         }
-
-        app(SaveWorkflowAction::class)->execute(
-            $this->workflow,
-            new SaveWorkflowData($this->workflow->id, Auth::id(), $this->nodes, $this->connections)
-        );
 
         app(UpdateWorkflowStatusAction::class)->publish($this->workflow);
         $this->workflow->refresh();
 
-        $this->flashMessage = 'Workflow published and is now active.';
+        $this->flashMessage = 'Published. New work uses this diagram.';
         $this->flashType = 'success';
-    }
-
-    /**
-     * Scan node labels and instruction configs for prompt injection attempts.
-     *
-     * Returns true and sets a flash error when suspicious content is detected,
-     * so the caller can abort the save/publish operation.
-     */
-    private function hasSuspiciousNodeInput(): bool
-    {
-        /** @var AuditService $auditService */
-        $auditService = app(AuditService::class);
-
-        foreach ($this->nodes as $node) {
-            $textFields = [
-                $node['label'] ?? '',
-                $node['config']['instructions'] ?? '',
-                $node['config']['system_prompt'] ?? '',
-                $node['config']['description'] ?? '',
-            ];
-
-            foreach ($textFields as $text) {
-                if (! empty($text) && $auditService->detectPromptInjection($text)) {
-                    $this->flashMessage = 'Security: Potential prompt injection detected in node configuration. Please review your input.';
-                    $this->flashType = 'error';
-
-                    return true;
-                }
-            }
-        }
-
-        return false;
     }
 
     /**
@@ -167,59 +97,54 @@ class WorkflowBuilder extends Component
         $this->flashType = 'success';
     }
 
-    // ──────────────────────────────────────────────
-    // Compatibility shim
-    // ──────────────────────────────────────────────
-
-    /**
-     * Older compiled blade views (with @entangle) call toJSON() on this
-     * component when Alpine initialises. This method exists solely to
-     * prevent a MethodNotFoundException 500 if a stale compiled view is
-     * still cached on the production server.  It is never called by the
-     * current blade (which uses Js::from() instead of @entangle).
-     */
-    public function toJSON(): array
+    /** Saves the diagram and runs it on what the person asked for. */
+    public function runWith(string $request): void
     {
-        return [];
-    }
+        $this->persist();
 
-    // ──────────────────────────────────────────────
-    // Execution
-    // ──────────────────────────────────────────────
-
-    /**
-     * Trigger graph execution and return the execution ID.
-     */
-    public function run(): void
-    {
-        if (empty($this->nodes)) {
-            $this->flashMessage = 'Add at least one agent node to the canvas before running.';
+        try {
+            $execution = app(StartWorkflowAction::class)->execute($this->workflow, new StartWorkflowData(trim($request) ?: 'Run this workflow.', auth()->user()));
+        } catch (ValidationException $e) {
+            $this->flashMessage = $e->validator->errors()->first();
             $this->flashType = 'warning';
 
             return;
         }
 
-        $this->save();
-
-        try {
-            $execution = app(GraphWorkflowEngineService::class)->execute(
-                workflow: $this->workflow,
-                triggeredBy: Auth::id(),
-            );
-
-            $this->flashMessage = "Execution #{$execution->id} started — status: {$execution->status}";
-            $this->flashType = $execution->status === 'completed' ? 'success' : 'warning';
-
-            $this->dispatch('execution-started', executionId: $execution->id);
-        } catch (\Throwable $e) {
-            $this->flashMessage = 'Workflow execution failed: '.$e->getMessage();
-            $this->flashType = 'error';
-        }
+        $this->flashMessage = null;
+        $this->dispatch('execution-started', executionId: $execution->id);
     }
 
-    // ──────────────────────────────────────────────
-    // Render
-    // ──────────────────────────────────────────────
+    /** @return list<string> */
+    #[Computed]
+    public function problems(): array
+    {
+        return app(WorkflowValidator::class)->problems($this->workflow);
+    }
+
+    /** @return array<string, mixed> Everything the diagram offers. */
+    #[Computed]
+    public function options(): array
+    {
+        return [
+            'agents' => AgentDeployment::where('organization_id', $this->workflow->organization_id)->whereIn('status', ['active', 'draft'])->orderBy('name')->get(['id', 'name', 'role', 'status'])->all(),
+            'tools' => collect(app(ToolCatalogue::class)->all($this->workflow->organization_id))
+                ->map(fn ($tool) => $tool->definition())
+                ->reject(fn ($tool) => in_array($tool->key, ['knowledge_search', 'remember_fact', 'delegate_task'], true))
+                ->map(fn ($tool) => ['key' => $tool->key, 'label' => $tool->label, 'fields' => array_keys((array) ($tool->schema['properties'] ?? []))])->values()->all(),
+            'operators' => EdgeCondition::OPERATORS,
+        ];
+    }
+
+    private function persist(): void
+    {
+        app(SaveWorkflowAction::class)->execute(
+            $this->workflow,
+            new SaveWorkflowData($this->workflow->id, Auth::id(), $this->nodes, $this->connections)
+        );
+
+        unset($this->problems);
+    }
 
     public function render()
     {

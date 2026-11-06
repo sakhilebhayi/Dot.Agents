@@ -7,7 +7,9 @@ use App\Models\AgentEffect;
 use App\Models\AgentRun;
 use App\Services\AI\OutputModerationService;
 use App\Services\Governance\AuditService;
+use App\Services\Runs\DelegationReturn;
 use App\Services\Runs\ToolJournal;
+use App\Support\MarkedData;
 use App\Support\RunTaint;
 use Illuminate\Support\Str;
 use Throwable;
@@ -24,6 +26,7 @@ class ToolExecutor
         private readonly ToolJournal $journal,
         private readonly OutputModerationService $moderation,
         private readonly AuditService $audit,
+        private readonly DelegationReturn $delegation,
     ) {}
 
     public function execute(AgentRun $run, AgentEffect $effect, AgentTool $tool): void
@@ -35,6 +38,17 @@ class ToolExecutor
 
         try {
             $output = $tool->run(new ToolContext($run, $effect->idempotency_key), $effect->arguments);
+        } catch (ToolSuspended $suspended) {
+            $effect->update(['status' => AgentEffect::WAITING, 'child_run_id' => $suspended->childRunId]);
+
+            // A quick teammate may already be done, before anyone was waiting for it.
+            $child = AgentRun::find($suspended->childRunId);
+
+            if ($child?->isFinished()) {
+                $this->delegation->back($child);
+            }
+
+            return;
         } catch (ToolFailure $failure) {
             $this->failed($run, $effect, $definition, $failure);
 
@@ -67,7 +81,7 @@ class ToolExecutor
 
         $signal = $untrusted && $this->audit->detectPromptInjection($content, $run->deployment);
 
-        $this->journal->result($run, $effect, $tool->label, $this->asData($tool->key, $content), ['signal' => $signal, 'version' => $tool->version, 'sources' => $output->sources]);
+        $this->journal->result($run, $effect, $tool->label, MarkedData::wrap($tool->key, $content), ['signal' => $signal, 'version' => $tool->version, 'sources' => $output->sources]);
         $this->audit->logAgentAction($run->deployment, 'tool_used', ['run' => $run->uuid, 'tool' => $tool->key, 'version' => $tool->version, 'effect' => $effect->id]);
     }
 
@@ -88,13 +102,5 @@ class ToolExecutor
         $effect->update(['status' => AgentEffect::FAILED, 'error_code' => 'tool_failed', 'error_message' => $failure->getMessage()]);
         $this->journal->result($run, $effect, $tool->label, "This did not work: {$failure->getMessage()}", ['error' => true]);
         $this->audit->logAgentAction($run->deployment, 'tool_failed', ['run' => $run->uuid, 'tool' => $tool->key, 'effect' => $effect->id]);
-    }
-
-    /** Whatever a tool returned stays marked as data, and cannot close the marking itself. */
-    private function asData(string $source, string $content): string
-    {
-        $safe = (string) preg_replace('/<(\/?)\s*data/i', '&lt;$1data', $content);
-
-        return "<data source=\"{$source}\">\n{$safe}\n</data>";
     }
 }

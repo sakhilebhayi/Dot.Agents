@@ -6,6 +6,7 @@ use App\Models\Concerns\HasOrganizationScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
 class WorkflowExecution extends Model
@@ -16,7 +17,10 @@ class WorkflowExecution extends Model
         'uuid', 'workflow_id', 'organization_id', 'triggered_by', 'status',
         'input_data', 'output_data', 'step_results', 'error_message',
         'current_step', 'total_steps', 'total_cost', 'started_at', 'completed_at',
+        'graph', 'is_test', 'idempotency_key', 'advancing_until',
     ];
+
+    public const OPEN = ['pending', 'running', 'waiting_approval'];
 
     protected $casts = [
         'input_data' => 'array',
@@ -35,6 +39,12 @@ class WorkflowExecution extends Model
                 $exec->uuid = (string) Str::uuid();
             }
         });
+    }
+
+    /** @return HasMany<WorkflowStep, $this> */
+    public function steps(): HasMany
+    {
+        return $this->hasMany(WorkflowStep::class);
     }
 
     public function workflow(): BelongsTo

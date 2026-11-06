@@ -17,7 +17,7 @@ class AgentApproval extends Model
         'uuid', 'task_id', 'agent_deployment_id', 'organization_id', 'requested_from',
         'approval_type', 'title', 'description', 'proposed_action', 'impact_assessment',
         'risk_level', 'confidence_score', 'status', 'reviewed_by', 'reviewer_notes',
-        'reviewer_data', 'reviewed_at', 'expires_at', 'agent_run_id', 'agent_effect_id', 'action_hash', 'gate_code',
+        'reviewer_data', 'reviewed_at', 'expires_at', 'agent_run_id', 'agent_effect_id', 'action_hash', 'gate_code', 'workflow_step_id',
     ];
 
     protected $casts = [

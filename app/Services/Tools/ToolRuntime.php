@@ -6,6 +6,7 @@ use App\Models\AgentApproval;
 use App\Models\AgentEffect;
 use App\Models\AgentRun;
 use App\Models\AgentRunStep;
+use App\Models\AgentTeam;
 use App\Services\Approvals\ApprovalDesk;
 use App\Services\Governance\AuditService;
 use App\Services\Runs\Journal;
@@ -20,6 +21,8 @@ class ToolRuntime
     public const WORKED = 'worked';
 
     public const WAITING = 'waiting';
+
+    public const DELEGATED = 'delegated';
 
     public const NOTHING = 'nothing';
 
@@ -58,7 +61,7 @@ class ToolRuntime
             ->orderBy('id')->first();
 
         if ($effect === null) {
-            return self::NOTHING;
+            return AgentEffect::where('agent_run_id', $run->id)->where('status', AgentEffect::WAITING)->exists() ? self::DELEGATED : self::NOTHING;
         }
 
         return match ($effect->status) {
@@ -168,6 +171,11 @@ class ToolRuntime
 
         if ($settings['memory']['long_term']) {
             $grants['remember_fact'] = ['key' => 'remember_fact', 'mode' => 'auto'];
+        }
+
+        // Leading a team is how an agent is given someone to hand work to.
+        if (AgentTeam::where('supervisor_deployment_id', $run->agent_deployment_id)->exists()) {
+            $grants['delegate_task'] = ['key' => 'delegate_task', 'mode' => 'auto'];
         }
 
         return $grants->all();

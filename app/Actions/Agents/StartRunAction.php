@@ -7,8 +7,10 @@ use App\Exceptions\RunRefused;
 use App\Jobs\RunAgentStep;
 use App\Models\AgentDeployment;
 use App\Models\AgentRun;
+use App\Models\AgentRunStep;
 use App\Services\AI\AgentQuotaGuard;
 use App\Services\AI\AgentSandboxService;
+use App\Services\Runs\Journal;
 use App\Services\Runs\RunKick;
 use App\Support\RunTaint;
 use Illuminate\Database\UniqueConstraintViolationException;
@@ -25,6 +27,7 @@ class StartRunAction
         private readonly RunKick $kick,
         private readonly AgentSandboxService $sandbox,
         private readonly AgentQuotaGuard $quota,
+        private readonly Journal $journal,
     ) {}
 
     /** @throws RunRefused */
@@ -66,10 +69,16 @@ class StartRunAction
                 'limits' => $version->settings()['limits'],
                 'idempotency_key' => $data->idempotencyKey,
                 'is_test' => $data->isTest,
-                'taint' => RunTaint::forTrigger($data->triggerType),
+                'taint' => RunTaint::forTrigger($data->triggerType) | $data->taint,
             ]);
         } catch (UniqueConstraintViolationException) {
             return $this->existing($deployment, (string) $data->idempotencyKey);
+        }
+
+        if ($data->directCall !== null) {
+            $this->journal->write($run, AgentRunStep::MODEL, 'A workflow step asked for this', [
+                'payload' => ['message' => ['role' => 'assistant', 'text' => '', 'calls' => [['id' => 'step', ...$data->directCall]]]],
+            ]);
         }
 
         RunAgentStep::dispatch($run->id, $run->organization_id);

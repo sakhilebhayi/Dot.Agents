@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Log;
  * Uses a cached counter for performance, invalidated at month rollover.
  * Raises a RuntimeException when the quota has been exhausted.
  *
- * Extracted from AgentOrchestrationService to keep orchestration focused.
+ * Checked before every run starts.
  */
 class AgentQuotaGuard
 {

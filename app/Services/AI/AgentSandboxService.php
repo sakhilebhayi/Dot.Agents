@@ -33,13 +33,7 @@ class AgentSandboxService
      * Maximum number of tool calls allowed within a single task execution,
      * for any deployment regardless of charter/provisional status.
      *
-     * Provisional (uncharted) agents already have a stricter, event-driven
-     * limit enforced in AgentOrchestrationService::executeTask() via the
-     * colony runtime contract (config('services.dot_brain.provisional_max_tool_calls')),
-     * escalating straight to quarantine. This is the broader safety net that
-     * also covers chartered agents, which otherwise have no tool-call limit
-     * at all — prevents a runaway tool-call loop (e.g. a cheap tool invoked
-     * indefinitely) regardless of trust tier.
+     * The run engine enforces each agent's own limit. This is the outer bound.
      */
     private const MAX_TOOL_CALLS_PER_TASK = 15;
 

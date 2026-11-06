@@ -1,252 +1,259 @@
 /**
- * workflowCanvas — Alpine.js component for the visual graph builder.
- *
- * Registered via Alpine.data() so it is loaded as a bundled external asset.
- * This avoids the CSP nonce mismatch that occurs when Livewire's navigate
- * feature clones inline <script nonce=""> tags across page transitions:
- * the browser rejects the cloned script because the nonce from the previous
- * page response no longer matches, leaving workflowCanvas undefined.
- *
- * Usage in blade: x-data="workflowCanvas(initialNodes, initialConnections)"
+ * The workflow diagram. Registered with Alpine.data so it ships as a bundled asset under the page's CSP.
+ * Steps and lines live here while being edited and go to the server on save. On a phone the same data is a list.
  */
+const STEP_W = 196;
+const STEP_H = 68;
+const GRID = 24;
+const snap = (value) => Math.max(0, Math.round(value / GRID) * GRID);
+const uuid = () => (crypto.randomUUID ? crypto.randomUUID() : `s-${Date.now()}-${Math.random().toString(16).slice(2)}`);
+
 document.addEventListener('alpine:init', () => {
-    Alpine.data('workflowCanvas', (initialNodes = [], initialConnections = []) => ({
+    Alpine.data('workflowCanvas', (initialNodes = [], initialConnections = [], options = {}) => ({
         nodes: [],
         connections: [],
-
-        // Node drag (store ID, not object reference — refs go stale after canvas-synced)
+        agents: options.agents ?? [],
+        tools: options.tools ?? [],
+        operators: options.operators ?? {},
+        selected: null,
         dragging: null,
-        dragOffsetX: 0,
-        dragOffsetY: 0,
-
-        // Click-click connection model
-        connectingMode: false,
-        connectionSourceId: null,
-        mouseX: 0,
-        mouseY: 0,
-
-        // Selection
-        selectedNode: null,
-
-        // Sidebar drag-and-drop
-        pendingAgentKey: null,
-        pendingAgentLabel: null,
-
-        // Node dimensions (w-44 = 176px wide; header ~36px + body ~32px = 68px)
-        NODE_W: 176,
-        NODE_H: 68,
+        linking: null,
+        pointer: { x: 0, y: 0 },
+        dirty: false,
 
         init() {
-            this.nodes       = initialNodes       ?? [];
-            this.connections = initialConnections ?? [];
+            this.nodes = (initialNodes ?? []).map((node) => ({ ...node, config: this.withDefaults(node.config) }));
+            this.connections = (initialConnections ?? []).map((line) => ({ ...line, condition: this.conditionOf(line.condition) }));
+            window.addEventListener('beforeunload', (event) => { if (this.dirty) event.preventDefault(); });
+            Alpine.effect(() => this.drawLines());
+        },
 
-            // canvas-synced is dispatched by the server after every mutation.
-            // Guard against duplicate listeners on Livewire re-render.
-            if (!window.__canvasSyncedBound) {
-                window.__canvasSyncedBound = true;
-                window.addEventListener('canvas-synced', (e) => {
-                    // Find the live Alpine component and update it
-                    const el = document.querySelector('[id^="workflow-canvas"]');
-                    if (el && el._x_dataStack) {
-                        const data = el._x_dataStack[0];
-                        if (data) {
-                            data.nodes       = e.detail.nodes       ?? [];
-                            data.connections = e.detail.connections ?? [];
-                        }
-                    }
-                });
-            }
-            // Also update directly on init (handles Livewire re-render)
-            const self = this;
-            window.addEventListener('canvas-synced', function handler(e) {
-                self.nodes       = e.detail.nodes       ?? [];
-                self.connections = e.detail.connections ?? [];
+        /** Alpine cannot template inside an SVG, so the lines are drawn here. It reruns whenever a step or line changes. */
+        drawLines() {
+            const layer = this.$refs.lines;
+            if (!layer) return;
+
+            const paths = this.connections.flatMap((edge) => {
+                const hit = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                const route = this.pathFor(edge);
+                hit.setAttribute('d', route);
+                hit.setAttribute('class', 'flow-hit');
+                hit.addEventListener('click', () => this.select('line', edge.id));
+                line.setAttribute('d', route);
+                line.setAttribute('marker-end', 'url(#flow-arrow)');
+                line.setAttribute('class', `flow-line${this.selected?.id === edge.id ? ' is-selected' : ''}${edge.condition?.op === 'failed' ? ' is-failure' : ''}`);
+
+                return [hit, line];
             });
+
+            layer.replaceChildren(...paths);
         },
 
-        // ── Sidebar drag-and-drop ──
-        startAgentDrag(e, agentKey, agentLabel) {
-            this.pendingAgentKey   = agentKey;
-            this.pendingAgentLabel = agentLabel;
-            e.dataTransfer.effectAllowed = 'copy';
+        withDefaults(config) {
+            const safe = Array.isArray(config) || !config ? {} : config;
+
+            return { kind: 'agent', deployment_id: null, instruction: '', on_failure: 'stop', retries: 0, tool: '', arguments: {}, expect: {}, ...safe };
         },
 
-        onCanvasDrop(e) {
-            if (!this.pendingAgentKey) return;
-            const canvas = document.getElementById('workflow-canvas');
-            const rect   = canvas.getBoundingClientRect();
-            const x = Math.round(e.clientX - rect.left - this.NODE_W / 2);
-            const y = Math.round(e.clientY - rect.top  - this.NODE_H / 2);
-            this.$wire.addNode(this.pendingAgentKey, Math.max(0, x), Math.max(0, y));
-            this.pendingAgentKey   = null;
-            this.pendingAgentLabel = null;
+        conditionOf(condition) {
+            const parsed = typeof condition === 'string' ? JSON.parse(condition || 'null') : condition;
+
+            return parsed && parsed.op ? parsed : { op: 'always', value: '' };
         },
 
-        // ── Node drag-to-move ──
-        startDrag(e, nodeId) {
-            if (e.button !== 0 || this.connectingMode) return;
-            const idx = this.nodes.findIndex(n => n.id === nodeId);
-            if (idx === -1) return;
-            this.dragging    = nodeId;
-            this.dragOffsetX = e.clientX - this.nodes[idx].x;
-            this.dragOffsetY = e.clientY - this.nodes[idx].y;
-            e.preventDefault();
-        },
+        get step() { return this.selected?.type === 'step' ? this.nodes.find((node) => node.id === this.selected.id) : null; },
+        get line() { return this.selected?.type === 'line' ? this.connections.find((edge) => edge.id === this.selected.id) : null; },
 
-        onMouseMove(e) {
-            this.mouseX = e.clientX;
-            this.mouseY = e.clientY;
-            if (this.dragging) {
-                const idx = this.nodes.findIndex(n => n.id === this.dragging);
-                if (idx !== -1) {
-                    this.nodes[idx].x = Math.max(0, Math.round(e.clientX - this.dragOffsetX));
-                    this.nodes[idx].y = Math.max(0, Math.round(e.clientY - this.dragOffsetY));
-                }
+        /** Steps in running order, for the phone list. */
+        get ordered() {
+            const placed = new Set();
+            const out = [];
+            let remaining = [...this.nodes].sort((a, b) => a.x - b.x || a.y - b.y);
+
+            while (remaining.length) {
+                const ready = remaining.filter((node) => this.connections.filter((edge) => edge.to === node.id).every((edge) => placed.has(edge.from)));
+                const next = ready.length ? ready : remaining.slice(0, 1);
+                next.forEach((node) => { placed.add(node.id); out.push(node); });
+                remaining = remaining.filter((node) => !placed.has(node.id));
             }
+
+            return out;
         },
 
-        onMouseUp(e) {
+        changed() { this.dirty = true; },
+
+        addStep(kind) {
+            const labels = { agent: 'New step', tool: 'Use a tool', approval: 'A person approves' };
+            const last = this.nodes[this.nodes.length - 1];
+            const node = { id: uuid(), agent_key: kind, label: labels[kind], x: last ? last.x + 264 : 48, y: last ? last.y : 96, config: this.withDefaults({ kind }) };
+
+            this.nodes.push(node);
+
+            if (last) {
+                this.connections.push({ id: uuid(), from: last.id, to: node.id, condition: { op: 'always', value: '' }, label: null });
+            }
+
+            this.select('step', node.id);
+            this.changed();
+        },
+
+        select(type, id) { this.selected = { type, id }; },
+
+        removeSelected() {
+            if (this.step) {
+                const id = this.step.id;
+                this.nodes = this.nodes.filter((node) => node.id !== id);
+                this.connections = this.connections.filter((edge) => edge.from !== id && edge.to !== id);
+            } else if (this.line) {
+                const id = this.line.id;
+                this.connections = this.connections.filter((edge) => edge.id !== id);
+            }
+
+            this.selected = null;
+            this.changed();
+        },
+
+        /** The way to connect steps without dragging: tick what a step runs after. */
+        runsAfter(from) { return this.connections.some((edge) => edge.from === from && edge.to === this.step?.id); },
+
+        toggleRunsAfter(from) {
+            const to = this.step.id;
+            const existing = this.connections.find((edge) => edge.from === from && edge.to === to);
+
+            if (existing) {
+                this.connections = this.connections.filter((edge) => edge !== existing);
+            } else if (!this.wouldLoop(from, to)) {
+                this.connections.push({ id: uuid(), from, to, condition: { op: 'always', value: '' }, label: null });
+            }
+
+            this.changed();
+        },
+
+        wouldLoop(from, to) {
+            const seen = new Set();
+            const walk = (id) => id === from || (!seen.has(id) && (seen.add(id), this.connections.filter((edge) => edge.from === id).some((edge) => walk(edge.to))));
+
+            return from === to || walk(to);
+        },
+
+        startDrag(event, node) {
+            event.preventDefault();
+            this.select('step', node.id);
+            this.dragging = { id: node.id, dx: event.clientX - node.x, dy: event.clientY - node.y };
+        },
+
+        startLink(event, node) {
+            event.stopPropagation();
+            event.preventDefault();
+            this.linking = node.id;
+            this.track(event);
+        },
+
+        track(event) {
+            const box = this.$refs.board.getBoundingClientRect();
+            this.pointer = { x: event.clientX - box.left, y: event.clientY - box.top };
+        },
+
+        moved(event) {
             if (this.dragging) {
-                const node = this.nodes.find(n => n.id === this.dragging);
-                if (node) this.$wire.moveNode(this.dragging, node.x, node.y);
+                const node = this.nodes.find((item) => item.id === this.dragging.id);
+                node.x = Math.max(0, event.clientX - this.dragging.dx);
+                node.y = Math.max(0, event.clientY - this.dragging.dy);
+            }
+
+            if (this.linking) this.track(event);
+        },
+
+        released() {
+            if (this.dragging) {
+                const node = this.nodes.find((item) => item.id === this.dragging.id);
+                node.x = snap(node.x);
+                node.y = snap(node.y);
                 this.dragging = null;
+                this.changed();
+            }
+
+            if (this.linking) {
+                const target = this.nodes.find((node) => this.pointer.x >= node.x && this.pointer.x <= node.x + STEP_W && this.pointer.y >= node.y && this.pointer.y <= node.y + STEP_H);
+
+                if (target && !this.wouldLoop(this.linking, target.id) && !this.connections.some((edge) => edge.from === this.linking && edge.to === target.id)) {
+                    const edge = { id: uuid(), from: this.linking, to: target.id, condition: { op: 'always', value: '' }, label: null };
+                    this.connections.push(edge);
+                    this.select('line', edge.id);
+                    this.changed();
+                }
+
+                this.linking = null;
             }
         },
 
-        // ── Click-click connection model ──
-        // Step 1: click yellow OUTPUT port → enter connect mode
-        startConnecting(nodeId) {
-            if (this.dragging) return;
-            this.connectingMode    = true;
-            this.connectionSourceId = nodeId;
+        nudge(event, node, dx, dy) {
+            event.preventDefault();
+            node.x = Math.max(0, node.x + dx * GRID);
+            node.y = Math.max(0, node.y + dy * GRID);
+            this.changed();
         },
 
-        // Step 2: click purple INPUT port of another node → create connection
-        completeConnection(targetNodeId) {
-            if (!this.connectingMode || !this.connectionSourceId) return;
-            if (this.connectionSourceId !== targetNodeId) {
-                this.$wire.connectNodes(this.connectionSourceId, targetNodeId, null);
-            }
-            this.connectingMode    = false;
-            this.connectionSourceId = null;
+        pathFor(edge) {
+            const from = this.nodes.find((node) => node.id === edge.from);
+            const to = this.nodes.find((node) => node.id === edge.to);
+            if (!from || !to) return '';
+
+            return this.route(from.x + STEP_W, from.y + STEP_H / 2, to.x, to.y + STEP_H / 2);
         },
 
-        // Cancel connect mode (canvas click, Escape key)
-        cancelConnecting() {
-            if (this.connectingMode) {
-                this.connectingMode    = false;
-                this.connectionSourceId = null;
-            }
+        route(x1, y1, x2, y2) {
+            const mid = x2 > x1 + 32 ? (x1 + x2) / 2 : x1 + 24;
+
+            return x2 > x1 + 32 ? `M${x1} ${y1} H${mid} V${y2} H${x2}` : `M${x1} ${y1} H${mid} V${y1 + (y2 >= y1 ? 56 : -56)} H${x2 - 24} V${y2} H${x2}`;
         },
 
-        removeNode(nodeId) {
-            this.$wire.removeNode(nodeId);
+        get linkPath() {
+            const from = this.nodes.find((node) => node.id === this.linking);
+
+            return from ? this.route(from.x + STEP_W, from.y + STEP_H / 2, this.pointer.x, this.pointer.y) : '';
         },
 
-        removeConnection(connId) {
-            this.$wire.removeConnection(connId);
+        labelSpot(edge) {
+            const from = this.nodes.find((node) => node.id === edge.from);
+            const to = this.nodes.find((node) => node.id === edge.to);
+            if (!from || !to) return '';
+
+            return `left:${(from.x + STEP_W + to.x) / 2}px;top:${(from.y + to.y + STEP_H) / 2}px`;
         },
 
-        // ── Imperative SVG renderer ──
-        // Called by x-effect on <g id="connections-group">.
-        // Builds SVG path elements using createElementNS so they are always
-        // in the correct SVG namespace — avoids the "conn is not defined"
-        // error caused by Alpine x-for losing scope when Livewire morphs the DOM.
-        renderConnections() {
-            const group = document.getElementById('connections-group');
-            if (!group) return;
+        lineWord(edge) {
+            const { op, value } = edge.condition ?? {};
+            const words = { failed: 'If it failed', contains: `Has "${value}"`, not_contains: `Not "${value}"`, equals: `Is "${value}"` };
 
-            // Remove all existing children
-            while (group.firstChild) group.removeChild(group.firstChild);
-
-            const SVG = 'http://www.w3.org/2000/svg';
-            const self = this;
-
-            for (const conn of this.connections) {
-                const d = this.connectionPath(conn);
-                if (!d || d === 'M 0 0') continue;
-
-                // Visible bezier line
-                const line = document.createElementNS(SVG, 'path');
-                line.setAttribute('d', d);
-                line.setAttribute('fill', 'none');
-                line.setAttribute('stroke', '#8b5cf6');
-                line.setAttribute('stroke-width', '2');
-                line.setAttribute('marker-end', 'url(#arrowhead)');
-                line.style.pointerEvents = 'none';
-                group.appendChild(line);
-
-                // Wide transparent hit-zone for click-to-delete
-                const hit = document.createElementNS(SVG, 'path');
-                hit.setAttribute('d', d);
-                hit.setAttribute('fill', 'none');
-                hit.setAttribute('stroke', 'transparent');
-                hit.setAttribute('stroke-width', '16');
-                hit.style.pointerEvents = 'all';
-                hit.style.cursor = 'pointer';
-                hit.title = 'Click to delete connection';
-                // Capture conn.id in closure to avoid loop variable re-binding
-                (function(id) {
-                    hit.addEventListener('click', function(e) {
-                        e.stopPropagation();
-                        self.removeConnection(id);
-                    });
-                })(conn.id);
-                group.appendChild(hit);
-            }
+            return words[op] ?? '';
         },
 
-        // ── Selection ──
-        selectNode(nodeId) {
-            if (this.dragging || this.connectingMode) return;
-            this.selectedNode = this.selectedNode === nodeId ? null : nodeId;
+        agentName(id) { return this.agents.find((agent) => agent.id === Number(id))?.name ?? 'Choose an agent'; },
+
+        subtitle(node) {
+            if (node.config.kind === 'approval') return 'Waits for a person';
+            if (node.config.kind === 'tool') return node.config.tool || 'Choose a tool';
+
+            return this.agentName(node.config.deployment_id);
         },
 
-        selectedNodeData() {
-            if (!this.selectedNode) return null;
-            return this.nodes.find(n => n.id === this.selectedNode) ?? null;
+        toolArguments(key) { return this.tools.find((tool) => tool.key === key)?.fields ?? []; },
+
+        payload() {
+            return [
+                this.nodes.map((node) => ({ ...node, x: Math.round(node.x), y: Math.round(node.y) })),
+                this.connections.map((edge) => ({ ...edge, condition: edge.condition?.op === 'always' ? null : edge.condition })),
+            ];
         },
 
-        updateNodeLabel(label) {
-            const idx = this.nodes.findIndex(n => n.id === this.selectedNode);
-            if (idx !== -1) this.nodes[idx].label = label;
-            if (this.selectedNode) this.$wire.updateNodeLabel(this.selectedNode, label);
-        },
-
-        // ── Port centre helpers (canvas-relative coordinates) ──
-        outputPort(node) {
-            // Bottom-centre of node (where yellow port lives)
-            return { x: node.x + this.NODE_W / 2, y: node.y + this.NODE_H + 2 };
-        },
-
-        inputPort(node) {
-            // Top-centre of node (where purple port lives)
-            return { x: node.x + this.NODE_W / 2, y: node.y - 2 };
-        },
-
-        // ── SVG bezier path generators ──
-        connectionPath(conn) {
-            const src = this.nodes.find(n => n.id === conn.from);
-            const dst = this.nodes.find(n => n.id === conn.to);
-            if (!src || !dst) return 'M 0 0';
-            const from = this.outputPort(src);
-            const to   = this.inputPort(dst);
-            const cy   = Math.max(50, Math.abs(to.y - from.y) * 0.6);
-            return `M ${from.x} ${from.y} C ${from.x} ${from.y + cy}, ${to.x} ${to.y - cy}, ${to.x} ${to.y}`;
-        },
-
-        liveConnectionPath() {
-            if (!this.connectingMode || !this.connectionSourceId) return 'M 0 0';
-            const src = this.nodes.find(n => n.id === this.connectionSourceId);
-            if (!src) return 'M 0 0';
-            const canvas = document.getElementById('workflow-canvas');
-            if (!canvas) return 'M 0 0';
-            const rect = canvas.getBoundingClientRect();
-            const from = this.outputPort(src);
-            const tx   = this.mouseX - rect.left;
-            const ty   = this.mouseY - rect.top;
-            const cy   = Math.max(40, Math.abs(ty - from.y) * 0.5);
-            return `M ${from.x} ${from.y} C ${from.x} ${from.y + cy}, ${tx} ${ty - cy}, ${tx} ${ty}`;
+        async save(action = 'save') {
+            const [nodes, connections] = this.payload();
+            this.$wire.nodes = nodes;
+            this.$wire.connections = connections;
+            this.dirty = false;
+            await this.$wire[action]();
         },
     }));
 });

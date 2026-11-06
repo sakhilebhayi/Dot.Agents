@@ -30,6 +30,8 @@ class AgentRun extends Model
 
     public const WAITING_APPROVAL = 'waiting_approval';
 
+    public const WAITING_AGENT = 'waiting_agent';
+
     public const COMPLETED = 'completed';
 
     public const FAILED = 'failed';
@@ -40,7 +42,7 @@ class AgentRun extends Model
 
     public const FINISHED = [self::COMPLETED, self::FAILED, self::STOPPED, self::CANCELLED];
 
-    public const OPEN = [self::QUEUED, self::RUNNING, self::WAITING_APPROVAL];
+    public const OPEN = [self::QUEUED, self::RUNNING, self::WAITING_APPROVAL, self::WAITING_AGENT];
 
     protected $guarded = ['id'];
 

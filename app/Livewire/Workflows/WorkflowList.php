@@ -4,9 +4,12 @@ namespace App\Livewire\Workflows;
 
 use App\Actions\Workflows\CreateWorkflowAction;
 use App\Actions\Workflows\DeleteWorkflowAction;
+use App\Actions\Workflows\SaveWorkflowAction;
 use App\DTOs\Workflows\CreateWorkflowData;
+use App\DTOs\Workflows\SaveWorkflowData;
 use App\Livewire\Concerns\ResolvesCurrentOrganization;
 use App\Models\AgentWorkflow;
+use Illuminate\Support\Str;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
@@ -59,6 +62,42 @@ class WorkflowList extends Component
 
         $this->showCreateModal = false;
         $this->redirect(route('workflows.builder', $workflow), navigate: true);
+    }
+
+    /** @return array<string, array<string, mixed>> */
+    #[Computed]
+    public function templates(): array
+    {
+        return config('workflow_templates');
+    }
+
+    public function useTemplate(string $key, SaveWorkflowAction $save): void
+    {
+        $template = config("workflow_templates.{$key}") ?? abort(404);
+
+        $workflow = app(CreateWorkflowAction::class)->execute($this->requireCurrentOrganization(), new CreateWorkflowData(
+            name: $template['name'],
+            triggerType: 'manual',
+            description: $template['summary'],
+        ));
+
+        $ids = collect($template['steps'])->mapWithKeys(fn ($step) => [$step['id'] => (string) Str::uuid()]);
+
+        $save->execute($workflow, new SaveWorkflowData(
+            $workflow->id,
+            auth()->id(),
+            collect($template['steps'])->map(fn ($step) => [
+                'id' => $ids[$step['id']],
+                'agent_key' => $step['kind'],
+                'label' => $step['label'],
+                'x' => $step['x'],
+                'y' => $step['y'],
+                'config' => ['kind' => $step['kind'], 'instruction' => $step['instruction'] ?? ''],
+            ])->all(),
+            collect($template['lines'])->map(fn ($line) => ['id' => (string) Str::uuid(), 'from' => $ids[$line[0]], 'to' => $ids[$line[1]], 'condition' => $line[2] ?? null])->all(),
+        ));
+
+        $this->redirect(route('workflows.builder', $workflow));
     }
 
     public function deleteWorkflow(int $id): void

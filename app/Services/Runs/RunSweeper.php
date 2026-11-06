@@ -2,9 +2,11 @@
 
 namespace App\Services\Runs;
 
+use App\Jobs\AdvanceWorkflow;
 use App\Jobs\RunAgentStep;
 use App\Models\AgentEffect;
 use App\Models\AgentRun;
+use App\Models\WorkflowExecution;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -35,6 +37,13 @@ class RunSweeper
                 $run->touch();
                 RunAgentStep::dispatch($run->id, $run->organization_id);
                 $resumed++;
+            });
+
+        WorkflowExecution::whereIn('status', WorkflowExecution::OPEN)
+            ->where('updated_at', '<', now()->subSeconds((int) config('agents.stale_seconds')))
+            ->each(function (WorkflowExecution $execution) {
+                $execution->touch();
+                AdvanceWorkflow::dispatch($execution->id, $execution->organization_id);
             });
 
         return compact('resumed', 'unknown');

@@ -23,6 +23,9 @@ class AgentEffect extends Model
 
     public const EXECUTING = 'executing';
 
+    /** Handed to another agent, which will report back. */
+    public const WAITING = 'waiting';
+
     public const DONE = 'done';
 
     public const FAILED = 'failed';

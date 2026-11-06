@@ -6,6 +6,7 @@ use App\Models\AgentMemory;
 use App\Models\AgentMessage;
 use App\Models\AgentRun;
 use App\Models\AgentRunStep;
+use App\Models\AgentTeamMember;
 use App\Services\Agents\AgentConfig;
 
 /**
@@ -40,6 +41,7 @@ class PromptAssembler
             $config['instructions'] ?: null,
             'Write in '.$config['language'].', in a '.strtolower(AgentConfig::TONES[$config['tone']] ?? 'plain').' tone.',
             $this->outputRule($config['output']['format']),
+            $this->team($run),
             'Today is '.now()->format('l j F Y').'.',
             self::RULES,
         ]));
@@ -92,6 +94,20 @@ class PromptAssembler
         AgentMemory::whereIn('id', $recalled['ids'])->increment('access_count');
 
         return $recalled['text'];
+    }
+
+    /** A supervisor is told who it can hand work to. Only the business set this up. */
+    private function team(AgentRun $run): ?string
+    {
+        $members = AgentTeamMember::with('deployment')->whereHas('team', fn ($team) => $team->where('supervisor_deployment_id', $run->agent_deployment_id))->get();
+
+        if ($members->isEmpty()) {
+            return null;
+        }
+
+        $list = $members->map(fn ($member) => "- {$member->agent_deployment_id}: {$member->deployment->name}, {$member->responsibility}")->implode("\n");
+
+        return "You lead a team. Hand each clear piece of work to the right teammate with delegate_task, then check what comes back before you answer.\n{$list}";
     }
 
     private function outputRule(string $format): string

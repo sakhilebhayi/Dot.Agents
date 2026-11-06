@@ -4,6 +4,7 @@ namespace App\Services\Runs;
 
 use App\Events\AgentTaskCompleted;
 use App\Events\AgentTaskFailed;
+use App\Jobs\AdvanceWorkflow;
 use App\Models\AgentApproval;
 use App\Models\AgentMessage;
 use App\Models\AgentRun;
@@ -22,6 +23,7 @@ class RunFinisher
         private readonly UsageLedger $ledger,
         private readonly AuditService $audit,
         private readonly OutputChannels $channels,
+        private readonly DelegationReturn $delegation,
     ) {}
 
     public function complete(AgentRun $run, string $text, bool $cutOff = false): void
@@ -69,6 +71,8 @@ class RunFinisher
     {
         $run->update(['status' => $status, 'finished_at' => now(), ...$attributes]);
 
+        $this->notifyWaiters($run);
+
         // Nothing is left asking for an answer that can no longer change anything.
         AgentApproval::where('agent_run_id', $run->id)->where('status', 'pending')->update(['status' => 'withdrawn']);
 
@@ -77,6 +81,18 @@ class RunFinisher
             $this->audit->logAgentAction($run->deployment, "run_{$status}", [
                 'run' => $run->uuid, 'version' => $run->config_version_id, 'tokens' => $run->tokens_used, 'cost' => $run->cost, 'error_code' => $run->error_code,
             ]);
+        }
+    }
+
+    /** Whoever was waiting on this run carries on: a supervisor, or the workflow it was a step of. */
+    private function notifyWaiters(AgentRun $run): void
+    {
+        if ($run->parent_run_id !== null) {
+            $this->delegation->back($run);
+        }
+
+        if ($run->workflow_execution_id !== null) {
+            AdvanceWorkflow::dispatch($run->workflow_execution_id, $run->organization_id);
         }
     }
 

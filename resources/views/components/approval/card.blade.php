@@ -2,7 +2,8 @@
 
 @php
     $card = $approval->proposed_action ?? [];
-    $isAction = isset($card['tool']);
+    $isAction = isset($card['values']);
+    $editable = isset($card['tool']);
     $canReview = auth()->user()->can('review', $approval) && $approval->status === 'pending';
 @endphp
 
@@ -21,7 +22,7 @@
 
         @if($isAction)
             <section aria-label="Exact values">
-                <h3>{{ $changing ? 'Change the values' : 'It will use exactly this' }}</h3>
+                <h3>{{ $changing ? 'Change the values' : ($editable ? 'It will use exactly this' : 'What came before this step') }}</h3>
                 <dl class="pairs">
                     @forelse($card['values'] as $name => $value)
                         <div>
@@ -78,7 +79,7 @@
                     <button type="button" class="btn primary" wire:click="approve" wire:loading.attr="disabled">{{ $changing ? 'Approve with these values' : 'Approve' }}</button>
                     <button type="button" class="btn danger" wire:click="reject" wire:loading.attr="disabled">Reject</button>
                     <button type="button" class="btn" wire:click="requestChanges" wire:loading.attr="disabled">Ask for changes</button>
-                    @if($isAction && ! $changing)
+                    @if($editable && ! $changing)
                         <button type="button" class="btn quiet" wire:click="$set('changing', true)">Change the values</button>
                     @endif
                 </div>

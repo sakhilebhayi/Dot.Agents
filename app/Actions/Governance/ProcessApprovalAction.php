@@ -50,7 +50,7 @@ class ProcessApprovalAction
             throw new \RuntimeException("Approval #{$approval->id} has expired.");
         }
 
-        if ($approval->agent_run_id !== null) {
+        if ($approval->agent_run_id !== null || $approval->workflow_step_id !== null) {
             return $this->decision->apply($approval, Auth::user(), $data);
         }
 

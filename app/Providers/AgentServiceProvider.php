@@ -2,31 +2,18 @@
 
 namespace App\Providers;
 
-use App\Services\AI\AgentModelCaller;
-use App\Services\AI\AgentOrchestrationService;
 use App\Services\AI\AgentPluginService;
-use App\Services\AI\AgentQuotaGuard;
 use App\Services\AI\AgentSandboxService;
 use App\Services\AI\EnterpriseBrainScorer;
 use App\Services\AI\EnterpriseBrainService;
 use App\Services\AI\ExecutiveCouncilService;
-use App\Services\AI\GraphWorkflowEngineService;
 use App\Services\AI\MemoryService;
-use App\Services\AI\ModelRouterService;
 use App\Services\AI\OutputModerationService;
-use App\Services\AI\PromptBuilderService;
-use App\Services\AI\ResponseProcessorService;
 use App\Services\AI\SkillExecutionPipeline;
 use App\Services\AI\SkillRegistryService;
 use App\Services\AI\ToolPermissionService;
-use App\Services\AI\Workflow\WorkflowGraphResolver;
-use App\Services\AI\WorkflowRiskScoringService;
-use App\Services\Governance\AgentCharterLoader;
 use App\Services\Governance\AuditService;
-use App\Services\Governance\DelusionDetectionService;
-use App\Services\Governance\DigitalImmuneSystem;
 use App\Services\Governance\EnterpriseConstitutionService;
-use App\Services\Memory\DotMemoryClient;
 use App\Services\Models\ModelGateway;
 use App\Services\Models\PrismGateway;
 use App\Services\Models\ScriptedGateway;
@@ -37,7 +24,6 @@ class AgentServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->app->singleton(ModelRouterService::class);
         $this->app->singleton(MemoryService::class);
         $this->app->singleton(ToolPermissionService::class);
         $this->app->singleton(OutputModerationService::class);
@@ -45,31 +31,6 @@ class AgentServiceProvider extends ServiceProvider
         $this->app->singleton(AgentSandboxService::class, function ($app) {
             return new AgentSandboxService(
                 $app->make(ToolPermissionService::class)
-            );
-        });
-
-        $this->app->singleton(AgentOrchestrationService::class, function ($app) {
-            return new AgentOrchestrationService(
-                $app->make(ModelRouterService::class),
-                $app->make(DelusionDetectionService::class),
-                $app->make(AuditService::class),
-                $app->make(AgentSandboxService::class),
-                $app->make(PromptBuilderService::class),
-                $app->make(ResponseProcessorService::class),
-                $app->make(AgentModelCaller::class),
-                $app->make(AgentQuotaGuard::class),
-                $app->make(DotMemoryClient::class),
-                $app->make(AgentCharterLoader::class),
-                $app->make(DigitalImmuneSystem::class),
-            );
-        });
-
-        $this->app->singleton(GraphWorkflowEngineService::class, function ($app) {
-            return new GraphWorkflowEngineService(
-                $app->make(AgentOrchestrationService::class),
-                $app->make(AuditService::class),
-                $app->make(WorkflowRiskScoringService::class),
-                $app->make(WorkflowGraphResolver::class),
             );
         });
 

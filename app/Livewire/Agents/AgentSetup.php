@@ -66,7 +66,7 @@ class AgentSetup extends Component
     {
         return collect(app(ToolCatalogue::class)->all($this->agent->organization_id))
             ->map(fn ($tool) => $tool->definition())
-            ->reject(fn ($tool) => in_array($tool->key, ['knowledge_search', 'remember_fact'], true));
+            ->reject(fn ($tool) => in_array($tool->key, ['knowledge_search', 'remember_fact', 'delegate_task'], true));
     }
 
     #[Computed]

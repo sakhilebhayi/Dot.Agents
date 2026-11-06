@@ -3,6 +3,7 @@
 namespace App\Services\Runs;
 
 use App\Jobs\RunAgentStep;
+use App\Models\AgentEffect;
 use App\Models\AgentRun;
 use App\Models\AgentRunStep;
 use App\Services\Models\ModelFailure;
@@ -89,8 +90,9 @@ class RunStepper
         // Finish what the last turn asked for before asking the model anything else.
         return match ($this->tools->work($run)) {
             ToolRuntime::WORKED => self::CONTINUE,
-            ToolRuntime::WAITING => $this->wait($run),
-            default => $this->askModel($run),
+            ToolRuntime::WAITING => $this->hold($run, AgentRun::WAITING_APPROVAL),
+            ToolRuntime::DELEGATED => $this->hold($run, AgentRun::WAITING_AGENT),
+            default => $run->trigger_type === 'workflow_tool' ? $this->finishToolStep($run) : $this->askModel($run),
         };
     }
 
@@ -113,9 +115,21 @@ class RunStepper
         return self::IDLE;
     }
 
-    private function wait(AgentRun $run): string
+    private function hold(AgentRun $run, string $status): string
     {
-        $run->update(['status' => AgentRun::WAITING_APPROVAL]);
+        $run->update(['status' => $status]);
+
+        return self::IDLE;
+    }
+
+    /** A tool step has no model. Its result is the tool's own, or its failure. */
+    private function finishToolStep(AgentRun $run): string
+    {
+        $effect = $run->effects()->latest('id')->first();
+
+        $effect?->status === AgentEffect::DONE
+            ? $this->finisher->complete($run, (string) ($effect->result['content'] ?? ''))
+            : $this->finisher->fail($run, $effect->error_code ?? 'tool_failed', $effect->error_message ?? 'The tool did not run.');
 
         return self::IDLE;
     }
