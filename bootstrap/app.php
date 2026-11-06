@@ -5,7 +5,6 @@ use App\Http\Middleware\ConsentRequiredMiddleware;
 use App\Http\Middleware\CorrelationIdMiddleware;
 use App\Http\Middleware\OrganizationContextMiddleware;
 use App\Http\Middleware\SecurityHeadersMiddleware;
-use App\Http\Middleware\VerifyCsrfToken;
 use App\Services\Guardian\ErrorCounter;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -29,10 +28,8 @@ return Application::configure(basePath: dirname(__DIR__))
         // CORS handling for API routes
         $middleware->api(prepend: [HandleCors::class]);
 
-        // CSRF verification with Stripe webhook exemption
-        $middleware->web(replace: [
-            Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class => VerifyCsrfToken::class,
-        ]);
+        // Webhooks carry a provider signature, verified in their controllers, and cannot send a CSRF token.
+        $middleware->preventRequestForgery(except: ['webhooks/stripe', 'social/webhooks/*']);
 
         // Custom aliases
         $middleware->alias([

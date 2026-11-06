@@ -9,7 +9,6 @@ use App\Providers\FortifyServiceProvider;
 use App\Providers\GovernanceEventServiceProvider;
 use App\Providers\GovernanceServiceProvider;
 use App\Providers\HealthCheckServiceProvider;
-use App\Providers\HorizonServiceProvider;
 use App\Providers\JetstreamServiceProvider;
 use App\Providers\PolicyServiceProvider;
 use App\Providers\ReadOnlyServiceProvider;
@@ -29,7 +28,6 @@ return [
     GovernanceEventServiceProvider::class,
     BillingEventServiceProvider::class,
     FortifyServiceProvider::class,
-    HorizonServiceProvider::class,
     JetstreamServiceProvider::class,
     // Read-only (viewer) role: Gate, Livewire and Blade hooks
     ReadOnlyServiceProvider::class,

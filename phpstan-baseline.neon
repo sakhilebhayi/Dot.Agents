@@ -445,12 +445,6 @@ parameters:
 			path: app/Livewire/Billing/BillingSettings.php
 
 		-
-			message: '#^Relation ''latestScorecard'' is not found in App\\Models\\AgentDeployment model\.$#'
-			identifier: larastan.relationExistence
-			count: 1
-			path: app/Livewire/Dashboard/AgentDashboard.php
-
-		-
 			message: '#^Access to an undefined property App\\Livewire\\Dashboard\\OperationsDashboard\:\:\$circuitBreakers\.$#'
 			identifier: property.notFound
 			count: 1
@@ -757,13 +751,13 @@ parameters:
 			path: app/Services/AI/WorkflowRiskScoringService.php
 
 		-
-			message: '#^Parameter \#1 \$params of method Stripe\\Service\\Checkout\\SessionService\:\:create\(\) expects array\{adaptive_pricing\?\: array\{enabled\?\: bool\}, after_expiration\?\: array\{recovery\?\: array\{allow_promotion_codes\?\: bool, enabled\: bool\}\}, allow_promotion_codes\?\: bool, automatic_tax\?\: array\{enabled\: bool, liability\?\: array\{account\?\: string, type\: string\}\}, billing_address_collection\?\: string, branding_settings\?\: array\{background_color\?\: string\|null, border_style\?\: string\|null, button_color\?\: string\|null, display_name\?\: string, font_family\?\: string\|null, icon\?\: array\{file\?\: string, type\: string, url\?\: string\}, logo\?\: array\{file\?\: string, type\: string, url\?\: string\}\}, cancel_url\?\: string, client_reference_id\?\: string, \.\.\.\}\|null, array\{customer\: string, mode\: ''subscription'', line_items\: array\{array\{price\: non\-falsy\-string, quantity\: 1\}\}, success_url\: string, cancel_url\: string, metadata\: array\{organization_id\: int, subscription_plan_id\: int\}, subscription_data\: array\{trial_period_days\: int\<1, max\>\|null, metadata\: array\{organization_id\: int, subscription_plan_id\: int\}\}\} given\.$#'
+			message: '#^Parameter \#1 \$params of method Stripe\\Service\\Checkout\\SessionService\:\:create\(\) expects array\{adaptive_pricing\?\: array\{enabled\?\: bool\}, after_expiration\?\: array\{recovery\?\: array\{allow_promotion_codes\?\: bool, enabled\: bool\}\}, allow_promotion_codes\?\: bool, automatic_tax\?\: array\{enabled\: bool, liability\?\: array\{account\?\: string, type\: string\}\}, billing_address_collection\?\: string, branding_settings\?\: array\{background_color\?\: string\|null, border_style\?\: string\|null, button_color\?\: string\|null, display_name\?\: string, font_family\?\: string\|null, icon\?\: array\{file\?\: string, type\: string, url\?\: string\}, logo\?\: array\{file\?\: string, type\: string, url\?\: string\}\}, cancel_url\?\: string, client_reference_id\?\: string, \.\.\.\}\|null, array\{customer\: string, mode\: ''subscription'', line_items\: array\{array\{price\: non\-falsy\-string, quantity\: 1\}\}, success_url\: string, cancel_url\: string, metadata\: array\{organization_id\: int\<0, max\>, subscription_plan_id\: int\<0, max\>\}, subscription_data\: array\{trial_period_days\: int\<1, max\>\|null, metadata\: array\{organization_id\: int\<0, max\>, subscription_plan_id\: int\<0, max\>\}\}\} given\.$#'
 			identifier: argument.type
 			count: 1
 			path: app/Services/Billing/StripeService.php
 
 		-
-			message: '#^Parameter \#1 \$params of method Stripe\\Service\\CustomerService\:\:create\(\) expects array\{address\?\: array\{city\?\: string, country\?\: string, line1\?\: string, line2\?\: string, postal_code\?\: string, state\?\: string\}\|null, balance\?\: int, business_name\?\: string\|null, cash_balance\?\: array\{settings\?\: array\{reconciliation_mode\?\: string\}\}, description\?\: string, email\?\: string, expand\?\: array\<string\>, individual_name\?\: string\|null, \.\.\.\}\|null, array\{name\: string, email\: mixed, metadata\: array\{organization_id\: int, organization_slug\: string\}\} given\.$#'
+			message: '#^Parameter \#1 \$params of method Stripe\\Service\\CustomerService\:\:create\(\) expects array\{address\?\: array\{city\?\: string, country\?\: string, line1\?\: string, line2\?\: string, postal_code\?\: string, state\?\: string\}\|null, balance\?\: int, business_name\?\: string\|null, cash_balance\?\: array\{settings\?\: array\{reconciliation_mode\?\: string\}\}, description\?\: string, email\?\: string, expand\?\: array\<string\>, individual_name\?\: string\|null, \.\.\.\}\|null, array\{name\: string, email\: mixed, metadata\: array\{organization_id\: int\<0, max\>, organization_slug\: string\}\} given\.$#'
 			identifier: argument.type
 			count: 1
 			path: app/Services/Billing/StripeService.php
@@ -775,7 +769,31 @@ parameters:
 			path: app/Services/Governance/Audit/Phase02SkillAudit.php
 
 		-
-			message: '#^Access to an undefined property App\\Models\\AgentDeployment\:\:\$latestScorecard\.$#'
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$accuracy_score\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Services/Governance/Audit/Phase13Scorecard.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$compliance_score\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Services/Governance/Audit/Phase13Scorecard.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$overall_health_score\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Services/Governance/Audit/Phase13Scorecard.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$reliability_score\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Services/Governance/Audit/Phase13Scorecard.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$trustworthiness_score\.$#'
 			identifier: property.notFound
 			count: 1
 			path: app/Services/Governance/Audit/Phase13Scorecard.php
@@ -794,12 +812,6 @@ parameters:
 
 		-
 			message: '#^Relation ''approval'' is not found in App\\Models\\AgentTask model\.$#'
-			identifier: larastan.relationExistence
-			count: 1
-			path: app/Services/Governance/DigitalImmuneSystem.php
-
-		-
-			message: '#^Relation ''latestScorecard'' is not found in App\\Models\\AgentDeployment model\.$#'
 			identifier: larastan.relationExistence
 			count: 1
 			path: app/Services/Governance/DigitalImmuneSystem.php
@@ -847,13 +859,13 @@ parameters:
 			path: app/Services/Governance/Memory/MemoryScoreCalculator.php
 
 		-
-			message: '#^Anonymous function should return Illuminate\\Support\\Collection\<\(int\|string\), array\{count\: mixed, avg_importance\: float\}\> but returns Illuminate\\Support\\Collection\<\(int\|string\), array\{count\: mixed, avg_importance\: float\}\>\.$#'
-			identifier: return.type
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Database\\Eloquent\\Collection\<\(int\|string\),App\\Models\\AgentMemory\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: argument.unresolvableType
 			count: 1
 			path: app/Services/Governance/Memory/MemoryScoreCalculator.php
 
 		-
-			message: '#^Parameter \#1 \$callback of method Illuminate\\Database\\Eloquent\\Collection\<\(int\|string\),App\\Models\\AgentMemory\>\:\:map\(\) contains unresolvable type\.$#'
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Database\\Eloquent\\Collection\<\(int\|string\),Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\AgentMemory\>\>\:\:map\(\) contains unresolvable type\.$#'
 			identifier: argument.unresolvableType
 			count: 1
 			path: app/Services/Governance/Memory/MemoryScoreCalculator.php
@@ -985,6 +997,12 @@ parameters:
 			path: app/Skills/Meta/SkillIntrospectionSkill.php
 
 		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Support\\Collection\<int,array\<string, mixed\>\>\:\:sortBy\(\) contains unresolvable type\.$#'
+			identifier: argument.unresolvableType
+			count: 1
+			path: app/Skills/Meta/SkillIntrospectionSkill.php
+
+		-
 			message: '#^Offset 1 on array\{list\<string\>, list\<non\-falsy\-string\>\} on left side of \?\? always exists and is not nullable\.$#'
 			identifier: nullCoalesce.offset
 			count: 2
@@ -1034,6 +1052,12 @@ parameters:
 
 		-
 			message: '#^Parameter \#1 \$callback of method Illuminate\\Database\\Eloquent\\Collection\<int,App\\Models\\AgentWorkflow\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: argument.unresolvableType
+			count: 1
+			path: app/Skills/Platform/WorkflowOptimizationSkill.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Support\\Collection\<int,array\<string, mixed\>\>\:\:sortByDesc\(\) contains unresolvable type\.$#'
 			identifier: argument.unresolvableType
 			count: 1
 			path: app/Skills/Platform/WorkflowOptimizationSkill.php
