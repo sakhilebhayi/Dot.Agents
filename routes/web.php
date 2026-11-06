@@ -72,6 +72,7 @@ Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
     'verified',
+    'reverify',
     'consent.required',
     'org.context',
     'writable', // a read-only (viewer) role gets 403 on every non-GET request
@@ -191,5 +192,11 @@ Route::get('/guardian/health', GuardianHealthController::class)
 // Public sign-up is closed (accounts are created by InfoDot at first sign-in). Keep the named route so any link or
 // invitation email that points at it lands on the login page instead of failing.
 if (! Features::enabled(Features::registration())) {
-    Route::redirect('/register', '/login')->name('register');
+    Route::get('/register', function () {
+        $infodot = (string) config('ecosystem.platforms.infodot.url', '');
+
+        return $infodot !== '' && config('ecosystem.sso_only')
+            ? redirect()->away(rtrim($infodot, '/').'/register')
+            : redirect('/login');
+    })->name('register');
 }

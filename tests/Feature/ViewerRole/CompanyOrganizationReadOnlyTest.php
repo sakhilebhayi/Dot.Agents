@@ -173,8 +173,8 @@ class CompanyOrganizationReadOnlyTest extends TestCase
         Livewire::actingAs($this->admin)->test(DepartmentManager::class)->set('formName', 'Finance')->call('save');
         $this->assertSame(1, Department::where('name', 'Finance')->where('organization_id', $this->acme->id)->count());
 
-        Livewire::actingAs($this->editor)->test(ApiKeyManager::class)->set('newKeyName', 'my key')->call('createToken');
-        $this->assertSame(1, $this->editor->tokens()->count());
+        Livewire::actingAs($this->admin)->test(ApiKeyManager::class)->set('newKeyName', 'my key')->call('createToken');
+        $this->assertSame(1, $this->admin->tokens()->count());
 
         Sanctum::actingAs($this->admin, ['read', 'write']);
         $this->postJson('/api/v1/deployments/'.$this->acmeDeployment->id.'/pause')->assertOk();

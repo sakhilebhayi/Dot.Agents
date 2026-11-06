@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Http\Middleware\OrganizationContextMiddleware;
 use App\Models\AgentCategory;
 use App\Models\AgentDepartment;
+use App\Models\PersonalAccessToken;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Blade;
@@ -12,6 +13,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
+use Laravel\Sanctum\Sanctum;
 use Livewire\Livewire;
 
 class AppServiceProvider extends ServiceProvider
@@ -34,6 +36,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Sanctum::usePersonalAccessTokenModel(PersonalAccessToken::class);
+
         // Livewire's update route skips page middleware unless told otherwise: a person removed from a business must
         // lose it on their next click, not their next page load.
         Livewire::addPersistentMiddleware([OrganizationContextMiddleware::class]);

@@ -29,6 +29,27 @@ class FortifyServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Registered after every provider boots: Jetstream sets its own login view in its boot, and the last one wins.
+        $this->app->booted(function () {
+            $front = fn (string $view, string $path) => function () use ($view, $path) {
+                $infodot = (string) config('ecosystem.platforms.infodot.url', '');
+
+                return $infodot !== '' && config('ecosystem.sso_only')
+                    ? redirect()->away(rtrim($infodot, '/').$path)
+                    : view($view);
+            };
+
+            Fortify::loginView($front('auth.login', '/login'));
+            Fortify::requestPasswordResetLinkView($front('auth.forgot-password', '/forgot-password'));
+            Fortify::resetPasswordView(function () {
+                $infodot = (string) config('ecosystem.platforms.infodot.url', '');
+
+                return $infodot !== '' && config('ecosystem.sso_only')
+                    ? redirect()->away(rtrim($infodot, '/').'/forgot-password')
+                    : view('auth.reset-password', ['request' => request()]);
+            });
+        });
+
         Fortify::createUsersUsing(CreateNewUser::class);
         Fortify::updateUserProfileInformationUsing(UpdateUserProfileInformation::class);
         Fortify::updateUserPasswordsUsing(UpdateUserPassword::class);

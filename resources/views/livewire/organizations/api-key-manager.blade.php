@@ -5,7 +5,7 @@
         <h2 class="text-lg font-bold text-gray-900 dark:text-white">API Keys</h2>
         <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
             Manage API keys for programmatic access to your organization's Dot.Agents resources.
-            Keys are scoped to your account and inherit your permissions.
+            A key works for this business only, does only what you tick, and lasts {{ \App\Livewire\Organizations\ApiKeyManager::DAYS_VALID }} days.
         </p>
     </div>
 
@@ -35,7 +35,16 @@
         <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Create a new API key</h3>
 
         @writable
-        <form wire:submit="createToken" class="flex gap-3 items-start">
+        <form wire:submit="createToken" class="space-y-3">
+            <fieldset class="flex flex-wrap gap-x-5 gap-y-2">
+                <legend class="sr-only">What this key may do</legend>
+                @foreach(\App\Models\PersonalAccessToken::ABILITIES as $ability => $label)
+                    <label class="inline-flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                        <input type="checkbox" wire:model="newKeyAbilities" value="{{ $ability }}"> {{ $label }}
+                    </label>
+                @endforeach
+            </fieldset>
+            <div class="flex gap-3 items-start">
             <div class="flex-1">
                 <input wire:model="newKeyName"
                     type="text"
@@ -54,6 +63,7 @@
                 <span wire:loading.remove wire:target="createToken">Generate Key</span>
                 <span wire:loading wire:target="createToken">Generating…</span>
             </button>
+            </div>
         </form>
         @endwritable
     </div>

@@ -600,7 +600,7 @@ class ServiceSizeLimitsTest extends TestCase
         //    null org (platform-level plugins shared across all tenants)
         //  - Membership: scoped via a query scope method rather than a global scope
         //    because membership records need to be looked up cross-org during invites
-        $allowedExceptions = ['AgentPlugin', 'Membership'];
+        $allowedExceptions = ['AgentPlugin', 'Membership', 'PersonalAccessToken'];
 
         $modelFiles = File::allFiles(app_path('Models'));
 

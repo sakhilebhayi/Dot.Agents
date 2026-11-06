@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Models\Organization;
+use App\Models\PersonalAccessToken;
 use App\Models\User;
 use App\Support\TenantContext;
 use Closure;
@@ -15,6 +16,12 @@ class OrganizationContextMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         if ($request->user()) {
+            // An API key works for the business it was made for, whichever one its holder has open.
+            $token = $request->user()->currentAccessToken();
+            if ($token instanceof PersonalAccessToken && is_numeric($token->organization_id)) {
+                session(['current_organization_id' => $token->organization_id]);
+            }
+
             // If not set yet, derive from the user's primary organization
             if (! session()->has('current_organization_id')) {
                 $org = $request->user()->currentOrganization();

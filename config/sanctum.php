@@ -50,7 +50,7 @@ return [
     |
     */
 
-    'expiration' => env('SANCTUM_TOKEN_EXPIRATION', 525600), // 1 year in minutes; override per env
+    'expiration' => env('SANCTUM_TOKEN_EXPIRATION'), // Keys carry their own expiry from the page that made them.
 
     /*
     |--------------------------------------------------------------------------
