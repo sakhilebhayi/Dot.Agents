@@ -4,6 +4,7 @@ namespace App\Services\Runs;
 
 use App\Events\AgentTaskCompleted;
 use App\Events\AgentTaskFailed;
+use App\Models\AgentApproval;
 use App\Models\AgentMessage;
 use App\Models\AgentRun;
 use App\Models\AgentRunStep;
@@ -74,6 +75,9 @@ class RunFinisher
     private function close(AgentRun $run, string $status, array $attributes): void
     {
         $run->update(['status' => $status, 'finished_at' => now(), ...$attributes]);
+
+        // Nothing is left asking for an answer that can no longer change anything.
+        AgentApproval::where('agent_run_id', $run->id)->where('status', 'pending')->update(['status' => 'withdrawn']);
 
         if ($run->deployment !== null) {
             $run->deployment->update(['last_active_at' => now()]);

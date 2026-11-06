@@ -34,11 +34,8 @@ class ApprovalRequestedEmail extends Mailable implements ShouldQueue
             with: [
                 'deploymentName' => $this->deployment->name,
                 'agentName' => $this->deployment->agent->name ?? 'Agent',
-                'taskDescription' => $this->approval->task_description ?? 'Review pending action',
-                'confidenceScore' => $this->approval->confidence_score ?? 0,
-                'approveUrl' => url("/approvals/{$this->approval->id}/approve"),
-                'rejectUrl' => url("/approvals/{$this->approval->id}/reject"),
-                'reviewUrl' => url("/approvals/{$this->approval->id}"),
+                'taskDescription' => $this->approval->title,
+                'reviewUrl' => route('governance.approvals', ['approval' => $this->approval->uuid]),
                 'expiresAt' => $this->approval->expires_at,
             ],
         );

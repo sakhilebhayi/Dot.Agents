@@ -68,6 +68,7 @@ class AgentDeployment extends Model
         return $this->belongsTo(Organization::class);
     }
 
+    /** @return BelongsTo<User, $this> */
     public function owner(): BelongsTo
     {
         return $this->belongsTo(User::class, 'owner_id');
@@ -106,6 +107,7 @@ class AgentDeployment extends Model
         return $this->belongsTo(Department::class);
     }
 
+    /** @return BelongsTo<User, $this> */
     public function deployedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'deployed_by');

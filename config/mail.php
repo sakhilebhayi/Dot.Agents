@@ -39,7 +39,8 @@ return [
 
         'smtp' => [
             'transport' => 'smtp',
-            'scheme' => env('MAIL_SCHEME'),
+            // Symfony Mailer knows ssl as smtps. Hosts set up for older versions still say ssl.
+            'scheme' => env('MAIL_SCHEME') === 'ssl' ? 'smtps' : env('MAIL_SCHEME'),
             'url' => env('MAIL_URL'),
             'host' => env('MAIL_HOST', '127.0.0.1'),
             'port' => env('MAIL_PORT', 2525),

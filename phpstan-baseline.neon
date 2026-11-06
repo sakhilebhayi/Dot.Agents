@@ -295,28 +295,10 @@ parameters:
 			path: app/Listeners/LogSocialPostPublished.php
 
 		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$deployedBy\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Listeners/NotifyOnApprovalProcessed.php
-
-		-
-			message: '#^Parameter \#2 \$deployment of class App\\Notifications\\ApprovalRequiredNotification constructor expects App\\Models\\AgentDeployment, Illuminate\\Database\\Eloquent\\Model given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Listeners/NotifyOnApprovalProcessed.php
-
-		-
 			message: '#^Parameter \#1 \$deployment of method App\\Services\\Governance\\AuditService\:\:logAgentAction\(\) expects App\\Models\\AgentDeployment, Illuminate\\Database\\Eloquent\\Model given\.$#'
 			identifier: argument.type
 			count: 1
 			path: app/Listeners/NotifyOnNegativeSentiment.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
-			identifier: property.notFound
-			count: 2
-			path: app/Listeners/SendApprovalNotification.php
 
 		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$email\.$#'
@@ -593,12 +575,6 @@ parameters:
 			identifier: property.notFound
 			count: 1
 			path: app/Models/SocialPage.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$organization_id\.$#'
-			identifier: property.notFound
-			count: 2
-			path: app/Policies/AgentApprovalPolicy.php
 
 		-
 			message: '#^Strict comparison using \!\=\= between int\<0, max\> and null will always evaluate to true\.$#'

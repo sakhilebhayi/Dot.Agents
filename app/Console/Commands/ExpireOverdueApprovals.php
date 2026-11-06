@@ -4,14 +4,14 @@ namespace App\Console\Commands;
 
 use App\Models\AgentApproval;
 use App\Models\AgentSkillApproval;
+use App\Services\Approvals\ApprovalDesk;
+use App\Services\Approvals\ApprovalResume;
+use App\Support\TenantContext;
 use Illuminate\Console\Command;
 
 /**
  * Expires pending approvals (both AgentApproval and AgentSkillApproval) whose
- * expires_at deadline has passed. Pure status bookkeeping -- no task or
- * deployment side effect, no notification. This is the command
- * routes/console.php has scheduled every 30 minutes all along; it just
- * didn't exist as a class until now.
+ * expires_at deadline has passed. A run waiting on one is told and carries on.
  */
 class ExpireOverdueApprovals extends Command
 {
@@ -19,12 +19,21 @@ class ExpireOverdueApprovals extends Command
 
     protected $description = 'Mark pending agent/skill approvals past their expiry deadline as expired.';
 
-    public function handle(): int
+    public function handle(ApprovalResume $resume, ApprovalDesk $desk): int
     {
-        $expiredApprovals = AgentApproval::withoutGlobalScope('organization')
-            ->where('status', 'pending')
-            ->where('expires_at', '<', now())
-            ->update(['status' => 'expired']);
+        $expiredApprovals = 0;
+
+        // One at a time, because a run behind an approval has to hear the answer.
+        TenantContext::system(fn () => AgentApproval::where('status', 'pending')->where('expires_at', '<', now())
+            ->each(function (AgentApproval $approval) use ($resume, $desk, &$expiredApprovals) {
+                $approval->update(['status' => 'expired']);
+                $desk->record($approval, null, 'expired');
+                $expiredApprovals++;
+
+                if ($approval->agent_run_id !== null) {
+                    $resume->declined($approval, 'approval_expired', 'Nobody answered in time, so this was not done.');
+                }
+            }));
 
         $expiredSkillApprovals = AgentSkillApproval::withoutGlobalScope('organization')
             ->where('status', 'pending')

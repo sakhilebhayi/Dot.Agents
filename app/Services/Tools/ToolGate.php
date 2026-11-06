@@ -4,6 +4,7 @@ namespace App\Services\Tools;
 
 use App\Models\AgentRun;
 use App\Services\AI\ToolPermissionService;
+use App\Services\Approvals\ApprovalDesk;
 use App\Support\RunTaint;
 
 /**
@@ -21,6 +22,7 @@ class ToolGate
     public function __construct(
         private readonly ToolPermissionService $permissions,
         private readonly ToolArguments $arguments,
+        private readonly ApprovalDesk $desk,
     ) {}
 
     /**
@@ -37,7 +39,7 @@ class ToolGate
             return GateDecision::deny('invalid_arguments', implode(' ', $errors));
         }
 
-        return $this->trifecta($run, $tool) ?? $this->autonomy($run, $tool, $grant);
+        return $this->trifecta($run, $tool) ?? $this->ruled($run, $tool) ?? $this->autonomy($run, $tool, $grant);
     }
 
     /**
@@ -76,6 +78,14 @@ class ToolGate
         }
 
         return null;
+    }
+
+    /** A business's own rules can add a person to any action. They can never remove one. */
+    private function ruled(AgentRun $run, ToolDefinition $tool): ?GateDecision
+    {
+        $rule = $this->desk->rule($run->organization_id, $tool);
+
+        return $rule === null ? null : GateDecision::ask('business_rule', "This business's rule \"{$rule->name}\" sends this to a person.");
     }
 
     /** @param  array{key: string, mode: string}  $grant */

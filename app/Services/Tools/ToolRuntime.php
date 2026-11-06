@@ -2,9 +2,11 @@
 
 namespace App\Services\Tools;
 
+use App\Models\AgentApproval;
 use App\Models\AgentEffect;
 use App\Models\AgentRun;
 use App\Models\AgentRunStep;
+use App\Services\Approvals\ApprovalDesk;
 use App\Services\Governance\AuditService;
 use App\Services\Runs\Journal;
 use App\Services\Runs\ToolJournal;
@@ -28,6 +30,7 @@ class ToolRuntime
         private readonly Journal $journal,
         private readonly ToolJournal $toolJournal,
         private readonly AuditService $audit,
+        private readonly ApprovalDesk $desk,
     ) {}
 
     /** @return list<array{name: string, description: string, schema: array<string, mixed>}> What the model is offered. */
@@ -81,8 +84,13 @@ class ToolRuntime
     {
         $tool = $this->catalogue->find($run->organization_id, $effect->tool_key);
 
-        if ($tool === null) {
-            return $this->deny($run, $effect, GateDecision::deny('unknown_tool', 'That tool no longer exists.'));
+        // Asked again at the last moment: an answer given days ago does not outlive the tool being taken away.
+        if ($refused = $this->gate->refused($run, $tool?->definition(), $this->grants($run)[$effect->tool_key] ?? null)) {
+            return $this->deny($run, $effect, $refused);
+        }
+
+        if (! $this->desk->matches($effect, $tool->definition())) {
+            return $this->deny($run, $effect, GateDecision::deny('approval_mismatch', 'What was approved is not what was about to run.'));
         }
 
         $this->executor->execute($run, $effect, $tool);
@@ -92,10 +100,14 @@ class ToolRuntime
 
     private function wait(AgentRun $run, AgentEffect $effect, GateDecision $decision): string
     {
+        $definition = $this->catalogue->find($run->organization_id, $effect->tool_key)->definition();
+        $approval = AgentApproval::where('agent_effect_id', $effect->id)->where('status', 'pending')->first()
+            ?? $this->desk->open($run, $effect, $definition, $decision);
+
         $this->journal->write($run, AgentRunStep::APPROVAL, 'Waiting for a person', [
             'tool_key' => $effect->tool_key,
             'status' => 'waiting',
-            'payload' => ['effect' => $effect->id, 'code' => $decision->code, 'reason' => $decision->reason],
+            'payload' => ['effect' => $effect->id, 'approval' => $approval->uuid, 'code' => $decision->code, 'reason' => $decision->reason],
         ]);
 
         return self::WAITING;

@@ -7,6 +7,7 @@ use App\DTOs\Governance\ProcessApprovalData;
 use App\Events\ApprovalProcessed;
 use App\Models\AgentApproval;
 use App\Models\DecisionLog;
+use App\Services\Approvals\ApprovalDecision;
 use App\Services\Governance\AuditService;
 use App\Services\Governance\PredictionAccuracyTrackingService;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -20,6 +21,7 @@ class ProcessApprovalAction
     public function __construct(
         private readonly AuditService $auditService,
         private readonly PredictionAccuracyTrackingService $predictionAccuracy,
+        private readonly ApprovalDecision $decision,
     ) {}
 
     /**
@@ -46,6 +48,10 @@ class ProcessApprovalAction
 
         if ($approval->isExpired()) {
             throw new \RuntimeException("Approval #{$approval->id} has expired.");
+        }
+
+        if ($approval->agent_run_id !== null) {
+            return $this->decision->apply($approval, Auth::user(), $data);
         }
 
         $approval->update([

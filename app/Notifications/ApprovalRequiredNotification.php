@@ -7,7 +7,6 @@ use App\Models\AgentApproval;
 use App\Models\AgentDeployment;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
 
 class ApprovalRequiredNotification extends Notification implements ShouldQueue
@@ -23,12 +22,12 @@ class ApprovalRequiredNotification extends Notification implements ShouldQueue
 
     public function via(object $notifiable): array
     {
-        return ['mail', 'database', 'broadcast'];
+        return ['mail', 'database'];
     }
 
     public function toMail(object $notifiable): ApprovalRequestedEmail
     {
-        return new ApprovalRequestedEmail($this->approval, $this->deployment);
+        return (new ApprovalRequestedEmail($this->approval, $this->deployment))->to($notifiable->email);
     }
 
     public function toArray(object $notifiable): array
@@ -41,12 +40,7 @@ class ApprovalRequiredNotification extends Notification implements ShouldQueue
             'task_description' => $this->approval->description,
             'confidence_score' => $this->approval->confidence_score,
             'expires_at' => $this->approval->expires_at?->toISOString(),
-            'url' => url("/approvals/{$this->approval->id}"),
+            'url' => route('governance.approvals', ['approval' => $this->approval->uuid]),
         ];
-    }
-
-    public function toBroadcast(object $notifiable): BroadcastMessage
-    {
-        return new BroadcastMessage($this->toArray($notifiable));
     }
 }

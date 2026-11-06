@@ -2,6 +2,8 @@
 
 namespace App\Services\Models;
 
+use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\Client\RequestException;
 use Prism\Prism\Enums\Provider;
 use Prism\Prism\Exceptions\PrismException;
 use Prism\Prism\Exceptions\PrismProviderOverloadedException;
@@ -51,8 +53,14 @@ final class PrismGateway implements ModelGateway
             throw new ModelFailure('overloaded', 'The provider is overloaded.');
         } catch (PrismException $e) {
             throw $this->classify($e);
-        } catch (Throwable $e) {
+        } catch (ConnectionException $e) {
             throw new ModelFailure('timeout', 'The provider could not be reached.');
+        } catch (RequestException $e) {
+            throw $this->refused($e);
+        } catch (Throwable $e) {
+            report($e);
+
+            throw new ModelFailure('provider_error', 'The provider gave an answer that could not be read.');
         }
 
         return new ModelReply(
@@ -65,6 +73,16 @@ final class PrismGateway implements ModelGateway
             model: $response->meta->model ?: $request->model,
             finish: $response->finishReason->value,
         );
+    }
+
+    private function refused(RequestException $e): ModelFailure
+    {
+        return match (true) {
+            in_array($e->response->status(), [401, 403], true) => new ModelFailure('provider_key', 'The provider refused the key set on this platform.'),
+            $e->response->status() === 429 => new ModelFailure('rate_limited', 'The provider asked us to slow down.'),
+            $e->response->serverError() => new ModelFailure('overloaded', 'The provider is having trouble.'),
+            default => new ModelFailure('invalid_request', 'The provider refused this request.'),
+        };
     }
 
     private function classify(PrismException $e): ModelFailure

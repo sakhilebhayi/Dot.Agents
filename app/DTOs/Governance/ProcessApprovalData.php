@@ -8,8 +8,10 @@ readonly class ProcessApprovalData
         public int $approvalId,
         public string $decision,
         public ?string $reviewerNotes = null,
+        /** @var array<string, mixed>|null What the reviewer changed the values to before approving. */
+        public ?array $editedArguments = null,
     ) {
-        if (! in_array($decision, ['approved', 'rejected', 'escalated'], true)) {
+        if (! in_array($decision, ['approved', 'rejected', 'changes_requested', 'escalated'], true)) {
             throw new \InvalidArgumentException("Invalid decision: {$decision}");
         }
     }
