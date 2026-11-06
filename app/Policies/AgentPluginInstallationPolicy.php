@@ -29,19 +29,13 @@ class AgentPluginInstallationPolicy
 
     public function update(User $user, AgentPluginInstallation $installation): bool
     {
-        return $user->organizations()
-            ->where('organizations.id', $installation->organization_id)
-            ->wherePivotIn('role', ['owner', 'admin'])
-            ->exists();
+        return $user->canInOrganization('tools.manage', $installation->organization_id);
     }
 
     /** Only org owners can uninstall plugins. */
     public function delete(User $user, AgentPluginInstallation $installation): bool
     {
-        return $user->organizations()
-            ->where('organizations.id', $installation->organization_id)
-            ->wherePivot('role', 'owner')
-            ->exists();
+        return $user->canInOrganization('tools.manage', $installation->organization_id);
     }
 
     public function forceDelete(User $user, AgentPluginInstallation $installation): bool

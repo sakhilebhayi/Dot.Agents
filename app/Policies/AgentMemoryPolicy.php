@@ -45,9 +45,6 @@ class AgentMemoryPolicy
 
         // Only org admins/owners can purge agent memory
         return $memory->organization_id === $orgId
-            && $user->organizations()
-                ->where('organizations.id', $orgId)
-                ->wherePivotIn('role', ['owner', 'admin'])
-                ->exists();
+            && $user->canInOrganization('memory.govern', $orgId);
     }
 }

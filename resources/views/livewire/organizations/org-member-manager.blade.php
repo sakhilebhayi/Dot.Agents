@@ -40,10 +40,9 @@
             <div class="w-40">
                 <label for="livewire-organizations-org-member-manager-inviterole" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Role</label>
                 <select id="livewire-organizations-org-member-manager-inviterole" wire:model="inviteRole" class="w-full text-sm rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-brand-purple-mid">
-                    <option value="viewer">Viewer</option>
-                    <option value="member">Member</option>
-                    <option value="admin">Admin</option>
-                    <option value="owner">Owner</option>
+                    @foreach(\App\Support\OrgRoles::LABELS as $value => $label)
+                        <option value="{{ $value }}">{{ $label }}</option>
+                    @endforeach
                 </select>
             </div>
             <div class="flex gap-2">
@@ -100,12 +99,12 @@
                         @if($member->id !== $this->organization->owner_id && auth()->id() !== $member->id)
                             <select aria-label="Role for {{ $member->name }}" wire:change="updateRole({{ $member->id }}, $event.target.value)"
                                 class="text-xs rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-brand-purple-mid py-1">
-                                @foreach(['viewer','member','admin','owner'] as $r)
-                                    <option value="{{ $r }}" {{ $member->pivot->role === $r ? 'selected' : '' }}>{{ ucfirst($r) }}</option>
+                                @foreach(\App\Support\OrgRoles::LABELS as $r => $label)
+                                    <option value="{{ $r }}" @selected(\App\Support\OrgRoles::normalise($member->pivot->role) === $r)>{{ $label }}</option>
                                 @endforeach
                             </select>
                         @else
-                            <span class="px-2 py-1 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-xs rounded-lg">{{ ucfirst($member->pivot->role ?? 'member') }}</span>
+                            <span class="px-2 py-1 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-xs rounded-lg">{{ \App\Support\OrgRoles::LABELS[\App\Support\OrgRoles::normalise($member->pivot->role) ?? 'viewer'] }}</span>
                         @endif
                     </td>
                     <td class="px-6 py-4 text-gray-500 text-xs">

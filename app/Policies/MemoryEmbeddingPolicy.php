@@ -29,9 +29,6 @@ class MemoryEmbeddingPolicy
 
     public function delete(User $user, MemoryEmbedding $embedding): bool
     {
-        return $user->organizations()
-            ->where('organizations.id', $embedding->organization_id)
-            ->wherePivot('role', 'owner')
-            ->exists();
+        return $user->canInOrganization('memory.govern', $embedding->organization_id);
     }
 }

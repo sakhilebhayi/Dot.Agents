@@ -25,10 +25,7 @@ class WorkflowExecutionPolicy
         // Executions are triggered by the system or by users with deploy rights
         $orgId = (int) session('current_organization_id');
 
-        return $user->organizations()
-            ->where('organizations.id', $orgId)
-            ->wherePivotIn('role', ['owner', 'admin', 'manager', 'member'])
-            ->exists();
+        return $user->canInOrganization('agents.operate', $orgId);
     }
 
     public function update(User $user, WorkflowExecution $execution): bool
@@ -37,10 +34,7 @@ class WorkflowExecutionPolicy
         $orgId = (int) session('current_organization_id');
 
         return $execution->organization_id === $orgId
-            && $user->organizations()
-                ->where('organizations.id', $orgId)
-                ->wherePivotIn('role', ['owner', 'admin'])
-                ->exists();
+            && $user->canInOrganization('workflows.manage', $orgId);
     }
 
     public function delete(User $user, WorkflowExecution $execution): bool

@@ -18,9 +18,6 @@ class AgentApprovalPolicy
     {
         $orgId = $approval->deployment?->organization_id;
 
-        return $user->organizations()
-            ->where('organizations.id', $orgId)
-            ->wherePivotIn('role', ['owner', 'admin', 'manager'])
-            ->exists();
+        return $user->canInOrganization('approvals.review', $orgId);
     }
 }

@@ -24,17 +24,11 @@ class AgentSkillAssignmentPolicy
 
     public function update(User $user, AgentSkillAssignment $assignment): bool
     {
-        return $user->organizations()
-            ->where('organizations.id', $assignment->organization_id)
-            ->wherePivotIn('role', ['owner', 'admin'])
-            ->exists();
+        return $user->canInOrganization('tools.manage', $assignment->organization_id);
     }
 
     public function delete(User $user, AgentSkillAssignment $assignment): bool
     {
-        return $user->organizations()
-            ->where('organizations.id', $assignment->organization_id)
-            ->wherePivotIn('role', ['owner', 'admin'])
-            ->exists();
+        return $user->canInOrganization('tools.manage', $assignment->organization_id);
     }
 }

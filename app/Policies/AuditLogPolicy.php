@@ -10,14 +10,13 @@ class AuditLogPolicy
     /** Org admins and compliance officers can list audit logs. */
     public function viewAny(User $user): bool
     {
-        return $user->hasAnyRole(['owner', 'admin', 'compliance_officer', 'platform_admin']);
+        return $user->canInOrganization('audit.view') || $user->hasAnyRole(['owner', 'admin', 'compliance_officer', 'platform_admin']);
     }
 
     /** Only org members with elevated roles can view audit log entries. */
     public function view(User $user, AuditLog $auditLog): bool
     {
-        return $user->organizations()->where('organizations.id', $auditLog->organization_id)->exists()
-            && $user->hasAnyRole(['owner', 'admin', 'compliance_officer', 'platform_admin']);
+        return $user->canInOrganization('audit.view', $auditLog->organization_id);
     }
 
     /** Audit logs are system-generated — no direct creation. */

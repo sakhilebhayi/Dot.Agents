@@ -24,17 +24,11 @@ class WorkflowConnectionPolicy
 
     public function update(User $user, WorkflowConnection $connection): bool
     {
-        return $user->organizations()
-            ->where('organizations.id', $connection->organization_id)
-            ->wherePivotIn('role', ['owner', 'admin'])
-            ->exists();
+        return $user->canInOrganization('workflows.manage', $connection->organization_id);
     }
 
     public function delete(User $user, WorkflowConnection $connection): bool
     {
-        return $user->organizations()
-            ->where('organizations.id', $connection->organization_id)
-            ->wherePivotIn('role', ['owner', 'admin'])
-            ->exists();
+        return $user->canInOrganization('workflows.manage', $connection->organization_id);
     }
 }

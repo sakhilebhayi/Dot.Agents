@@ -24,10 +24,7 @@ class KnowledgeBasePolicy
     {
         $orgId = (int) session('current_organization_id');
 
-        return $user->organizations()
-            ->where('organizations.id', $orgId)
-            ->wherePivotIn('role', ['owner', 'admin', 'manager'])
-            ->exists();
+        return $user->canInOrganization('knowledge.manage', $orgId);
     }
 
     public function update(User $user, KnowledgeBase $knowledgeBase): bool
@@ -35,10 +32,7 @@ class KnowledgeBasePolicy
         $orgId = (int) session('current_organization_id');
 
         return $knowledgeBase->organization_id === $orgId
-            && $user->organizations()
-                ->where('organizations.id', $orgId)
-                ->wherePivotIn('role', ['owner', 'admin', 'manager'])
-                ->exists();
+            && $user->canInOrganization('knowledge.manage', $orgId);
     }
 
     public function delete(User $user, KnowledgeBase $knowledgeBase): bool
@@ -46,9 +40,6 @@ class KnowledgeBasePolicy
         $orgId = (int) session('current_organization_id');
 
         return $knowledgeBase->organization_id === $orgId
-            && $user->organizations()
-                ->where('organizations.id', $orgId)
-                ->wherePivotIn('role', ['owner', 'admin'])
-                ->exists();
+            && $user->canInOrganization('knowledge.manage', $orgId);
     }
 }

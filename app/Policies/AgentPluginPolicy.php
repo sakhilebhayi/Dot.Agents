@@ -33,10 +33,7 @@ class AgentPluginPolicy
             return $user->hasRole('super-admin');
         }
 
-        return $user->organizations()
-            ->where('organizations.id', $plugin->organization_id)
-            ->wherePivotIn('role', ['owner', 'admin'])
-            ->exists();
+        return $user->canInOrganization('tools.manage', $plugin->organization_id);
     }
 
     public function delete(User $user, AgentPlugin $plugin): bool
@@ -45,9 +42,6 @@ class AgentPluginPolicy
             return $user->hasRole('super-admin');
         }
 
-        return $user->organizations()
-            ->where('organizations.id', $plugin->organization_id)
-            ->wherePivot('role', 'owner')
-            ->exists();
+        return $user->canInOrganization('tools.manage', $plugin->organization_id);
     }
 }

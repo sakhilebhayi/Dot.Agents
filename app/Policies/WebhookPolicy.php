@@ -24,10 +24,7 @@ class WebhookPolicy
 
     public function update(User $user, Webhook $webhook): bool
     {
-        return $user->organizations()
-            ->where('organizations.id', $webhook->organization_id)
-            ->wherePivotIn('role', ['owner', 'admin'])
-            ->exists();
+        return $user->canInOrganization('tools.manage', $webhook->organization_id);
     }
 
     public function delete(User $user, Webhook $webhook): bool

@@ -38,10 +38,7 @@ class AgentTaskPolicy
      */
     public function update(User $user, AgentTask $agentTask): bool
     {
-        return $user->organizations()
-            ->where('organizations.id', $agentTask->organization_id)
-            ->wherePivotIn('role', ['owner', 'admin'])
-            ->exists();
+        return $user->canInOrganization('agents.manage', $agentTask->organization_id);
     }
 
     /**
@@ -49,10 +46,7 @@ class AgentTaskPolicy
      */
     public function delete(User $user, AgentTask $agentTask): bool
     {
-        return $user->organizations()
-            ->where('organizations.id', $agentTask->organization_id)
-            ->wherePivot('role', 'owner')
-            ->exists();
+        return $user->canInOrganization('agents.manage', $agentTask->organization_id);
     }
 
     /**

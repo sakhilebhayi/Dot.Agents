@@ -144,7 +144,7 @@ class SyncOrganizationsFromInfoDot
         return match ($infodotRole) {
             'owner' => 'owner',
             'admin' => 'admin',
-            'editor' => 'member',
+            'editor' => 'operator',
             default => 'viewer',
         };
     }
