@@ -2,8 +2,10 @@
 
 use App\Http\Controllers\Auth\EcosystemAuthController;
 use App\Http\Controllers\BillingController;
+use App\Http\Controllers\CspReportController;
 use App\Http\Controllers\GuardianHealthController;
 use App\Http\Controllers\HealthCheckController;
+use App\Http\Controllers\ReadyController;
 use App\Http\Controllers\SchedulerProbeController;
 use App\Http\Controllers\SocialAccountController;
 use App\Http\Controllers\SocialOAuthController;
@@ -12,9 +14,12 @@ use App\Http\Middleware\AuthenticateGuardian;
 use App\Models\AgentDeployment;
 use App\Models\AgentWorkflow;
 use App\Models\User;
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
+use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
+use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Laravel\Fortify\Features;
 
 // ── Health Checks ─────────────────────────────────────────────────────────────
@@ -181,6 +186,13 @@ Route::post('/social/webhooks/{platform}', [SocialWebhookController::class, 'rec
 // Public liveness probe for the cron scheduler and queue worker, watched from GitHub every
 // 15 minutes by .github/workflows/scheduler-watchdog.yml.
 Route::get('/up/scheduler', SchedulerProbeController::class)->name('up.scheduler');
+Route::get('/ready', ReadyController::class)->name('ready');
+
+// Violation reports need no session or forgery token. The controller keeps only the directive and blocked host.
+Route::post('/csp-report', CspReportController::class)
+    ->withoutMiddleware([PreventRequestForgery::class, StartSession::class, ShareErrorsFromSession::class])
+    ->middleware('throttle:60,1,csp-report')
+    ->name('csp.report');
 
 // Guardian observability report for Dot.Brain (dot-guardian/v1): operational
 // detail, so behind a bearer token (fails closed with 503 when none is
