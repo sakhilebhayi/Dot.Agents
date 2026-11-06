@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
@@ -101,7 +102,8 @@ class Agent extends Model
         return $this->hasMany(AgentPersona::class);
     }
 
-    public function defaultPersona()
+    /** @return HasOne<AgentPersona, $this> */
+    public function defaultPersona(): HasOne
     {
         return $this->hasOne(AgentPersona::class)->where('is_default', true);
     }

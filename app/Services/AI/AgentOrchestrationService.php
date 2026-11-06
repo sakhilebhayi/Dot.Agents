@@ -4,8 +4,6 @@ namespace App\Services\AI;
 
 use App\Events\AgentRunContractBreach;
 use App\Models\AgentDeployment;
-use App\Models\AgentMessage;
-use App\Models\AgentSession;
 use App\Models\AgentTask;
 use App\Models\AgentWorkflow;
 use App\Models\DecisionLog;
@@ -34,9 +32,7 @@ class AgentOrchestrationService
         private readonly ModelRouterService $modelRouter,
         private readonly DelusionDetectionService $delusionDetector,
         private readonly AuditService $auditService,
-        private readonly MemoryService $memoryService,
         private readonly AgentSandboxService $sandbox,
-        private readonly OutputModerationService $outputModeration,
         private readonly PromptBuilderService $promptBuilder,
         private readonly ResponseProcessorService $responseProcessor,
         private readonly AgentModelCaller $modelCaller,
@@ -45,81 +41,6 @@ class AgentOrchestrationService
         private readonly AgentCharterLoader $charterLoader,
         private readonly DigitalImmuneSystem $digitalImmuneSystem,
     ) {}
-
-    /**
-     * Process a user message and generate an agent response.
-     */
-    public function processMessage(
-        AgentDeployment $deployment,
-        AgentSession $session,
-        string $userMessage,
-        array $context = []
-    ): AgentMessage {
-        $this->sandbox->assertPermitted($deployment, 'process_message', $context);
-
-        $history = $this->promptBuilder->buildConversationHistory($session);
-        $memoryContext = $this->memoryService->getRelevantMemories($deployment, $userMessage);
-
-        $systemPrompt = Cache::remember(
-            "agent_system_prompt_{$deployment->id}",
-            600,
-            fn () => $this->promptBuilder->buildSystemPrompt($deployment, $memoryContext, $context)
-        );
-
-        $startTime = microtime(true);
-        $response = $this->modelCaller->callWithFailover(
-            $deployment->id,
-            $this->modelRouter->buildFailoverChain($deployment),
-            $systemPrompt,
-            $history,
-            $userMessage
-        );
-        $latencyMs = (int) ((microtime(true) - $startTime) * 1000);
-
-        ['content' => $moderatedContent, 'scan' => $moderationScan] = $this->outputModeration->scanAndRedact(
-            $response['content'],
-            ['deployment_id' => $deployment->id, 'session_id' => $session->id]
-        );
-
-        if ($moderationScan['verdict'] === OutputModerationService::BLOCK) {
-            $moderatedContent = $this->outputModeration->blockedResponse();
-        }
-
-        $assistantMessage = AgentMessage::create([
-            'session_id' => $session->id,
-            'role' => 'assistant',
-            'content' => $moderatedContent,
-            'token_count' => $response['usage']['total_tokens'] ?? 0,
-            'cost' => $response['cost'] ?? 0,
-            'model_used' => $response['model_used'] ?? 'gpt-4o',
-            'latency_ms' => $latencyMs,
-            'flagged' => $moderationScan['flagged'],
-            'flag_reason' => $moderationScan['flag_reason'],
-            'metadata' => [
-                'finish_reason' => $response['finish_reason'] ?? null,
-                'tool_calls' => $response['tool_calls'] ?? null,
-                'moderation_verdict' => $moderationScan['verdict'],
-                'provider' => $response['provider'] ?? null,
-            ],
-        ]);
-
-        $session->increment('message_count', 2);
-        $session->increment('token_count', $response['usage']['total_tokens'] ?? 0);
-
-        $this->responseProcessor->recordUsage($deployment, $response, $session);
-
-        if ($deployment->enable_memory) {
-            $this->memoryService->processInteraction($deployment, $userMessage, $response['content']);
-        }
-
-        $this->auditService->logAgentAction($deployment, 'message_processed', [
-            'session_id' => $session->id,
-            'message_id' => $assistantMessage->id,
-            'token_count' => $response['usage']['total_tokens'] ?? 0,
-        ]);
-
-        return $assistantMessage;
-    }
 
     /**
      * Execute an agent task with full governance (delusion detection, approval flow).

@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Livewire;
 
-use App\Jobs\ProcessAgentMessage;
+use App\Jobs\RunAgentStep;
 use App\Livewire\Agents\AgentChat;
 use App\Models\AgentDeployment;
 use App\Models\AgentMessage;
@@ -113,7 +113,7 @@ class AgentChatTest extends TestCase
     // Async processing on the 'ai' queue
     // -----------------------------------------------------------------------
 
-    public function test_send_message_dispatches_processing_to_the_ai_queue_instead_of_running_inline(): void
+    public function test_send_message_starts_a_run_on_the_engine_instead_of_working_inline(): void
     {
         Queue::fake();
         $this->actingAs($this->user);
@@ -124,7 +124,8 @@ class AgentChatTest extends TestCase
             ->call('sendMessage')
             ->assertSet('isTyping', true);
 
-        Queue::assertPushedOn('ai', ProcessAgentMessage::class);
+        Queue::assertPushedOn('agent-steps', RunAgentStep::class);
+        $this->assertDatabaseHas('agent_runs', ['agent_deployment_id' => $this->deployment->id, 'trigger_type' => 'chat', 'status' => 'queued']);
     }
 
     public function test_send_message_persists_the_user_message_immediately_even_though_the_reply_is_queued(): void

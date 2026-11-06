@@ -16,6 +16,7 @@ final class AgentStates
         'awaiting_approval' => ['Waiting for approval', 'hold'],
         'paused' => ['Paused', 'hold'],
         'failed' => ['Failed', 'stop'],
+        'stopped' => ['Stopped', 'stop'],
         'cancelled' => ['Cancelled', 'off'],
         'completed' => ['Completed', 'clear'],
         'disabled' => ['Disabled', 'off'],

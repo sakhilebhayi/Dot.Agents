@@ -95,6 +95,7 @@ class AgentDeployment extends Model
         return $this->hasOne(AgentConfigVersion::class)->where('state', AgentConfigVersion::DRAFT)->latestOfMany('number');
     }
 
+    /** @return BelongsTo<Agent, $this> */
     public function agent(): BelongsTo
     {
         return $this->belongsTo(Agent::class);

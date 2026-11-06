@@ -442,12 +442,13 @@ jobs:
             echo "::error::crontab -l answered empty or failed five times ($(cat "$ERR")). Refusing to write a crontab I could not read."; exit 1
           fi
           KEY="${MARK#\# dot-}"
-          EXPECT_MINE=2
+          EXPECT_MINE=3
           OTHERS=$(grep -v "$MARK" "$OLD" | grep -c . || true)
           {
             grep -v "$MARK" "$OLD" || true
             echo "* * * * * cd $DEPLOY_PATH && exec $PHP_BIN artisan schedule:run > storage/logs/cron-scheduler.log 2>&1 $MARK"
             echo "* * * * * cd $DEPLOY_PATH && exec $PHP_BIN artisan queue:work --queue=critical,security,ai,agent-tasks,agents,governance,billing,notifications,social-commerce,default --stop-when-empty --tries=3 --timeout=90 --max-time=50 > storage/logs/cron-queue.log 2>&1 $MARK"
+            echo "* * * * * cd $DEPLOY_PATH && exec $PHP_BIN artisan queue:work agents --queue=agent-steps --stop-when-empty --tries=3 --timeout=180 --max-time=50 > storage/logs/cron-agent-steps.log 2>&1 $MARK"
           } > "$NEW"
           # Runner mode (InfoDot docs/programme R-1): when the account runs the bounded-concurrency cron runner
           # (InfoDot: Cron Runner workflow, "install"), this app's commands go to ~/.dot-cron.d/$KEY.cron and the

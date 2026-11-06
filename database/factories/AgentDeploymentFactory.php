@@ -3,9 +3,11 @@
 namespace Database\Factories;
 
 use App\Models\Agent;
+use App\Models\AgentConfigVersion;
 use App\Models\AgentDeployment;
 use App\Models\Organization;
 use App\Models\User;
+use App\Services\Agents\AgentConfig;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
@@ -15,6 +17,23 @@ use Illuminate\Support\Str;
 class AgentDeploymentFactory extends Factory
 {
     protected $model = AgentDeployment::class;
+
+    /** A deployed agent always has a published setup, as DeployAgentAction leaves it. */
+    public function configure(): static
+    {
+        return $this->afterCreating(function (AgentDeployment $deployment) {
+            $version = AgentConfigVersion::create([
+                'organization_id' => $deployment->organization_id,
+                'agent_deployment_id' => $deployment->id,
+                'number' => 1,
+                'state' => AgentConfigVersion::PUBLISHED,
+                'config' => AgentConfig::defaults(),
+                'published_at' => now(),
+            ]);
+
+            $deployment->forceFill(['published_version_id' => $version->id])->saveQuietly();
+        });
+    }
 
     public function definition(): array
     {
