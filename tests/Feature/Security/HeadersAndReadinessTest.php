@@ -71,7 +71,7 @@ class HeadersAndReadinessTest extends TestCase
     {
         Artisan::call('migrate:rollback', ['--step' => 1, '--force' => true]);
 
-        $this->getJson('/ready')->assertOk()->assertJsonPath('status', 'fail')->assertJsonPath('checks.database.ok', false);
+        $this->getJson('/ready')->assertStatus(503)->assertJsonPath('status', 'fail')->assertJsonPath('checks.database.ok', false);
     }
 
     public function test_a_violation_report_keeps_only_the_directive_and_host(): void
