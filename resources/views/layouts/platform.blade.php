@@ -35,6 +35,7 @@
         'Today' => [
             ['dashboard', 'dashboard', 'panel', 'Command centre'],
             ['governance.approvals', 'governance.approvals*', 'approve', 'Approvals', $waiting],
+            ['runs.index', 'runs.*', 'run', 'Runs'],
         ],
         'Workforce' => [
             ['agents.deployments', 'agents.*', 'agents', 'Agents'],
@@ -54,6 +55,7 @@
         ],
         'Business' => [
             ['org.members', 'org.members*', 'people', 'People'],
+            ['usage', 'usage', 'usage', 'Usage'],
             ['billing.index', 'billing.*', 'billing', 'Billing'],
         ],
     ];

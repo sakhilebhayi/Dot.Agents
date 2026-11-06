@@ -2,128 +2,113 @@
 
 namespace App\Livewire\Dashboard;
 
+use App\Actions\Agents\ToggleFavouriteAction;
+use App\DTOs\Agents\ToggleFavouriteData;
 use App\Models\AgentApproval;
 use App\Models\AgentDeployment;
-use App\Models\AgentTask;
-use App\Models\SecurityEvent;
-use App\Models\UsageRecord;
-use Carbon\Carbon;
+use App\Models\AgentRun;
+use App\Models\WorkflowExecution;
+use App\Services\Insights\RunMetrics;
+use App\Support\TenantContext;
 use Livewire\Attributes\Computed;
-use Livewire\Attributes\Lazy;
 use Livewire\Component;
 
-#[Lazy]
+/** The first page. It answers what needs a person, what is under way, and how the work has gone. */
 class AgentDashboard extends Component
 {
     /** Actions a read-only (viewer) role may still call; every other action is refused for it. */
-    public const READ_ONLY_ACTIONS = ['setTimeframe'];
+    public const READ_ONLY_ACTIONS = ['setTimeframe', 'toggleFavourite'];
 
     public string $timeframe = '7d';
 
+    /** @return array<string, mixed> */
     #[Computed]
-    public function organization()
+    public function summary(): array
     {
-        return auth()->user()->currentTeam ?? null;
+        return app(RunMetrics::class)->summary($this->organizationId(), $this->since());
     }
 
+    /** @return list<array{day: string, completed: int, failed: int}> */
     #[Computed]
-    public function deploymentStats(): array
+    public function daily(): array
     {
-        $orgId = $this->getOrgId();
-        $total = AgentDeployment::where('organization_id', $orgId)->count();
-        $active = AgentDeployment::where('organization_id', $orgId)->where('status', 'active')->count();
-        $paused = AgentDeployment::where('organization_id', $orgId)->where('status', 'paused')->count();
-
-        return compact('total', 'active', 'paused');
+        return app(RunMetrics::class)->daily($this->organizationId(), now()->subDays(13));
     }
 
     #[Computed]
-    public function taskStats(): array
+    public function agents()
     {
-        $orgId = $this->getOrgId();
-        $since = $this->getSince();
-
-        $query = AgentTask::where('organization_id', $orgId)->where('created_at', '>=', $since);
-
-        return [
-            'total' => $query->count(),
-            'completed' => (clone $query)->where('status', 'completed')->count(),
-            'failed' => (clone $query)->where('status', 'failed')->count(),
-            'pending_approval' => (clone $query)->where('status', 'awaiting_approval')->count(),
-        ];
+        return app(RunMetrics::class)->byAgent($this->organizationId(), $this->since())->take(8);
     }
 
     #[Computed]
-    public function pendingApprovals()
+    public function approvals()
     {
-        return AgentApproval::where('organization_id', $this->getOrgId())
-            ->where('status', 'pending')
-            ->with(['deployment.agent', 'task'])
-            ->orderBy('risk_level')
-            ->take(5)
-            ->get();
+        return AgentApproval::where('organization_id', $this->organizationId())->where('status', 'pending')
+            ->orderByRaw("CASE risk_level WHEN 'critical' THEN 1 WHEN 'high' THEN 2 WHEN 'medium' THEN 3 ELSE 4 END")->orderBy('created_at')->limit(5)->get();
     }
 
     #[Computed]
-    public function activeAgents()
+    public function failures()
     {
-        return AgentDeployment::where('organization_id', $this->getOrgId())
-            ->where('status', 'active')
-            ->with(['agent', 'latestScorecard'])
-            ->orderByDesc('last_active_at')
-            ->take(6)
-            ->get();
+        return AgentRun::with('deployment:id,name')->where('organization_id', $this->organizationId())->where('is_test', false)
+            ->whereIn('status', [AgentRun::FAILED, AgentRun::STOPPED])->where('finished_at', '>=', now()->subDay())->latest('id')->limit(5)->get();
     }
 
     #[Computed]
-    public function recentSecurityEvents()
+    public function running()
     {
-        return SecurityEvent::where('organization_id', $this->getOrgId())
-            ->whereIn('severity', ['critical', 'error'])
-            ->where('status', 'open')
-            ->orderByDesc('created_at')
-            ->take(5)
-            ->get();
+        return AgentRun::with('deployment:id,name')->where('organization_id', $this->organizationId())->where('is_test', false)
+            ->whereIn('status', [AgentRun::QUEUED, AgentRun::RUNNING, AgentRun::WAITING_AGENT])->latest('id')->limit(5)->get();
     }
 
     #[Computed]
-    public function costStats(): array
+    public function workflows()
     {
-        $orgId = $this->getOrgId();
-        $since = $this->getSince();
-
-        $totalCost = UsageRecord::where('organization_id', $orgId)
-            ->where('recorded_date', '>=', $since->toDateString())
-            ->sum('total_cost');
-
-        $dailyAvg = $totalCost / max(1, now()->diffInDays($since));
-
-        return [
-            'total' => round($totalCost, 2),
-            'daily_avg' => round($dailyAvg, 2),
-        ];
+        return WorkflowExecution::with('workflow:id,name')->where('organization_id', $this->organizationId())->whereIn('status', WorkflowExecution::OPEN)->latest('id')->limit(5)->get();
     }
 
-    private function getOrgId(): ?int
+    /** The agents this person keeps coming back to: starred first, then the ones they used last. */
+    #[Computed]
+    public function mine()
     {
-        return session('current_organization_id')
-            ?? auth()->user()?->currentOrganization()?->id;
+        $starred = auth()->user()->favouriteAgents()->allRelatedIds();
+        $recent = AgentRun::where('organization_id', $this->organizationId())->where('initiated_by', auth()->id())->where('is_test', false)->latest('id')->limit(30)->pluck('agent_deployment_id')->unique();
+        $owned = AgentDeployment::where('organization_id', $this->organizationId())->where('owner_id', auth()->id())->pluck('id');
+
+        $ids = $starred->merge($recent)->merge($owned)->unique()->take(6)->values();
+
+        return AgentDeployment::where('organization_id', $this->organizationId())->whereIn('id', $ids)->get(['id', 'name', 'role', 'status'])
+            ->sortBy(fn (AgentDeployment $agent) => $ids->search($agent->id))->values()
+            ->each(fn (AgentDeployment $agent) => $agent->setAttribute('starred', $starred->contains($agent->id)));
     }
 
-    private function getSince(): Carbon
+    public function setTimeframe(string $timeframe): void
+    {
+        $this->timeframe = in_array($timeframe, ['24h', '7d', '30d'], true) ? $timeframe : '7d';
+        unset($this->summary, $this->agents);
+    }
+
+    public function toggleFavourite(int $id, ToggleFavouriteAction $action): void
+    {
+        $agent = AgentDeployment::where('organization_id', $this->organizationId())->findOrFail($id);
+
+        $action->execute(new ToggleFavouriteData(auth()->id(), $agent->id));
+        unset($this->mine);
+    }
+
+    private function organizationId(): int
+    {
+        return (int) TenantContext::id();
+    }
+
+    private function since()
     {
         return match ($this->timeframe) {
             '24h' => now()->subDay(),
             '30d' => now()->subDays(30),
-            '90d' => now()->subDays(90),
             default => now()->subDays(7),
         };
-    }
-
-    public function setTimeframe(string $tf): void
-    {
-        $this->timeframe = $tf;
-        unset($this->taskStats, $this->costStats);
     }
 
     public function render()

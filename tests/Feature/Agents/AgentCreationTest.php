@@ -2,13 +2,19 @@
 
 namespace Tests\Feature\Agents;
 
+use App\Actions\Agents\StartRunAction;
+use App\DTOs\Agents\StartRunData;
+use App\Jobs\ReportRunToDotMemory;
 use App\Livewire\Agents\AgentCreate;
 use App\Livewire\Agents\AgentSetup;
 use App\Livewire\Agents\AgentVersions;
 use App\Livewire\Agents\DeploymentOverview;
+use App\Livewire\Marketplace\TemplateLibrary;
 use App\Models\AgentConfigVersion;
 use App\Models\AgentDeployment;
+use App\Models\AgentEffect;
 use App\Models\AgentRun;
+use App\Models\BusinessTemplate;
 use App\Models\KnowledgeBase;
 use App\Models\Organization;
 use App\Models\UsageRecord;
@@ -18,11 +24,15 @@ use App\Services\Agents\AgentConfigReview;
 use App\Services\Agents\AgentDescriptionReader;
 use App\Services\Agents\AgentPackage;
 use App\Services\Models\ScriptedGateway;
+use App\Services\Runs\RunFinisher;
 use App\Support\TenantContext;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Client\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Queue;
 use Livewire\Livewire;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
@@ -368,5 +378,122 @@ class AgentCreationTest extends TestCase
     private function recordRun(AgentDeployment $agent, AgentConfigVersion $version, string $status): void
     {
         AgentRun::create(['organization_id' => $agent->organization_id, 'agent_deployment_id' => $agent->id, 'config_version_id' => $version->id, 'trigger_type' => 'test', 'status' => $status, 'input' => 'x', 'limits' => [], 'is_test' => true]);
+    }
+
+    public function test_a_template_records_where_an_agent_came_from_and_a_newer_version_is_mentioned(): void
+    {
+        Livewire::test(AgentCreate::class)->call('useTemplate', 'policy-helper');
+        $agent = AgentDeployment::firstOrFail();
+        config(['agent_templates.policy-helper.version' => 2]);
+
+        Livewire::test(DeploymentOverview::class, ['deploymentId' => $agent->id])->assertSee('Version 2 of the template');
+
+        $this->assertSame('policy-helper', $agent->draftVersion()->first()->settings()['template']['key']);
+    }
+
+    public function test_an_agent_can_be_kept_as_this_businesss_own_template_without_its_knowledge(): void
+    {
+        $agent = $this->agent(['name' => 'Our clerk']);
+        $agent->versions()->create(['organization_id' => $agent->organization_id, 'number' => 2, 'state' => 'draft', 'config' => AgentConfig::normalise(['instructions' => 'Do it our way.', 'knowledge' => [9]])]);
+
+        Livewire::test(DeploymentOverview::class, ['deploymentId' => $agent->id])->call('saveAsTemplate')->call('saveAsTemplate');
+
+        $template = BusinessTemplate::latest('id')->firstOrFail();
+        $this->assertSame(2, $template->version);
+        $this->assertSame([], $template->config['knowledge']);
+
+        Livewire::test(AgentCreate::class)->set('way', 'template')->assertSee('Our clerk')->call('useBusinessTemplate', $template->id);
+        $this->assertSame('Do it our way.', AgentDeployment::latest('id')->first()->draftVersion()->first()->settings()['instructions']);
+    }
+
+    public function test_another_businesss_template_is_out_of_reach(): void
+    {
+        $theirs = TenantContext::system(function () {
+            $agent = AgentDeployment::factory()->create();
+
+            return BusinessTemplate::create(['organization_id' => $agent->organization_id, 'name' => 'Secret', 'config' => []]);
+        });
+
+        $this->expectException(ModelNotFoundException::class);
+        Livewire::test(AgentCreate::class)->call('useBusinessTemplate', $theirs->id);
+    }
+
+    public function test_the_library_lists_templates_with_what_they_need_and_no_popularity_figures(): void
+    {
+        Livewire::test(TemplateLibrary::class)
+            ->assertSee('Invoice Checker')->assertSee('Needs:')->assertDontSee('rating')->assertDontSee('deployments')
+            ->set('category', 'HR')->assertSee('Policy Helper')->assertDontSee('Invoice Checker');
+    }
+
+    public function test_the_library_says_what_each_tool_does_and_whether_it_is_available(): void
+    {
+        Livewire::test(TemplateLibrary::class)->call('setTab', 'tools')
+            ->assertSee('Read a web page')->assertSee('Reaches:')->assertSee('Save a document to Dot.Files')->assertSee('Not connected');
+    }
+
+    public function test_every_category_the_brief_needs_first_has_a_working_template(): void
+    {
+        $categories = collect(config('agent_templates'))->pluck('category')->unique()->all();
+
+        foreach (['Finance', 'HR', 'Operations', 'Administration', 'Customer support', 'Reporting'] as $category) {
+            $this->assertContains($category, $categories);
+        }
+
+        foreach (config('agent_templates') as $template) {
+            $this->assertNotEmpty($template['needs']);
+            $this->assertArrayHasKey($template['autonomy'], AgentConfig::AUTONOMY);
+        }
+    }
+
+    public function test_the_dot_files_tool_is_refused_until_it_is_connected(): void
+    {
+        config(['prism.default_provider' => 'scripted', 'services.files.secret' => null]);
+        $agent = $this->agent(['status' => 'active', 'autonomy_level' => 4]);
+        DB::table('agent_config_versions')->where('id', $agent->published_version_id)->update(['config' => encrypt(json_encode(['tools' => [['key' => 'save_to_files', 'mode' => 'auto']]]), false)]);
+        $model = app(ScriptedGateway::class);
+        $model->call('save_to_files', ['name' => 'Report', 'text' => 'Hello'])->say('It is not connected.');
+
+        app(StartRunAction::class)->execute($agent->fresh(), new StartRunData('Save it'));
+
+        $this->assertSame([], $model->requests[0]->tools);
+        $this->assertSame('not_connected', AgentEffect::firstOrFail()->error_code);
+    }
+
+    public function test_the_dot_files_tool_signs_its_call_and_a_lost_answer_is_not_repeated(): void
+    {
+        config(['prism.default_provider' => 'scripted', 'services.files.secret' => 'shared-secret', 'services.files.url' => 'https://files.example']);
+        $this->organization->forceFill(['infodot_team_uuid' => 'team-1'])->save();
+        $agent = $this->agent(['status' => 'active', 'autonomy_level' => 4]);
+        DB::table('agent_config_versions')->where('id', $agent->published_version_id)->update(['config' => encrypt(json_encode(['tools' => [['key' => 'save_to_files', 'mode' => 'auto']]]), false)]);
+        Http::fake(['*' => Http::response(['reference' => 'DOC-1'], 201)]);
+        $model = app(ScriptedGateway::class);
+        $model->call('save_to_files', ['name' => 'Report', 'text' => 'Hello'])->say('Saved.');
+
+        app(StartRunAction::class)->execute($agent->fresh(), new StartRunData('Save it'));
+
+        Http::assertSent(function (Request $request) {
+            $expected = 'sha256='.hash_hmac('sha256', $request->header('X-Dot-Timestamp')[0].'.'.$request->body(), 'shared-secret');
+
+            return $request->url() === 'https://files.example/api/platform/files/store'
+                && $request->header('X-Dot-Signature')[0] === $expected
+                && $request['team_uuid'] === 'team-1'
+                && $request->hasHeader('Idempotency-Key');
+        });
+
+        $this->assertStringContainsString('DOC-1', AgentEffect::firstOrFail()->result['content']);
+    }
+
+    public function test_a_finished_run_is_reported_to_dot_memory_and_a_test_is_not(): void
+    {
+        Queue::fake();
+        $agent = $this->agent(['status' => 'active']);
+        $run = AgentRun::create(['organization_id' => $agent->organization_id, 'agent_deployment_id' => $agent->id, 'config_version_id' => $agent->published_version_id, 'trigger_type' => 'manual', 'status' => 'running', 'input' => 'x', 'limits' => []]);
+        $test = AgentRun::create(['organization_id' => $agent->organization_id, 'agent_deployment_id' => $agent->id, 'config_version_id' => $agent->published_version_id, 'trigger_type' => 'manual', 'status' => 'running', 'input' => 'x', 'limits' => [], 'is_test' => true]);
+
+        app(RunFinisher::class)->complete($test, 'Done.');
+        Queue::assertNotPushed(ReportRunToDotMemory::class);
+
+        app(RunFinisher::class)->complete($run, 'Done.');
+        Queue::assertPushed(ReportRunToDotMemory::class);
     }
 }

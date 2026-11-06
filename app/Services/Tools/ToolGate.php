@@ -23,6 +23,7 @@ class ToolGate
         private readonly ToolPermissionService $permissions,
         private readonly ToolArguments $arguments,
         private readonly ApprovalDesk $desk,
+        private readonly ToolCatalogue $catalogue,
     ) {}
 
     /**
@@ -49,12 +50,18 @@ class ToolGate
      */
     public function refused(AgentRun $run, ?ToolDefinition $tool, ?array $grant): ?GateDecision
     {
+        $missing = $tool === null ? null : $this->catalogue->missing($run->organization_id, $tool->key);
+
         if ($tool === null) {
             return GateDecision::deny('unknown_tool', 'There is no such tool.');
         }
 
         if ($grant === null) {
             return GateDecision::deny('not_granted', 'This agent has not been given this tool.');
+        }
+
+        if ($missing !== null) {
+            return GateDecision::deny('not_connected', $missing);
         }
 
         if ($this->permissions->isDenied($run->deployment, $tool->key)) {

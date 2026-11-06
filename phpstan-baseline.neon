@@ -385,12 +385,6 @@ parameters:
 			path: app/Livewire/Agents/DeploymentManager.php
 
 		-
-			message: '#^Access to an undefined property App\\Livewire\\Agents\\DeploymentOverview\:\:\$deployment\.$#'
-			identifier: property.notFound
-			count: 6
-			path: app/Livewire/Agents/DeploymentOverview.php
-
-		-
 			message: '#^Access to an undefined property App\\Livewire\\Agents\\ScorecardViewer\:\:\$deployment\.$#'
 			identifier: property.notFound
 			count: 3
@@ -707,6 +701,12 @@ parameters:
 			identifier: nullCoalesce.variable
 			count: 1
 			path: app/Services/Governance/Scorecard/ScorecardGateEvaluator.php
+
+		-
+			message: '#^Method App\\Services\\Insights\\RunMetrics\:\:byAgent\(\) should return Illuminate\\Support\\Collection\<int\|string, mixed\> but returns Illuminate\\Support\\Collection\<int, array\{agent\: App\\Models\\AgentDeployment\|null, runs\: int, completed\: int, failed\: int, rate\: float\|null, cost\: float, tokens\: int\}\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Services/Insights/RunMetrics.php
 
 		-
 			message: '#^Parameter \#1 \$callback of method Illuminate\\Database\\Eloquent\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:map\(\) expects callable\(Illuminate\\Database\\Eloquent\\Model, int\)\: array\{role\: ''assistant''\|''user'', content\: string\}, Closure\(App\\Models\\SocialMessage\)\: array\{role\: ''assistant''\|''user'', content\: string\} given\.$#'

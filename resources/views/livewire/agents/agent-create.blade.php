@@ -39,6 +39,18 @@
             </section>
         @endif
     @elseif($way === 'template')
+        @if($this->own->isNotEmpty())
+            <section class="card" aria-label="Your templates" style="margin-bottom: var(--gap)">
+                <div class="card-head"><h2>Yours</h2></div>
+                @foreach($this->own as $template)
+                    <div class="row template" wire:key="own-{{ $template->id }}">
+                        <div class="row-main"><b>{{ $template->name }}</b><span>Version {{ $template->version }}</span></div>
+                        <button type="button" class="btn small" wire:click="useBusinessTemplate({{ $template->id }})">Use</button>
+                    </div>
+                @endforeach
+            </section>
+        @endif
+
         <section class="card" aria-label="Templates">
             @foreach($this->templates as $key => $template)
                 <div class="row template" wire:key="template-{{ $key }}">

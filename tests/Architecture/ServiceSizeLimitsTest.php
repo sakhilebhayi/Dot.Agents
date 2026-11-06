@@ -146,12 +146,10 @@ class ServiceSizeLimitsTest extends TestCase
             }
         }
 
-        // AgentMarketplace (243) and WorkflowBuilder (221) are tracked for split.
-        // Guard against NEW violations — only 2 are acceptable right now.
-        $this->assertLessThanOrEqual(
-            2,
+        $this->assertSame(
+            0,
             count($violations),
-            "Livewire components exceeding 200-line limit (max 2 tracked backlog items allowed):\n"
+            "Livewire components exceeding 200-line limit:\n"
             .implode("\n", $violations)
         );
     }

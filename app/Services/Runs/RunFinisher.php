@@ -5,6 +5,7 @@ namespace App\Services\Runs;
 use App\Events\AgentTaskCompleted;
 use App\Events\AgentTaskFailed;
 use App\Jobs\AdvanceWorkflow;
+use App\Jobs\ReportRunToDotMemory;
 use App\Models\AgentApproval;
 use App\Models\AgentMessage;
 use App\Models\AgentRun;
@@ -13,6 +14,7 @@ use App\Models\AgentTask;
 use App\Services\AI\OutputModerationService;
 use App\Services\Evals\TestMarker;
 use App\Services\Governance\AuditService;
+use App\Services\Insights\BudgetWatch;
 use App\Services\Triggers\BusinessEvents;
 use Illuminate\Support\Str;
 
@@ -28,6 +30,7 @@ class RunFinisher
         private readonly DelegationReturn $delegation,
         private readonly BusinessEvents $events,
         private readonly TestMarker $tests,
+        private readonly BudgetWatch $budget,
     ) {}
 
     public function complete(AgentRun $run, string $text, bool $cutOff = false): void
@@ -100,6 +103,11 @@ class RunFinisher
         }
 
         $this->events->runEnded($run);
+        $this->budget->check($run->organization_id);
+
+        if (! $run->is_test) {
+            ReportRunToDotMemory::dispatch($run->id, $run->organization_id);
+        }
         $this->tests->runEnded($run);
     }
 

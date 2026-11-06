@@ -5,6 +5,7 @@ namespace App\Livewire\Agents;
 use App\Actions\Agents\CreateAgentAction;
 use App\DTOs\Agents\CreateAgentData;
 use App\Models\AgentDeployment;
+use App\Models\BusinessTemplate;
 use App\Services\Agents\AgentConfig;
 use App\Services\Agents\AgentDescriptionReader;
 use App\Services\Agents\AgentPackage;
@@ -47,6 +48,12 @@ class AgentCreate extends Component
         return config('agent_templates');
     }
 
+    #[Computed]
+    public function own()
+    {
+        return BusinessTemplate::latestVersions()->where('organization_id', TenantContext::id())->orderBy('name')->get();
+    }
+
     public function mount(): void
     {
         abort_unless(Gate::allows('create', [AgentDeployment::class, TenantContext::id()]), 403);
@@ -83,7 +90,15 @@ class AgentCreate extends Component
             'instructions' => $template['instructions'],
             'autonomy' => $template['autonomy'],
             'tools' => $template['tools'],
+            'template' => ['key' => $key, 'version' => $template['version']],
         ]);
+    }
+
+    public function useBusinessTemplate(int $id, CreateAgentAction $action): void
+    {
+        $template = BusinessTemplate::where('organization_id', TenantContext::id())->findOrFail($id);
+
+        $this->create($action, $template->name, (string) $template->role, $template->responsibility, $template->config);
     }
 
     public function build(CreateAgentAction $action): void
