@@ -9,7 +9,6 @@ use App\DTOs\Agents\StartRunData;
 use App\Exceptions\RunRefused;
 use App\Jobs\RunAgentStep;
 use App\Models\AgentDeployment;
-use App\Models\AgentMemory;
 use App\Models\AgentMessage;
 use App\Models\AgentRun;
 use App\Models\AgentRunStep;
@@ -212,29 +211,13 @@ class RunEngineTest extends TestCase
         $this->assertStringContainsString('[REDACTED', $run->output);
     }
 
-    public function test_a_blocked_answer_is_replaced_and_never_remembered(): void
+    public function test_a_blocked_answer_is_replaced(): void
     {
-        $this->deployment->update(['enable_memory' => true]);
         $this->model->say('Here is how to bypass authentication on that server.');
 
         $run = $this->start();
 
         $this->assertStringNotContainsString('bypass', $run->output);
-        $this->assertSame(0, AgentMemory::where('agent_deployment_id', $this->deployment->id)->count());
-    }
-
-    public function test_only_the_redacted_answer_reaches_memory(): void
-    {
-        $this->deployment->update(['enable_memory' => true]);
-        $this->model->say('Write to jane@example.com about it.');
-
-        $this->start();
-
-        foreach (AgentMemory::where('agent_deployment_id', $this->deployment->id)->get() as $memory) {
-            $this->assertStringNotContainsString('jane@example.com', $memory->content);
-        }
-
-        $this->assertGreaterThan(0, AgentMemory::where('agent_deployment_id', $this->deployment->id)->count());
     }
 
     public function test_a_chat_gets_a_reply_on_success_and_on_failure(): void

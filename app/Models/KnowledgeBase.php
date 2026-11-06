@@ -14,11 +14,12 @@ class KnowledgeBase extends Model
 
     protected $fillable = [
         'organization_id', 'name', 'description', 'type',
-        'access_level', 'is_active', 'settings', 'metadata',
+        'access_level', 'is_active', 'settings', 'metadata', 'accessible_agents',
     ];
 
     protected $casts = [
         'settings' => 'array',
+        'accessible_agents' => 'array',
         'metadata' => 'array',
         'is_active' => 'boolean',
     ];

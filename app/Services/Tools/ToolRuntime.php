@@ -158,6 +158,18 @@ class ToolRuntime
     /** @return array<string, array{key: string, mode: string}> */
     private function grants(AgentRun $run): array
     {
-        return collect($run->configVersion->settings()['tools'])->keyBy('key')->all();
+        $settings = $run->configVersion->settings();
+        $grants = collect($settings['tools'])->keyBy('key');
+
+        // Choosing knowledge or long-term memory for an agent is how it is given these two.
+        if ($settings['knowledge'] !== []) {
+            $grants['knowledge_search'] = ['key' => 'knowledge_search', 'mode' => 'auto'];
+        }
+
+        if ($settings['memory']['long_term']) {
+            $grants['remember_fact'] = ['key' => 'remember_fact', 'mode' => 'auto'];
+        }
+
+        return $grants->all();
     }
 }

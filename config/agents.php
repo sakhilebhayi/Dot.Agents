@@ -47,5 +47,7 @@ return [
         BuiltIn\ReadWebPage::class,
         BuiltIn\TeamDirectory::class,
         BuiltIn\NotifyMember::class,
+        BuiltIn\KnowledgeSearch::class,
+        BuiltIn\RememberFact::class,
     ],
 ];

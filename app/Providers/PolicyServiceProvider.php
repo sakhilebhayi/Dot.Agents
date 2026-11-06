@@ -40,7 +40,6 @@ use App\Models\Invoice;
 use App\Models\KnowledgeArticle;
 use App\Models\KnowledgeBase;
 use App\Models\Membership;
-use App\Models\MemoryEmbedding;
 use App\Models\Organization;
 use App\Models\OrganizationDNA;
 use App\Models\OrganizationSocialCredential;
@@ -109,7 +108,6 @@ use App\Policies\InvoicePolicy;
 use App\Policies\KnowledgeArticlePolicy;
 use App\Policies\KnowledgeBasePolicy;
 use App\Policies\MembershipPolicy;
-use App\Policies\MemoryEmbeddingPolicy;
 use App\Policies\OrganizationDNAPolicy;
 use App\Policies\OrganizationPolicy;
 use App\Policies\OrganizationSocialCredentialPolicy;
@@ -197,7 +195,6 @@ class PolicyServiceProvider extends ServiceProvider
         Gate::policy(AgentMemory::class, AgentMemoryPolicy::class);
         Gate::policy(KnowledgeBase::class, KnowledgeBasePolicy::class);
         Gate::policy(KnowledgeArticle::class, KnowledgeArticlePolicy::class);
-        Gate::policy(MemoryEmbedding::class, MemoryEmbeddingPolicy::class);
 
         // ── Agent Plugins ───────────────────────────────────────────────────
         Gate::policy(AgentPlugin::class, AgentPluginPolicy::class);

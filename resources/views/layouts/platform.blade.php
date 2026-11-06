@@ -46,6 +46,7 @@
             ['org.knowledge', 'org.knowledge*', 'knowledge', 'Knowledge'],
         ],
         'Oversight' => [
+            ['org.memory', 'org.memory*', 'memory', 'Memory'],
             ['governance.decisions', 'governance.decisions*', 'decision', 'Decisions'],
             ['governance.audit', 'governance.audit*', 'audit', 'Audit log'],
             ['security.center', 'security.*', 'shield', 'Security'],

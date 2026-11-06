@@ -441,7 +441,7 @@ parameters:
 		-
 			message: '#^Access to an undefined property App\\Livewire\\Organizations\\KnowledgeManager\:\:\$organization\.$#'
 			identifier: property.notFound
-			count: 5
+			count: 6
 			path: app/Livewire/Organizations/KnowledgeManager.php
 
 		-

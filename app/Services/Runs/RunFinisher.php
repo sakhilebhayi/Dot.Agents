@@ -9,7 +9,6 @@ use App\Models\AgentMessage;
 use App\Models\AgentRun;
 use App\Models\AgentRunStep;
 use App\Models\AgentTask;
-use App\Services\AI\MemoryService;
 use App\Services\AI\OutputModerationService;
 use App\Services\Governance\AuditService;
 use Illuminate\Support\Str;
@@ -21,7 +20,6 @@ class RunFinisher
         private readonly Journal $journal,
         private readonly OutputModerationService $moderation,
         private readonly UsageLedger $ledger,
-        private readonly MemoryService $memory,
         private readonly AuditService $audit,
         private readonly OutputChannels $channels,
     ) {}
@@ -47,11 +45,6 @@ class RunFinisher
         $this->close($run, AgentRun::COMPLETED, ['output' => $clean, 'error_code' => $cutOff ? 'output_cut_off' : null]);
         $this->reply($run, $clean, $scan);
         $this->settleTask($run, 'completed', $clean);
-
-        // What is remembered is what was safe to show, so nothing the check caught can come back in a later prompt.
-        if ($run->deployment?->enable_memory && $scan['verdict'] !== OutputModerationService::BLOCK) {
-            $this->memory->processInteraction($run->deployment, (string) $run->input, $clean);
-        }
     }
 
     public function fail(AgentRun $run, string $code, string $message): void
