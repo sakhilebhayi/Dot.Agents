@@ -1,4 +1,4 @@
 <x-layouts.platform>
-    <x-slot:header>My Deployed Agents</x-slot:header>
+    <x-slot:header>Agents</x-slot:header>
     @livewire('agents.deployment-manager')
 </x-layouts.platform>

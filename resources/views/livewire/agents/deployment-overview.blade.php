@@ -1,216 +1,98 @@
-<div class="space-y-6">
-    @php
-        $statusColors = ['active' => 'emerald', 'paused' => 'yellow', 'configuring' => 'blue', 'decommissioned' => 'gray', 'suspended' => 'red'];
-        $statusColor = $statusColors[$this->deployment->status] ?? 'gray';
-    @endphp
+@php
+    $agent = $this->deployment;
+    $settings = ($agent->publishedVersion ?? $agent->draftVersion()->first())?->settings() ?? \App\Services\Agents\AgentConfig::defaults();
+    $level = \App\Services\Agents\AgentConfig::AUTONOMY[(int) $agent->autonomy_level] ?? null;
+@endphp
 
-    {{-- Header --}}
-    <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-6">
-        <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-            <div class="flex items-center gap-4">
-                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-brand-purple to-brand-purple-light flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
-                    {{ substr($this->deployment->agent?->name ?? 'AI', 0, 2) }}
-                </div>
-                <div>
-                    <div class="flex items-center gap-2 flex-wrap">
-                        <h2 class="text-lg font-bold text-gray-900 dark:text-white">{{ $this->deployment->display_name }}</h2>
-                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-{{ $statusColor }}-100 text-{{ $statusColor }}-700 dark:bg-{{ $statusColor }}-900/30 dark:text-{{ $statusColor }}-400">
-                            {{ ucfirst($this->deployment->status) }}
-                        </span>
-                    </div>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-                        {{ $this->deployment->agent?->name }}
-                        @if($this->deployment->agent?->agent_type)
-                            · {{ ucfirst($this->deployment->agent->agent_type) }}
-                        @endif
-                        @if($this->deployment->department?->name)
-                            · {{ $this->deployment->department->name }}
-                        @endif
-                    </p>
-                </div>
-            </div>
-        </div>
+<x-sig.page :title="$agent->name" :sub="$agent->role ?: $agent->agent?->name">
+    <x-slot:actions>
+        @can('update', $agent)
+            <a class="btn" href="{{ route('agents.setup', $agent) }}">Set up</a>
+            <a class="btn quiet" href="{{ route('agents.export', $agent) }}">Export</a>
+            <button type="button" class="btn quiet" wire:click="duplicate">Duplicate</button>
+        @endcan
+        <a class="btn" href="{{ route('agents.scorecard', $agent) }}">Scorecard</a>
+        @if($agent->status === 'active')<a class="btn primary" href="{{ route('agents.chat', $agent) }}">Talk</a>@endif
+    </x-slot:actions>
 
-        {{-- Tab nav --}}
-        <nav class="flex gap-1 mt-5 -mb-6 border-t border-gray-100 dark:border-gray-800 pt-4">
-            <span class="px-4 py-2 text-sm font-medium border-b-2 border-brand-purple-mid text-brand-purple-mid dark:text-brand-purple-light">
-                Overview
-            </span>
-            @if($this->deployment->status === 'active' && auth()->user()->can('chat', $this->deployment))
-                <a href="{{ route('agents.chat', $this->deployment) }}"
-                    class="px-4 py-2 text-sm font-medium border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition">
-                    Chat
-                </a>
-            @else
-                <span class="px-4 py-2 text-sm font-medium border-b-2 border-transparent text-gray-300 dark:text-gray-700 cursor-not-allowed" title="Chat is only available for active deployments, to roles that can write">
-                    Chat
-                </span>
-            @endif
-            <a href="{{ route('agents.scorecard', $this->deployment) }}"
-                class="px-4 py-2 text-sm font-medium border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition">
-                Scorecard
-            </a>
-        </nav>
-    </div>
-
-    {{-- Non-active banner --}}
-    @if($this->deployment->status !== 'active')
-        @php
-            $bannerCopy = match($this->deployment->status) {
-                'paused' => 'This deployment is paused. It is not processing tasks or chat messages right now, and the figures below reflect its last active state.',
-                'decommissioned' => 'This deployment has been decommissioned. It is permanently retired and the figures below are historical only.',
-                'suspended' => 'This deployment is suspended pending review. It cannot act until it is reinstated, and the figures below reflect its last active state.',
-                default => 'This deployment is not currently active. The figures below reflect its last active state, not live data.',
-            };
-        @endphp
-        <div class="flex items-start gap-3 px-4 py-3 rounded-xl bg-{{ $statusColor }}-50 dark:bg-{{ $statusColor }}-900/20 border border-{{ $statusColor }}-200 dark:border-{{ $statusColor }}-800 text-{{ $statusColor }}-700 dark:text-{{ $statusColor }}-400 text-sm">
-            <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/>
-            </svg>
-            <span>{{ $bannerCopy }}</span>
-        </div>
+    @if($agent->status !== 'active')
+        <div class="notice hold" role="status">{{ $agent->name }} is {{ $agent->status }}, so it is not taking work.</div>
     @endif
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {{-- Configuration --}}
-        <div class="lg:col-span-2 bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-6">
-            <h3 class="font-semibold text-gray-900 dark:text-white text-sm mb-4">Configuration</h3>
-            <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 text-sm">
-                <div>
-                    <dt class="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wide">Deployment Mode</dt>
-                    <dd class="mt-1 font-medium text-gray-900 dark:text-white">{{ ucfirst($this->deployment->deployment_mode) }}</dd>
+    <div class="grid two">
+        <div class="grid">
+            <section class="card" aria-label="The job">
+                <div class="card-head"><h2>The job</h2><x-sig.lamp :state="$agent->status" /></div>
+                <div class="card-body">
+                    <dl class="pairs wide">
+                        <div><dt>Responsible for</dt><dd>{{ $agent->responsibility ?: 'Not written yet' }}</dd></div>
+                        <div><dt>Catalogue agent</dt><dd>{{ $agent->agent?->name }}</dd></div>
+                        <div><dt>Department</dt><dd>{{ $agent->department?->name ?? $agent->agent?->agentDepartment?->name ?? 'None' }}</dd></div>
+                        <div><dt>Answers to</dt><dd>{{ $agent->owner?->name ?? $agent->deployedBy?->name ?? 'Nobody yet' }}</dd></div>
+                        <div><dt>Autonomy</dt><dd>{{ $level ? "{$level[0]}. {$level[1]}" : 'Not set' }}</dd></div>
+                        <div><dt>Running version</dt><dd>{{ $agent->publishedVersion ? 'Version '.$agent->publishedVersion->number : 'Not published' }}</dd></div>
+                    </dl>
                 </div>
-                <div>
-                    <dt class="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wide">Confidence Threshold</dt>
-                    <dd class="mt-1 font-medium text-gray-900 dark:text-white">{{ rtrim(rtrim(number_format((float) $this->deployment->confidence_threshold, 2), '0'), '.') }}%</dd>
-                </div>
-                <div>
-                    <dt class="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wide">Risk Tolerance</dt>
-                    <dd class="mt-1 font-medium text-gray-900 dark:text-white">{{ rtrim(rtrim(number_format((float) $this->deployment->risk_tolerance, 2), '0'), '.') }}%</dd>
-                </div>
-                <div>
-                    <dt class="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wide">Human Approval</dt>
-                    <dd class="mt-1 font-medium text-gray-900 dark:text-white">
-                        @if($this->deployment->requires_human_approval)
-                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">Required</span>
-                        @else
-                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400">Not required</span>
-                        @endif
-                    </dd>
-                </div>
-                <div>
-                    <dt class="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wide">Model Override</dt>
-                    <dd class="mt-1 font-medium text-gray-900 dark:text-white">{{ $this->deployment->model_override ?: 'Platform default' }}</dd>
-                </div>
-                <div>
-                    <dt class="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wide">Custom Instructions</dt>
-                    <dd class="mt-1 font-medium text-gray-900 dark:text-white">
-                        @if($this->deployment->custom_instructions)
-                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-brand-purple-pale text-brand-purple dark:bg-brand-purple-deeper/30 dark:text-brand-purple-light">Configured</span>
-                        @else
-                            <span class="text-gray-400 dark:text-gray-500">Not set</span>
-                        @endif
-                    </dd>
-                </div>
-                <div>
-                    <dt class="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wide">Deployed</dt>
-                    <dd class="mt-1 font-medium text-gray-900 dark:text-white">{{ $this->deployment->deployed_at?->format('M j, Y') ?? '—' }}</dd>
-                </div>
-                <div>
-                    <dt class="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wide">Last Active</dt>
-                    <dd class="mt-1 font-medium text-gray-900 dark:text-white">{{ $this->deployment->last_active_at?->diffForHumans() ?? 'Never' }}</dd>
-                </div>
-                <div>
-                    <dt class="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wide">Deployed By</dt>
-                    <dd class="mt-1 font-medium text-gray-900 dark:text-white">{{ $this->deployment->deployedBy?->name ?? '—' }}</dd>
-                </div>
-            </dl>
-        </div>
+            </section>
 
-        {{-- Scorecard summary --}}
-        <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 flex flex-col">
-            <h3 class="font-semibold text-gray-900 dark:text-white text-sm mb-4">Latest Scorecard</h3>
-            @if($this->scorecard)
-                @php $overall = round((float) ($this->scorecard->overall_health_score ?? 0)); @endphp
-                <div class="text-center flex-1 flex flex-col items-center justify-center">
-                    <div class="w-24 h-24 rounded-full border-8 {{ $overall >= 80 ? 'border-emerald-500' : ($overall >= 60 ? 'border-yellow-500' : 'border-red-500') }} flex items-center justify-center mb-3">
-                        <div>
-                            <div class="text-2xl font-bold text-gray-900 dark:text-white">{{ $overall }}</div>
-                            <div class="text-xs text-gray-400">/100</div>
-                        </div>
+            <section class="card" aria-label="Recent work">
+                <div class="card-head"><h2>Recent work</h2></div>
+                @forelse($this->recentRuns as $run)
+                    <div class="row" wire:key="run-{{ $run->id }}">
+                        <div class="row-main"><b>{{ $run->summary }}</b><span>{{ str_replace('_', ' ', $run->trigger_type) }}, {{ $run->created_at->diffForHumans() }}</span></div>
+                        <x-sig.lamp :state="$run->status" />
                     </div>
-                    <p class="text-xs text-gray-400 dark:text-gray-500">
-                        {{ $this->scorecard->period_start?->format('M j') }} – {{ $this->scorecard->period_end?->format('M j, Y') }}
-                    </p>
-                </div>
-            @else
-                <div class="flex-1 flex items-center justify-center text-sm text-gray-500 dark:text-gray-400 text-center py-6">
-                    No scorecard data yet.
-                </div>
-            @endif
-            <a href="{{ route('agents.scorecard', $this->deployment) }}"
-                class="mt-4 block w-full py-2 text-xs font-medium text-center border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors">
-                View Full Scorecard
-            </a>
-        </div>
-    </div>
+                @empty
+                    <div class="empty">It has not done any work yet.</div>
+                @endforelse
+            </section>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {{-- Enabled skills --}}
-        <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
-            <div class="px-5 py-4 border-b border-gray-200 dark:border-gray-700">
-                <h3 class="font-semibold text-gray-900 dark:text-white text-sm">Enabled Skills</h3>
-            </div>
-            @if($this->enabledSkills->isNotEmpty())
-                <ul class="divide-y divide-gray-100 dark:divide-gray-800">
-                    @foreach($this->enabledSkills as $assignment)
-                        <li class="px-5 py-3 flex items-center justify-between gap-3">
-                            <div class="min-w-0">
-                                <p class="text-sm font-medium text-gray-900 dark:text-white truncate">{{ $assignment->skill?->name ?? $assignment->skill?->key ?? 'Unknown skill' }}</p>
-                                @if($assignment->skill?->key)
-                                    <p class="text-xs text-gray-400 dark:text-gray-500 truncate">{{ $assignment->skill->key }}</p>
-                                @endif
-                            </div>
-                        </li>
-                    @endforeach
-                </ul>
-            @else
-                <p class="px-5 py-6 text-sm text-gray-500 dark:text-gray-400 text-center">No skills enabled for this deployment.</p>
-            @endif
-        </div>
-
-        {{-- Recent activity --}}
-        <div class="lg:col-span-2 bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
-            <div class="px-5 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
-                <h3 class="font-semibold text-gray-900 dark:text-white text-sm">Recent Activity</h3>
-                @if($this->pendingApprovalsCount > 0)
-                    <a href="{{ route('governance.approvals') }}"
-                        class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400 hover:bg-yellow-200 dark:hover:bg-yellow-900/50 transition-colors">
-                        {{ $this->pendingApprovalsCount }} pending approval{{ $this->pendingApprovalsCount === 1 ? '' : 's' }}
-                    </a>
-                @endif
-            </div>
             @if($this->recentTasks->isNotEmpty())
-                <ul class="divide-y divide-gray-100 dark:divide-gray-800">
+                <section class="card" aria-label="Tasks">
+                    <div class="card-head"><h2>Tasks</h2></div>
                     @foreach($this->recentTasks as $task)
-                        @php
-                            $taskStatusColors = ['completed' => 'emerald', 'failed' => 'red', 'in_progress' => 'blue', 'pending' => 'gray', 'cancelled' => 'gray', 'awaiting_approval' => 'yellow'];
-                            $taskColor = $taskStatusColors[$task->status] ?? 'gray';
-                        @endphp
-                        <li class="px-5 py-3 flex items-center justify-between gap-3">
-                            <p class="text-sm text-gray-700 dark:text-gray-300 truncate">{{ $task->title }}</p>
-                            <div class="flex items-center gap-3 flex-shrink-0">
-                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-{{ $taskColor }}-100 text-{{ $taskColor }}-700 dark:bg-{{ $taskColor }}-900/30 dark:text-{{ $taskColor }}-400">
-                                    {{ ucfirst(str_replace('_', ' ', $task->status)) }}
-                                </span>
-                                <span class="text-xs text-gray-400 dark:text-gray-500 whitespace-nowrap">{{ $task->created_at?->diffForHumans() }}</span>
-                            </div>
-                        </li>
+                        <div class="row" wire:key="task-{{ $task->id }}">
+                            <div class="row-main"><b>{{ $task->title }}</b><span>{{ $task->created_at->diffForHumans() }}</span></div>
+                            <x-sig.lamp :state="$task->status" />
+                        </div>
                     @endforeach
-                </ul>
-            @else
-                <p class="px-5 py-6 text-sm text-gray-500 dark:text-gray-400 text-center">No tasks recorded yet.</p>
+                </section>
+            @endif
+
+            <livewire:agents.agent-versions :deployment-id="$agent->id" />
+        </div>
+
+        <div class="grid">
+            @if($this->pendingApprovalsCount > 0)
+                <a class="notice hold" href="{{ route('governance.approvals') }}">{{ $this->pendingApprovalsCount }} pending {{ Str::plural('approval', $this->pendingApprovalsCount) }}</a>
+            @endif
+
+            <section class="card" aria-label="Can use">
+                <div class="card-head"><h2>Can use</h2></div>
+                @forelse($settings['tools'] as $tool)
+                    <div class="row"><div class="row-main"><b>{{ str_replace('_', ' ', $tool['key']) }}</b></div><span class="chip">{{ $tool['mode'] === 'approve' ? 'Asks first' : 'Allowed' }}</span></div>
+                @empty
+                    <div class="empty">No tools.</div>
+                @endforelse
+            </section>
+
+            <section class="card" aria-label="Can read">
+                <div class="card-head"><h2>Can read</h2></div>
+                @forelse($this->knowledge as $base)
+                    <div class="row"><div class="row-main"><b>{{ $base->name }}</b></div></div>
+                @empty
+                    <div class="empty">No knowledge.</div>
+                @endforelse
+            </section>
+
+            @if($this->enabledSkills->isNotEmpty())
+                <section class="card" aria-label="Skills">
+                    <div class="card-head"><h2>Skills</h2></div>
+                    @foreach($this->enabledSkills as $assignment)
+                        <div class="row"><div class="row-main"><b>{{ $assignment->skill?->name }}</b></div></div>
+                    @endforeach
+                </section>
             @endif
         </div>
     </div>
-</div>
+</x-sig.page>

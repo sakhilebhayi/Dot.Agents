@@ -273,3 +273,58 @@ a.row:hover, button.row:hover { background: var(--raised); }
 .memory-text { margin-top: 4px; white-space: pre-wrap; overflow-wrap: anywhere; }
 .memory-source { margin-top: 4px; font-size: 12px; line-height: 16px; }
 .memory-actions { margin-top: 8px; }
+
+/* Creating and setting up an agent */
+.proposal { margin-top: var(--gap); }
+.template { align-items: flex-start; padding-block: 12px; }
+.row-main p { margin: 2px 0 0; overflow-wrap: anywhere; }
+.setup { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: var(--gap); align-items: start; }
+.setup-review { position: sticky; top: 72px; }
+.verdict { color: var(--muted); }
+.verdict.stop { color: var(--stop); }
+.verdict.clear { color: var(--clear); }
+.findings { display: grid; gap: 8px; margin: 12px 0 0; padding: 0; list-style: none; font-size: 13px; }
+.findings b { display: block; font-weight: 500; }
+.findings li { color: var(--muted); }
+.findings li b { color: var(--text); }
+.findings li.blocker b { color: var(--stop); }
+.setup-review .answer-main { margin-top: 16px; }
+.pair-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 12px; }
+.check { cursor: pointer; }
+.check input { flex: none; accent-color: var(--accent); }
+.check .row-main b, .tool-row .row-main b { white-space: normal; }
+.check .row-main span, .tool-row .row-main span { white-space: normal; }
+.bare { padding-inline: 0; border-top: 0; }
+.tool-row { align-items: flex-start; padding-block: 10px; }
+.tool-mode { width: 150px; flex: none; }
+.small-note { padding-top: 8px; font-size: 13px; }
+.advanced summary { cursor: pointer; list-style-position: inside; justify-content: flex-start; border-bottom: 0; }
+.advanced[open] summary { border-bottom: 1px solid var(--rule); }
+.sub-head { margin: 12px 0 8px; font-size: 14px; font-weight: 600; }
+.limit-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 0 12px; }
+
+@media (max-width: 900px) {
+    .setup { grid-template-columns: minmax(0, 1fr); }
+    .setup-review { position: static; }
+    .pair-fields { grid-template-columns: minmax(0, 1fr); }
+    .tool-row { flex-wrap: wrap; }
+    .tool-mode { width: 100%; }
+}
+
+/* The roster */
+.roster-tools { gap: 8px; padding-block: 8px; }
+.roster-tools .input { flex: 1; min-width: 0; }
+.roster-tools .select { width: auto; flex: none; }
+.roster .row-main { color: inherit; text-decoration: none; }
+.roster .row-main:hover b { text-decoration: underline; text-underline-offset: 3px; }
+.roster-owner { width: 140px; flex: none; font-size: 13px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.roster-lamp { width: 104px; flex: none; }
+.roster-actions { display: flex; justify-content: flex-end; gap: 4px; width: 120px; flex: none; }
+
+@media (max-width: 720px) {
+    .roster { flex-wrap: wrap; }
+    .roster .row-main { flex-basis: 100%; }
+    .roster-owner { width: auto; flex: 1; }
+    .roster-lamp { width: auto; }
+    .roster-actions { width: auto; }
+}
