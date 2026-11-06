@@ -39,7 +39,7 @@ class DashboardPageTest extends TestCase
         $response = $this->actingAs($user)->get('/dashboard');
 
         $response->assertOk();
-        $response->assertSee('AI Workforce Dashboard');
+        $response->assertSee('Command centre');
     }
 
     #[Test]

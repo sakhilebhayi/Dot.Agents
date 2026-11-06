@@ -7,6 +7,7 @@ use App\Support\TenantContext;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
@@ -67,6 +68,12 @@ class User extends Authenticatable implements PasskeyUser
         'consent_records' => 'array',
         'erased_at' => 'datetime',
     ];
+
+    /** @return BelongsToMany<AgentDeployment, $this> */
+    public function favouriteAgents(): BelongsToMany
+    {
+        return $this->belongsToMany(AgentDeployment::class, 'agent_favourites')->withTimestamps();
+    }
 
     public function organizations()
     {

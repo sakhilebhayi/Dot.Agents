@@ -10,6 +10,7 @@ use App\Models\AgentRun;
 use App\Models\AgentRunStep;
 use App\Services\AI\AgentQuotaGuard;
 use App\Services\AI\AgentSandboxService;
+use App\Services\Insights\BudgetWatch;
 use App\Services\Runs\Journal;
 use App\Services\Runs\RunKick;
 use App\Support\RunTaint;
@@ -28,6 +29,7 @@ class StartRunAction
         private readonly AgentSandboxService $sandbox,
         private readonly AgentQuotaGuard $quota,
         private readonly Journal $journal,
+        private readonly BudgetWatch $budget,
     ) {}
 
     /** @throws RunRefused */
@@ -100,6 +102,10 @@ class StartRunAction
         try {
             $this->sandbox->assertPermitted($deployment, 'process_message', ['organization_id' => $deployment->organization_id]);
             $this->quota->assertQuotaAvailable($deployment->organization_id, $deployment->organization?->plan);
+
+            if ($this->budget->hasRunOut($deployment->organization_id)) {
+                throw new RuntimeException('This business has reached the monthly budget it set for agents.');
+            }
         } catch (RuntimeException $e) {
             throw new RunRefused($e->getMessage(), previous: $e);
         }

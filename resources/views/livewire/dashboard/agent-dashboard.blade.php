@@ -1,137 +1,110 @@
-<div class="space-y-6">
-    {{-- Header Row --}}
-    <div class="flex items-center justify-between">
-        <div>
-            <h2 class="text-xl font-bold text-gray-900 dark:text-white">AI Workforce Overview</h2>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Monitor your deployed agents, tasks, and governance metrics</p>
-        </div>
-        <div class="flex items-center gap-2">
-            @foreach(["24h" => "24h", "7d" => "7 Days", "30d" => "30 Days", "90d" => "90 Days"] as $key => $label)
-                <button wire:click="setTimeframe('{{ $key }}')"
-                    wire:loading.attr="disabled"
-                    class="px-3 py-1.5 text-xs font-medium rounded-lg transition {{ $timeframe === $key ? 'bg-brand-purple-mid text-white' : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700' }}">
-                    {{ $label }}
-                </button>
+@php
+    $definitions = \App\Services\Insights\RunMetrics::DEFINITIONS;
+    $peak = max(1, collect($this->daily)->max(fn ($day) => $day['completed'] + $day['failed']));
+    $seconds = $this->summary['duration'];
+@endphp
+
+<x-sig.page title="Command centre" sub="What needs you, what is under way, and how the work has gone.">
+    <x-slot:actions>
+        <div class="segmented" role="group" aria-label="Period">
+            @foreach(['24h' => '24 hours', '7d' => '7 days', '30d' => '30 days'] as $value => $label)
+                <button type="button" class="btn small {{ $timeframe === $value ? 'is-on' : 'quiet' }}" wire:click="setTimeframe('{{ $value }}')" aria-pressed="{{ $timeframe === $value ? 'true' : 'false' }}">{{ $label }}</button>
             @endforeach
         </div>
-    </div>
+    </x-slot:actions>
 
-    {{-- KPI Cards --}}
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-5">
-        <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5">
-            <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-3">Active Agents</p>
-            <p class="text-3xl font-bold text-gray-900 dark:text-white">{{ $this->deploymentStats["active"] }}</p>
-            <p class="text-xs text-gray-500 mt-1">{{ $this->deploymentStats["total"] }} total deployed</p>
-        </div>
-        <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5">
-            <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-3">Tasks Completed</p>
-            <p class="text-3xl font-bold text-gray-900 dark:text-white">{{ number_format($this->taskStats["completed"]) }}</p>
-            <p class="text-xs text-gray-500 mt-1">{{ $this->taskStats["total"] > 0 ? round(($this->taskStats["completed"] / $this->taskStats["total"]) * 100) . "%" : "0%" }} completion</p>
-        </div>
-        <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5">
-            <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-3">Pending Approvals</p>
-            <p class="text-3xl font-bold {{ count($this->pendingApprovals) > 0 ? "text-yellow-600" : "text-gray-900 dark:text-white" }}">{{ count($this->pendingApprovals) }}</p>
-            <p class="text-xs text-gray-500 mt-1">Awaiting human review</p>
-        </div>
-        <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5">
-            <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-3">AI Spend</p>
-            <p class="text-3xl font-bold text-gray-900 dark:text-white">${{ number_format($this->costStats["total"], 2) }}</p>
-            <p class="text-xs text-gray-500 mt-1">${{ number_format($this->costStats["daily_avg"], 2) }}/day avg</p>
-        </div>
-    </div>
+    <div class="grid two" wire:poll.30s>
+        <div class="grid">
+            @if($this->approvals->isNotEmpty() || $this->failures->isNotEmpty())
+                <section class="card" aria-label="Needs you">
+                    <div class="card-head"><h2>Needs you</h2></div>
+                    @foreach($this->approvals as $approval)
+                        <a class="row" href="{{ route('governance.approvals', ['approval' => $approval->uuid]) }}" wire:key="approval-{{ $approval->id }}">
+                            <span class="row-main"><b>{{ $approval->title }}</b><span>{{ $approval->deployment?->name }}, {{ $approval->created_at->diffForHumans() }}</span></span>
+                            <x-sig.lamp state="waiting_approval" />
+                        </a>
+                    @endforeach
+                    @foreach($this->failures as $run)
+                        <a class="row" href="{{ route('runs.show', $run) }}" wire:key="failed-{{ $run->id }}">
+                            <span class="row-main"><b>{{ $run->summary }}</b><span>{{ $run->deployment?->name }}: {{ $run->error_message }}</span></span>
+                            <x-sig.lamp :state="$run->status" />
+                        </a>
+                    @endforeach
+                </section>
+            @endif
 
-    {{-- Main Grid --}}
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {{-- Active Agents List --}}
-        <div class="lg:col-span-2 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800">
-            <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-800">
-                <h3 class="font-semibold text-gray-900 dark:text-white">Deployed Agents</h3>
-                <a href="{{ route("agents.deployments") }}" class="text-xs text-brand-purple-mid dark:text-brand-purple-light hover:underline">View all</a>
+            <section class="card" aria-label="Under way">
+                <div class="card-head"><h2>Under way</h2><a class="btn quiet small" href="{{ route('runs.index') }}">All runs</a></div>
+                @foreach($this->workflows as $execution)
+                    <div class="row" wire:key="flow-{{ $execution->id }}"><div class="row-main"><b>{{ $execution->workflow?->name }}</b><span>{{ $execution->current_step }} of {{ $execution->total_steps }} steps</span></div><x-sig.lamp :state="$execution->status" /></div>
+                @endforeach
+                @foreach($this->running as $run)
+                    <a class="row" href="{{ route('runs.show', $run) }}" wire:key="run-{{ $run->id }}"><span class="row-main"><b>{{ $run->summary }}</b><span>{{ $run->deployment?->name }}</span></span><x-sig.lamp :state="$run->status" /></a>
+                @endforeach
+                @if($this->workflows->isEmpty() && $this->running->isEmpty())
+                    <div class="empty">Nothing is running right now.</div>
+                @endif
+            </section>
+
+            <section class="card" aria-label="The last two weeks">
+                <div class="card-head"><h2>The last two weeks</h2>
+                    <span class="legend"><i class="done"></i>Completed <i class="bad"></i>Failed</span>
+                </div>
+                <div class="card-body">
+                    <div class="bars" role="img" aria-label="Completed and failed work each day. The table below has the same figures.">
+                        @foreach($this->daily as $day)
+                            <div class="bar" title="{{ $day['day'] }}: {{ $day['completed'] }} completed, {{ $day['failed'] }} failed">
+                                @if($day['failed'] > 0)<i class="bad" style="height: {{ round(100 * $day['failed'] / $peak) }}%"></i>@endif
+                                @if($day['completed'] > 0)<i class="done" style="height: {{ round(100 * $day['completed'] / $peak) }}%"></i>@endif
+                            </div>
+                        @endforeach
+                    </div>
+                    <details class="tech"><summary>See the figures</summary>
+                        <table class="table"><thead><tr><th>Day</th><th class="right">Completed</th><th class="right">Failed</th></tr></thead><tbody>
+                            @foreach($this->daily as $day)<tr><td>{{ $day['day'] }}</td><td class="right num">{{ $day['completed'] }}</td><td class="right num">{{ $day['failed'] }}</td></tr>@endforeach
+                        </tbody></table>
+                    </details>
+                </div>
+            </section>
+
+            <section class="card" aria-label="How each agent is doing">
+                <div class="card-head"><h2>How each agent is doing</h2></div>
+                @forelse($this->agents as $row)
+                    <a class="row" href="{{ route('agents.show', $row['agent']) }}" wire:key="agent-{{ $row['agent']?->id }}">
+                        <span class="row-main"><b>{{ $row['agent']?->name }}</b><span>{{ $row['runs'] }} {{ Str::plural('run', $row['runs']) }}, {{ $row['failed'] }} failed</span></span>
+                        <span class="row-end num">{{ $row['rate'] === null ? '–' : $row['rate'].'%' }}</span>
+                    </a>
+                @empty
+                    <div class="empty">No agent has finished any work in this period.</div>
+                @endforelse
+            </section>
+        </div>
+
+        <div class="grid">
+            <div class="stats side-stats">
+                <div class="stat" title="{{ $definitions['finished'] }}"><span>Finished</span><b>{{ number_format($this->summary['finished']) }}</b></div>
+                <div class="stat" title="{{ $definitions['rate'] }}"><span>Completed</span><b>{{ $this->summary['rate'] === null ? '–' : $this->summary['rate'].'%' }}</b></div>
+                <div class="stat" title="{{ $definitions['cost'] }}"><span>Cost</span><b>{{ number_format($this->summary['cost'], 2) }}</b></div>
+                <div class="stat" title="{{ $definitions['duration'] }}"><span>Average time</span><b>{{ $seconds === null ? '–' : ($seconds >= 60 ? round($seconds / 60, 1).' min' : $seconds.' s') }}</b></div>
             </div>
-            <div class="divide-y divide-gray-100 dark:divide-gray-800">
-                @forelse($this->activeAgents as $deployment)
-                    <div class="flex items-center gap-4 px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition">
-                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-purple-light to-brand-purple flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
-                            {{ strtoupper(substr($deployment->display_name, 0, 2)) }}
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="text-sm font-medium text-gray-900 dark:text-white truncate">{{ $deployment->display_name }}</p>
-                            <p class="text-xs text-gray-500">{{ $deployment->agent->agentDepartment?->name ?? "General" }} &bull; {{ ucfirst($deployment->deployment_mode) }}</p>
-                        </div>
-                        @if($deployment->latestScorecard)
-                        <div class="text-right flex-shrink-0">
-                            <p class="text-sm font-bold {{ $deployment->latestScorecard->overall_health_score >= 80 ? "text-green-600" : ($deployment->latestScorecard->overall_health_score >= 60 ? "text-yellow-600" : "text-red-600") }}">
-                                {{ number_format($deployment->latestScorecard->overall_health_score, 1) }}/100
-                            </p>
-                            <p class="text-xs text-gray-400">Health</p>
-                        </div>
-                        @endif
-                        <span class="w-2.5 h-2.5 rounded-full {{ $deployment->status === "active" ? "bg-green-500" : "bg-gray-300" }} flex-shrink-0"></span>
+            @if($this->summary['unpriced'] > 0)
+                <p class="muted small-note"><a href="{{ route('usage') }}">Cost is missing {{ $this->summary['unpriced'] }} {{ Str::plural('call', $this->summary['unpriced']) }}</a> with no price on file.</p>
+            @endif
+
+            <section class="card" aria-label="Your agents">
+                <div class="card-head"><h2>Your agents</h2></div>
+                @forelse($this->mine as $agent)
+                    <div class="row" wire:key="mine-{{ $agent->id }}">
+                        <button type="button" class="star" wire:click="toggleFavourite({{ $agent->id }})" aria-pressed="{{ $agent->starred ? 'true' : 'false' }}" aria-label="Star {{ $agent->name }}">
+                            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.8l1.9 3.9 4.3.6-3.1 3 .7 4.3L8 11.6l-3.8 2 .7-4.3-3.1-3 4.3-.6z"/></svg>
+                        </button>
+                        <a class="row-main" href="{{ route('agents.show', $agent) }}"><b>{{ $agent->name }}</b><span>{{ $agent->role }}</span></a>
+                        <x-sig.lamp :state="$agent->status" class="desk-lamp" />
                     </div>
                 @empty
-                    <div class="px-6 py-12 text-center">
-                        <p class="text-gray-500 text-sm">No agents deployed yet.</p>
-                        <a href="{{ route("marketplace") }}" class="text-brand-purple-mid text-sm hover:underline mt-1 inline-block">Browse Marketplace &rarr;</a>
-                    </div>
+                    <div class="empty"><b>No agents yet.</b> <a class="btn small" href="{{ route('agents.create') }}">New agent</a></div>
                 @endforelse
-            </div>
-        </div>
-
-        {{-- Right column --}}
-        <div class="space-y-4">
-            {{-- Pending Approvals --}}
-            <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800">
-                <div class="flex items-center justify-between px-5 py-4 border-b border-gray-200 dark:border-gray-800">
-                    <h3 class="font-semibold text-gray-900 dark:text-white text-sm">Approval Queue</h3>
-                    @if(count($this->pendingApprovals) > 0)
-                    <span class="px-2 py-0.5 bg-red-100 text-red-700 text-xs rounded-full font-medium">{{ count($this->pendingApprovals) }}</span>
-                    @endif
-                </div>
-                <div class="divide-y divide-gray-100 dark:divide-gray-800">
-                    @forelse($this->pendingApprovals as $approval)
-                        <div class="px-5 py-3">
-                            <div class="flex items-start justify-between gap-2">
-                                <div class="min-w-0">
-                                    <p class="text-xs font-medium text-gray-900 dark:text-white truncate">{{ $approval->title }}</p>
-                                    <p class="text-xs text-gray-500">{{ $approval->deployment?->display_name }}</p>
-                                </div>
-                                <span class="flex-shrink-0 px-1.5 py-0.5 text-xs rounded font-medium
-                                    {{ $approval->risk_level === "critical" ? "bg-red-100 text-red-700" : ($approval->risk_level === "high" ? "bg-orange-100 text-orange-700" : "bg-yellow-100 text-yellow-700") }}">
-                                    {{ ucfirst($approval->risk_level) }}
-                                </span>
-                            </div>
-                        </div>
-                    @empty
-                        <div class="px-5 py-6 text-center">
-                            <p class="text-xs text-green-600">&#10003; All clear</p>
-                        </div>
-                    @endforelse
-                </div>
-                @if(count($this->pendingApprovals) > 0)
-                <div class="px-5 py-3 border-t border-gray-100 dark:border-gray-800">
-                    <a href="{{ route("governance.approvals") }}" class="text-xs text-brand-purple-mid hover:underline">Review all &rarr;</a>
-                </div>
-                @endif
-            </div>
-
-            {{-- Security Events --}}
-            @if(count($this->recentSecurityEvents) > 0)
-            <div class="bg-white dark:bg-gray-900 rounded-xl border border-red-200 dark:border-red-900">
-                <div class="flex items-center gap-2 px-5 py-4 border-b border-red-200 dark:border-red-900">
-                    <span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
-                    <h3 class="font-semibold text-red-700 text-sm">Security Alerts</h3>
-                </div>
-                @foreach($this->recentSecurityEvents as $event)
-                    <div class="px-5 py-3 border-b border-gray-100 dark:border-gray-800 last:border-0">
-                        <p class="text-xs font-medium text-gray-900 dark:text-white">{{ $event->title }}</p>
-                        <p class="text-xs text-gray-500">{{ $event->created_at->diffForHumans() }}</p>
-                    </div>
-                @endforeach
-                <div class="px-5 py-3 border-t border-gray-100 dark:border-gray-800">
-                    <a href="{{ route("security.center") }}" class="text-xs text-red-600 hover:underline">Security center &rarr;</a>
-                </div>
-            </div>
-            @endif
+            </section>
         </div>
     </div>
-</div>
+</x-sig.page>

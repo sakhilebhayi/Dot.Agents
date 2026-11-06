@@ -12,6 +12,7 @@ use App\Http\Controllers\SocialOAuthController;
 use App\Http\Controllers\SocialWebhookController;
 use App\Http\Middleware\AuthenticateGuardian;
 use App\Models\AgentDeployment;
+use App\Models\AgentRun;
 use App\Models\AgentWorkflow;
 use App\Models\User;
 use App\Services\Agents\AgentPackage;
@@ -128,6 +129,15 @@ Route::middleware([
             return view('agents.scorecard', compact('deployment'));
         })->name('scorecard');
     });
+
+    // What agents are doing and what it costs
+    Route::get('/runs', fn () => view('runs.index'))->name('runs.index');
+    Route::get('/runs/{run}', function (AgentRun $run) {
+        abort_unless(Gate::allows('view', $run), 403);
+
+        return view('runs.show', compact('run'));
+    })->name('runs.show');
+    Route::get('/usage', fn () => view('usage.index'))->name('usage');
 
     // Workflows
     Route::prefix('workflows')->name('workflows.')->group(function () {
