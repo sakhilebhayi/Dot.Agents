@@ -9,6 +9,7 @@ use App\DTOs\Agents\StartRunData;
 use App\Exceptions\RunRefused;
 use App\Models\AgentDeployment;
 use App\Models\AgentMessage;
+use App\Models\AgentRun;
 use App\Models\AgentSession;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
@@ -33,6 +34,8 @@ class AgentChat extends Component
      * after this row.
      */
     public ?int $pendingMessageId = null;
+
+    public bool $waitingForPerson = false;
 
     public function mount(int $deploymentId): void
     {
@@ -126,8 +129,13 @@ class AgentChat extends Component
         if ($hasReply) {
             $this->isTyping = false;
             $this->pendingMessageId = null;
+            $this->waitingForPerson = false;
             unset($this->chatMessages);
+
+            return;
         }
+
+        $this->waitingForPerson = AgentRun::where('agent_session_id', $this->sessionId)->where('status', AgentRun::WAITING_APPROVAL)->exists();
     }
 
     public function newSession(): void

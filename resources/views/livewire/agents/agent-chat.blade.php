@@ -75,7 +75,11 @@
                     </div>
                 @endforeach
 
-                @if($isTyping)
+                @if($waitingForPerson)
+                    <p wire:poll.5s="pollForReply" class="notice hold">
+                        This agent has stopped and is waiting for a person. <a href="{{ route('governance.approvals') }}">See what it is asking</a>
+                    </p>
+                @elseif($isTyping)
                     <div wire:poll.1500ms="pollForReply" class="flex justify-start gap-3">
                         <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-brand-purple to-brand-purple-light flex items-center justify-center text-white text-xs font-bold flex-shrink-0 mt-1">AI</div>
                         <div class="bg-gray-100 dark:bg-gray-800 rounded-2xl rounded-tl-sm px-4 py-3">

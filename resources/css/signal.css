@@ -222,3 +222,44 @@ a.row:hover, button.row:hover { background: var(--raised); }
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
 }
+
+/* The approval desk: a queue, and the one thing being decided */
+.desk { display: grid; grid-template-columns: minmax(280px, 340px) minmax(0, 1fr); gap: var(--gap); align-items: start; }
+.desk-filter { width: auto; min-height: 28px; padding: 2px 6px; font-size: 13px; }
+.desk-row { width: 100%; border-inline: 0; border-bottom: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.desk-row[aria-current='true'] { background: var(--raised); box-shadow: inset 1px 0 0 var(--accent); }
+.desk-lamp { font-size: 0; gap: 0; }
+.desk-back { display: none; margin-right: auto; }
+.plate { display: grid; gap: 20px; }
+.plate h2 { font-size: 20px; line-height: 26px; font-weight: 600; letter-spacing: -0.01em; }
+.plate h3 { margin-bottom: 6px; font-size: 14px; line-height: 20px; font-weight: 600; }
+.plate .notice { margin-bottom: 8px; }
+.pairs { display: grid; margin: 0; border: 1px solid var(--rule); border-radius: var(--radius); }
+.pairs > div { display: grid; grid-template-columns: minmax(96px, 150px) minmax(0, 1fr); gap: 12px; padding: 8px 12px; border-top: 1px solid var(--rule); }
+.pairs > div:first-child { border-top: 0; }
+.pairs dt { color: var(--muted); font-size: 13px; }
+.pairs dd { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font-family: var(--mono); font-size: 13px; }
+.pairs.wide dd { font-family: var(--sans); font-size: 14px; }
+.value-edit { min-height: 32px; font-family: var(--mono); font-size: 13px; field-sizing: content; }
+.said { margin: 0; padding: 8px 12px; border-radius: var(--radius); background: var(--raised); color: var(--muted); white-space: pre-wrap; overflow-wrap: anywhere; }
+.answer { padding-top: 16px; border-top: 1px solid var(--border); }
+.answer .field { margin-bottom: 8px; }
+.answer-main, .answer-pass { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.answer-pass .select { width: auto; flex: 1 1 160px; }
+.answer-more { margin-top: 12px; color: var(--muted); font-size: 13px; }
+.answer-more summary { width: fit-content; cursor: pointer; }
+.answer-more[open] summary { margin-bottom: 8px; }
+.history { display: grid; gap: 4px; margin: 0; padding: 0; list-style: none; color: var(--muted); font-size: 13px; }
+.history li { display: grid; grid-template-columns: 100px minmax(0, 1fr); gap: 8px; }
+.history time { font-size: 12px; line-height: 20px; }
+.rule-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; align-items: end; }
+.rule-form .field { margin: 0; }
+
+@media (max-width: 900px) {
+    .desk { grid-template-columns: minmax(0, 1fr); }
+    .desk-idle { display: none; }
+    .desk-card { position: fixed; inset: 0; z-index: 50; overflow-y: auto; border: 0; border-radius: 0; }
+    .desk-back { display: inline-flex; }
+    .history li { grid-template-columns: minmax(0, 1fr); gap: 0; }
+    .pairs > div { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+}

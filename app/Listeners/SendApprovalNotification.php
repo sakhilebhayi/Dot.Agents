@@ -5,6 +5,7 @@ namespace App\Listeners;
 use App\Events\ApprovalRequested;
 use App\Jobs\SendPlatformNotification;
 use App\Models\PlatformNotification;
+use App\Notifications\ApprovalRequiredNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
@@ -50,9 +51,13 @@ class SendApprovalNotification implements ShouldQueue
                 'risk_level' => $approval->risk_level,
                 'expires_at' => $approval->expires_at?->toIso8601String(),
             ],
-            actionUrl: '/governance/approvals',
+            actionUrl: route('governance.approvals', ['approval' => $approval->uuid], false),
             actionLabel: 'Review Now'
         ));
+
+        if ($approval->deployment !== null) {
+            $approver->notify(new ApprovalRequiredNotification($approval, $approval->deployment));
+        }
     }
 
     public function failed(ApprovalRequested $event, Throwable $exception): void

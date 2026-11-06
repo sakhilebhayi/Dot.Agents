@@ -3,7 +3,7 @@
 namespace App\Listeners;
 
 use App\Events\ApprovalProcessed;
-use App\Notifications\ApprovalRequiredNotification;
+use App\Notifications\ApprovalAnsweredNotification;
 use App\Services\Governance\AuditService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
@@ -24,10 +24,7 @@ class NotifyOnApprovalProcessed implements ShouldQueue
         $deployer = $deployment->deployedBy;
 
         if ($deployer && $approval->status !== 'pending') {
-            // Notify deployer of the approval decision
-            $deployer->notify(
-                new ApprovalRequiredNotification($approval, $deployment)
-            );
+            $deployer->notify(new ApprovalAnsweredNotification($approval));
         }
 
         // Log the approval outcome via audit

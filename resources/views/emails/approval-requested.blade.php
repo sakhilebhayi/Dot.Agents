@@ -31,12 +31,11 @@
   </div>
   <div class="body">
     <span class="badge">Human Approval Required</span>
-    <p>Your AI agent <strong>{{ $deploymentName }}</strong> has completed a task and is requesting your approval before proceeding.</p>
+    <p>Your AI agent <strong>{{ $deploymentName }}</strong> has stopped at something that needs your approval before proceeding.</p>
 
     <div class="meta-block">
       <p><strong>Agent:</strong> {{ $agentName }}</p>
       <p><strong>Task:</strong> {{ $taskDescription }}</p>
-      <p><strong>Confidence Score:</strong> {{ $confidenceScore }}%</p>
       @if($expiresAt)
       <p><strong>Expires:</strong> {{ \Carbon\Carbon::parse($expiresAt)->format('M j, Y g:i A') }}</p>
       @endif
@@ -45,13 +44,9 @@
     <p>Please review the agent's proposed action and approve or reject it. If no action is taken before the expiry time, the task will be automatically rejected.</p>
 
     <div class="actions">
-      <a href="{{ $approveUrl }}" class="btn-approve">✓ Approve</a>
-      <a href="{{ $rejectUrl }}" class="btn-reject">✗ Reject</a>
+      <a href="{{ $reviewUrl }}" class="btn-approve">Review and answer</a>
     </div>
 
-    <p style="margin-top:24px; font-size:13px; color:#9ca3af;">
-      Or <a href="{{ $reviewUrl }}" style="color:#3d2ea0;">view full details</a> before deciding.
-    </p>
   </div>
   <div class="footer">
     <p>Dot.Agents AI Workforce Platform</p>
