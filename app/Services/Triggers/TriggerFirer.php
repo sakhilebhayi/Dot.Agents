@@ -21,7 +21,7 @@ class TriggerFirer
 {
     public function __construct(private readonly StartRunAction $runs, private readonly StartWorkflowAction $workflows) {}
 
-    public function fire(AgentTrigger $trigger, string $key, ?string $content = null, bool $tainted = true): AgentRun|WorkflowExecution|null
+    public function fire(AgentTrigger $trigger, string $key, ?string $content = null): AgentRun|WorkflowExecution|null
     {
         $request = $this->request($trigger, $content);
         $idempotency = "trigger:{$trigger->id}:{$key}";
@@ -30,7 +30,7 @@ class TriggerFirer
             $work = $trigger->target_type === AgentTrigger::WORKFLOW
                 ? $this->workflows->execute(AgentWorkflow::findOrFail($trigger->target_id), new StartWorkflowData($request, idempotencyKey: $idempotency))
                 : $this->runs->execute(AgentDeployment::findOrFail($trigger->target_id), new StartRunData(
-                    $request, $trigger->kind, $trigger->uuid, $trigger->created_by, idempotencyKey: $idempotency, taint: $content !== null && $tainted ? 1 : 0,
+                    $request, $trigger->kind, $trigger->uuid, $trigger->created_by, idempotencyKey: $idempotency,
                 ));
         } catch (RunRefused|ValidationException|HttpException $e) {
             $trigger->update(['last_error' => mb_substr($e->getMessage(), 0, 500)]);

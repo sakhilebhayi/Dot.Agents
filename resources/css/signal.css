@@ -377,3 +377,28 @@ a.row:hover, button.row:hover { background: var(--raised); }
     .flow-side.is-open { position: fixed; inset: 0; z-index: 50; display: block; max-height: none; border: 0; background: var(--surface); }
 }
 .team-pick { display: grid; gap: 4px; margin-bottom: 6px; }
+
+/* The test bench and the record of a run */
+.bench-grid { grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
+.bench-compare { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
+.result { color: var(--text); margin-bottom: 8px; }
+.bench-measures { margin-bottom: 12px; font-size: 13px; }
+.add-case summary { cursor: pointer; color: var(--muted); font-size: 13px; width: fit-content; }
+.add-case-form { margin-top: 12px; }
+.timeline { margin: 0; padding: 0; list-style: none; }
+.timeline li { position: relative; display: flex; gap: 12px; padding-bottom: 14px; }
+.timeline li::before { content: ''; position: absolute; left: 5px; top: 14px; bottom: 0; width: 2px; background: var(--control); }
+.timeline li:last-child::before { display: none; }
+.timeline i { flex: none; width: 12px; height: 12px; margin-top: 4px; border-radius: 50%; border: 2px solid var(--clear); background: var(--clear); }
+.timeline li.failed i { border-radius: 2px; border-color: var(--stop); background: var(--stop); }
+.timeline li.held i { border-radius: 2px; rotate: 45deg; border-color: var(--hold); background: var(--hold); }
+.timeline li > div { min-width: 0; flex: 1; }
+.timeline b { display: block; font-weight: 500; }
+.timeline-meta { display: block; color: var(--muted); font-size: 12px; line-height: 16px; }
+.timeline details { margin-top: 4px; font-size: 13px; }
+.timeline summary { width: fit-content; color: var(--muted); cursor: pointer; }
+.timeline pre { max-height: 240px; margin: 4px 0 0; padding: 8px; overflow: auto; border-radius: var(--radius); background: var(--raised); white-space: pre-wrap; overflow-wrap: anywhere; font: 13px/20px var(--mono); }
+
+@media (max-width: 900px) {
+    .bench-compare { grid-template-columns: minmax(0, 1fr); }
+}

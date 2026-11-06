@@ -107,6 +107,11 @@ Route::middleware([
 
             return view('agents.setup', compact('deployment'));
         })->name('setup');
+        Route::get('/{deployment}/test', function (AgentDeployment $deployment) {
+            abort_unless(Gate::allows('update', $deployment), 403);
+
+            return view('agents.test', compact('deployment'));
+        })->name('test');
         Route::get('/{deployment}/export', function (AgentDeployment $deployment) {
             abort_unless(Gate::allows('update', $deployment), 403);
 

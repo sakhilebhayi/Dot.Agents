@@ -37,7 +37,7 @@ class ToolExecutor
         $run->increment('tool_calls_used');
 
         try {
-            $output = $tool->run(new ToolContext($run, $effect->idempotency_key), $effect->arguments);
+            $output = $this->outcome($run, $effect, $tool);
         } catch (ToolSuspended $suspended) {
             $effect->update(['status' => AgentEffect::WAITING, 'child_run_id' => $suspended->childRunId]);
 
@@ -61,6 +61,22 @@ class ToolExecutor
         }
 
         $this->succeeded($run, $effect, $definition, $output);
+    }
+
+    /** In a test nothing outside the platform is touched and nothing is changed: the call is written down instead. */
+    private function outcome(AgentRun $run, AgentEffect $effect, AgentTool $tool): ToolOutput
+    {
+        $definition = $tool->definition();
+
+        if ($run->is_test && ($run->limits['fail_tool'] ?? null) === $definition->key) {
+            throw new ToolFailure('This tool was set to fail for the test.');
+        }
+
+        if ($run->is_test && ($definition->writesState || $definition->externalReach)) {
+            return new ToolOutput('[Test run] Nothing was done. It would have run with: '.json_encode($effect->arguments, JSON_UNESCAPED_UNICODE));
+        }
+
+        return $tool->run(new ToolContext($run, $effect->idempotency_key), $effect->arguments);
     }
 
     private function succeeded(AgentRun $run, AgentEffect $effect, ToolDefinition $tool, ToolOutput $output): void

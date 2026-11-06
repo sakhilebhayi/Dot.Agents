@@ -66,7 +66,7 @@ class StartRunAction
                 'status' => AgentRun::QUEUED,
                 'summary' => Str::limit(trim((string) preg_replace('/\s+/', ' ', $data->input)), 190),
                 'input' => $data->input,
-                'limits' => $version->settings()['limits'],
+                'limits' => [...$version->settings()['limits'], 'fail_tool' => $data->isTest ? $data->failTool : null],
                 'idempotency_key' => $data->idempotencyKey,
                 'is_test' => $data->isTest,
                 'taint' => RunTaint::forTrigger($data->triggerType) | $data->taint,
@@ -81,10 +81,17 @@ class StartRunAction
             ]);
         }
 
-        RunAgentStep::dispatch($run->id, $run->organization_id);
-        $this->kick->after($run);
+        if (! $data->deferred) {
+            $this->begin($run);
+        }
 
         return $run;
+    }
+
+    public function begin(AgentRun $run): void
+    {
+        RunAgentStep::dispatch($run->id, $run->organization_id);
+        $this->kick->after($run);
     }
 
     /** @throws RunRefused */

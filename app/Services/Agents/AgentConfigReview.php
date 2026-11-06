@@ -5,10 +5,13 @@ namespace App\Services\Agents;
 use App\Models\AgentConfigVersion;
 use App\Models\AgentDeployment;
 use App\Models\AgentRun;
+use App\Models\AgentTestResult;
+use App\Models\AgentWorkflow;
 use App\Models\KnowledgeBase;
 use App\Services\Models\ModelCatalog;
 use App\Services\Tools\ToolCatalogue;
 use App\Services\Tools\ToolDefinition;
+use Illuminate\Support\Str;
 
 /**
  * Reads an agent's setup the way a careful colleague would, by rules that can be checked. A setup with no findings is
@@ -44,7 +47,30 @@ class AgentConfigReview
             ...$this->execution($agent, $config),
         ]));
 
+        array_push($findings, ...$this->tests($agent, $version));
+
         return [...$this->verdict($findings, $version), 'findings' => $findings];
+    }
+
+    /** @return list<array{level: string, title: string, fix: string}> */
+    private function tests(AgentDeployment $agent, ?AgentConfigVersion $version): array
+    {
+        if ($version === null) {
+            return [];
+        }
+
+        $failing = AgentTestResult::where('config_version_id', $version->id)->whereIn('id', AgentTestResult::selectRaw('max(id)')->groupBy('agent_test_case_id', 'config_version_id'))->where('status', AgentTestResult::FAILED)->count();
+
+        $findings = $failing > 0 ? [$this->warning("{$failing} saved ".Str::plural('test', $failing).' failed on this version', 'See what went wrong on the test page.')] : [];
+
+        $live = AgentWorkflow::where('organization_id', $agent->organization_id)->where('status', 'active')
+            ->whereHas('nodes', fn ($node) => $node->where('config->deployment_id', $agent->id))->count();
+
+        if ($live > 0 && $version->state === AgentConfigVersion::DRAFT) {
+            $findings[] = $this->warning('Live workflows use this agent', "Publishing changes the work of {$live} ".Str::plural('workflow', $live).'. Test it first.');
+        }
+
+        return $findings;
     }
 
     /** @param  array<string, mixed>  $config */
@@ -63,7 +89,8 @@ class AgentConfigReview
             return ['verdict' => 'not_ready', 'words' => 'Not ready. Fix what is marked below.'];
         }
 
-        $tested = $version !== null && AgentRun::where('config_version_id', $version->id)->where('is_test', true)->where('status', AgentRun::COMPLETED)->exists();
+        $tested = $version !== null && AgentRun::where('config_version_id', $version->id)->where('is_test', true)->where('status', AgentRun::COMPLETED)->exists()
+            && ! collect($findings)->contains(fn ($finding) => str_contains($finding['title'], 'failed on this version'));
 
         return $tested
             ? ['verdict' => 'ready', 'words' => 'This version passed a test run and the checks below.']

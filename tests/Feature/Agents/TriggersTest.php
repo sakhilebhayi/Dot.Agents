@@ -3,7 +3,9 @@
 namespace Tests\Feature\Agents;
 
 use App\Actions\Agents\SaveTriggerAction;
+use App\Actions\Agents\StartRunAction;
 use App\DTOs\Agents\SaveTriggerData;
+use App\DTOs\Agents\StartRunData;
 use App\Livewire\Agents\AgentTriggers;
 use App\Models\AgentDeployment;
 use App\Models\AgentRun;
@@ -21,6 +23,7 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Testing\TestResponse;
 use Illuminate\Validation\ValidationException;
 use Laravel\Sanctum\Sanctum;
 use Livewire\Livewire;
@@ -58,7 +61,7 @@ class TriggersTest extends TestCase
         return app(SaveTriggerAction::class)->execute(new SaveTriggerData($this->owner, $this->organization->id, AgentTrigger::AGENT, $this->agent->id, $kind, 'Daily', $instruction, $settings));
     }
 
-    private function hook(array $saved, string $body, ?int $at = null, array $headers = [], ?string $secret = null): \Illuminate\Testing\TestResponse
+    private function hook(array $saved, string $body, ?int $at = null, array $headers = [], ?string $secret = null): TestResponse
     {
         $stamp = (string) ($at ?? now()->timestamp);
         $signature = 'sha256='.hash_hmac('sha256', "{$stamp}.{$body}", $secret ?? $saved['secret']);
@@ -231,7 +234,7 @@ class TriggersTest extends TestCase
         $this->trigger('event', ['event' => 'run.failed'], 'Find out what went wrong.');
         $other = AgentDeployment::factory()->create(['organization_id' => $this->organization->id, 'status' => 'active', 'enable_memory' => false]);
 
-        app(\App\Actions\Agents\StartRunAction::class)->execute($other, new \App\DTOs\Agents\StartRunData('Go'));
+        app(StartRunAction::class)->execute($other, new StartRunData('Go'));
 
         $followed = AgentRun::where('trigger_type', 'event')->firstOrFail();
         $this->assertSame($this->agent->id, $followed->agent_deployment_id);
@@ -243,7 +246,7 @@ class TriggersTest extends TestCase
         $this->model->fail('invalid_request', 'No.')->fail('invalid_request', 'No.');
         $this->trigger('event', ['event' => 'run.failed'], 'Look into it.');
 
-        app(\App\Actions\Agents\StartRunAction::class)->execute($this->agent, new \App\DTOs\Agents\StartRunData('Go'));
+        app(StartRunAction::class)->execute($this->agent, new StartRunData('Go'));
 
         $this->assertSame(2, AgentRun::count());
     }

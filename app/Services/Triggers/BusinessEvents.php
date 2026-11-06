@@ -15,7 +15,7 @@ class BusinessEvents
 
     public function runEnded(AgentRun $run): void
     {
-        if ($run->status === AgentRun::FAILED && $run->trigger_type !== 'event') {
+        if ($run->status === AgentRun::FAILED && $run->trigger_type !== 'event' && ! $run->is_test) {
             $this->raise($run->organization_id, 'run.failed', $run->uuid, "{$run->deployment?->name} failed: {$run->error_message}");
         }
     }

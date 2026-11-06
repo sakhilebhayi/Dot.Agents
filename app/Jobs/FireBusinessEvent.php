@@ -24,7 +24,7 @@ class FireBusinessEvent implements ShouldQueue
         TenantContext::forOrganization($this->organizationId, function () use ($firer) {
             AgentTrigger::where('organization_id', $this->organizationId)->where('kind', AgentTrigger::EVENT)->where('is_active', true)
                 ->where('settings->event', $this->event)
-                ->each(fn (AgentTrigger $trigger) => $firer->fire($trigger, $this->key, $this->summary, tainted: false));
+                ->each(fn (AgentTrigger $trigger) => $firer->fire($trigger, $this->key, $this->summary));
         });
     }
 }
