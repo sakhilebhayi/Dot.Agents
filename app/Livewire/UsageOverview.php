@@ -12,6 +12,7 @@ use App\Support\TenantContext;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
+/** @property-read ?UsageBudget $budget */
 class UsageOverview extends Component
 {
     public const READ_ONLY_ACTIONS = ['setDays'];

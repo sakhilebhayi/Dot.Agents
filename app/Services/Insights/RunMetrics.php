@@ -73,7 +73,7 @@ class RunMetrics
         return $days;
     }
 
-    /** @return Collection<int, array<string, mixed>> Busiest first. */
+    /** @return Collection<int|string, mixed> Busiest first. */
     public function byAgent(int $organizationId, CarbonInterface $since): Collection
     {
         return $this->runs($organizationId, $since)->with('deployment:id,name,owner_id')->get(['agent_deployment_id', 'status', 'cost', 'tokens_used'])
@@ -86,7 +86,7 @@ class RunMetrics
             })->sortByDesc('runs')->values();
     }
 
-    /** @return Collection<int, object> */
+    /** @return Collection<int, AgentUsageEvent> */
     public function byModel(int $organizationId, CarbonInterface $since): Collection
     {
         return AgentUsageEvent::where('organization_id', $organizationId)->where('created_at', '>=', $since)

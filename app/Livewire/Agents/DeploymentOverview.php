@@ -11,6 +11,7 @@ use App\Models\KnowledgeBase;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
+/** @property-read AgentDeployment $deployment */
 class DeploymentOverview extends Component
 {
     public int $deploymentId;
