@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use App\Models\Organization;
 use App\Models\User;
+use App\Support\TenantContext;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -46,6 +47,8 @@ class OrganizationContextMiddleware
                     abort(403, 'Unauthorized to access this organization.');
                 }
             }
+
+            TenantContext::set((int) $orgId);
         }
 
         return $next($request);

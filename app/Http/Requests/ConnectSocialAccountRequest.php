@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Models\SocialAccount;
+use App\Support\TenantRules;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ConnectSocialAccountRequest extends FormRequest
@@ -24,7 +25,7 @@ class ConnectSocialAccountRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'agent_deployment_id' => ['nullable', 'integer', 'exists:agent_deployments,id'],
+            'agent_deployment_id' => ['nullable', 'integer', TenantRules::exists('agent_deployments')],
         ];
     }
 }

@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Models\Organization;
 use App\Models\PlatformMegaScorecard;
 use App\Services\Governance\MegaV2ScorecardService;
+use App\Support\TenantContext;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -50,7 +51,7 @@ class GenerateMegaV2PlatformScorecard implements ShouldQueue
             : Organization::where('status', '!=', 'suspended')->get();
 
         foreach ($orgs as $org) {
-            $this->generateForOrg($service, $org);
+            TenantContext::forOrganization($org->id, fn () => $this->generateForOrg($service, $org));
         }
     }
 

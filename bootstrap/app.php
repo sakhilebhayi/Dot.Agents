@@ -4,12 +4,14 @@ use App\Http\Middleware\BlockWritesForReadOnlyUsers;
 use App\Http\Middleware\ConsentRequiredMiddleware;
 use App\Http\Middleware\CorrelationIdMiddleware;
 use App\Http\Middleware\OrganizationContextMiddleware;
+use App\Http\Middleware\ResetTenantContext;
 use App\Http\Middleware\SecurityHeadersMiddleware;
 use App\Services\Guardian\ErrorCounter;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Middleware\HandleCors;
+use Illuminate\Routing\Middleware\SubstituteBindings;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -21,6 +23,10 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         // Correlation ID on every request — must be first for log context
         $middleware->prepend(CorrelationIdMiddleware::class);
+
+        // Tenant context comes before route model binding, and starts empty on every request.
+        $middleware->prepend(ResetTenantContext::class);
+        $middleware->prependToPriorityList(SubstituteBindings::class, OrganizationContextMiddleware::class);
 
         // Security headers on every response
         $middleware->append(SecurityHeadersMiddleware::class);

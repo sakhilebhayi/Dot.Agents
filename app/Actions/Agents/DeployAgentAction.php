@@ -6,6 +6,7 @@ use App\Actions\Concerns\LogsActionErrors;
 use App\DTOs\Agents\DeployAgentData;
 use App\Events\AgentDeployed;
 use App\Models\AgentDeployment;
+use App\Models\Department;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
@@ -30,6 +31,12 @@ class DeployAgentAction
     {
         return $this->runAction(function () use ($data) {
             Gate::authorize('create', [AgentDeployment::class, $data->organizationId]);
+
+            if ($data->departmentId !== null) {
+                Department::withoutGlobalScopes()
+                    ->where('organization_id', $data->organizationId)
+                    ->findOrFail($data->departmentId);
+            }
 
             $deployment = AgentDeployment::create([
                 'uuid' => (string) Str::uuid(),

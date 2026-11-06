@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Organization;
 use App\Services\Governance\DWCAAuditService;
+use App\Support\TenantContext;
 use Illuminate\Console\Command;
 
 /**
@@ -50,7 +51,7 @@ class RunDWCAuditCommand extends Command
             $this->line("  → Auditing: {$org->name} (ID: {$org->id})");
 
             try {
-                $report = $auditService->auditOrganization($org->id);
+                $report = TenantContext::forOrganization($org->id, fn () => $auditService->auditOrganization($org->id));
                 $allReports[] = ['org' => $org->name, 'report' => $report];
 
                 if ($format === 'table') {

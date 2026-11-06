@@ -4,6 +4,7 @@ namespace App\Actions\Social;
 
 use App\Models\SocialAccount;
 use App\Models\SocialConversation;
+use App\Support\TenantContext;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -66,6 +67,12 @@ class ReceiveFacebookWebhookAction
             return;
         }
 
+        // The page id says whose message this is; everything after it runs for that business.
+        TenantContext::forOrganization($socialAccount->organization_id, fn () => $this->recordMessage($socialAccount, $messagingEvent, $senderPlatformId, $messageText));
+    }
+
+    private function recordMessage(SocialAccount $socialAccount, array $messagingEvent, string $senderPlatformId, string $messageText): void
+    {
         $conversation = SocialConversation::withoutGlobalScope('organization')
             ->where('social_account_id', $socialAccount->id)
             ->where('contact_platform_id', $senderPlatformId)

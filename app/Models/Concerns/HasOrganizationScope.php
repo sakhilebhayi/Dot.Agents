@@ -2,25 +2,15 @@
 
 namespace App\Models\Concerns;
 
+use App\Support\TenantContext;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
- * HasOrganizationScope — auto-scopes queries to the current organization.
+ * Keeps a model inside the business in TenantContext.
  *
- * Apply this trait to any model that has an `organization_id` column and
- * should only ever be queried within the context of a single organization.
- *
- * The global scope is only active when a `current_organization_id` value
- * is present in the session, so background jobs (no session) are unaffected.
- *
- * Usage:
- *   use App\Models\Concerns\HasOrganizationScope;
- *   class AgentDeployment extends Model {
- *       use HasOrganizationScope;
- *   }
- *
- * To bypass the scope (e.g. in admin controllers or cross-org queries):
- *   AgentDeployment::withoutGlobalScope('organization')->get();
+ * With no business in context the query throws, so a job or command that forgot to say whose data it wants fails
+ * loudly instead of reading every tenant. Work across businesses declares it with TenantContext::system(), and a
+ * single deliberate lookup uses forOrganization() or withoutGlobalScope('organization').
  */
 trait HasOrganizationScope
 {
@@ -30,13 +20,16 @@ trait HasOrganizationScope
     public static function bootHasOrganizationScope(): void
     {
         static::addGlobalScope('organization', function (Builder $query) {
-            $organizationId = session('current_organization_id');
+            if (TenantContext::isSystem()) {
+                return;
+            }
 
-            if ($organizationId) {
-                $model = new self;
-                $table = $model->getTable();
+            $organizationId = TenantContext::id();
 
-                $query->where("{$table}.organization_id", (int) $organizationId);
+            if ($organizationId !== null) {
+                $query->where((new self)->getTable().'.organization_id', $organizationId);
+            } elseif (! TenantContext::isLenient()) {
+                throw TenantContext::missing(self::class);
             }
         });
     }

@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use App\DTOs\Agents\DeployAgentData;
 use App\Models\AgentDeployment;
 use App\Services\Governance\AuditService;
+use App\Support\TenantRules;
 use Illuminate\Foundation\Http\FormRequest;
 
 class DeployAgentRequest extends FormRequest
@@ -22,7 +23,7 @@ class DeployAgentRequest extends FormRequest
             'name' => ['required', 'string', 'max:100'],
             'deployment_mode' => ['required', 'in:advisory,semi-autonomous,autonomous,executive_approval'],
             'confidence_threshold' => ['sometimes', 'numeric', 'min:0', 'max:100'],
-            'department_id' => ['nullable', 'integer', 'exists:departments,id'],
+            'department_id' => ['nullable', 'integer', TenantRules::exists('departments')],
             'custom_instructions' => ['nullable', 'string', 'max:5000'],
         ];
     }

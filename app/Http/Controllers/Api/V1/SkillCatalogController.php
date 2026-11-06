@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Models\AgentSkill;
 use App\Support\TaggableCache;
+use App\Support\TenantContext;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -19,7 +20,7 @@ class SkillCatalogController extends Controller
     public function index(Request $request): JsonResponse
     {
         // Cache skill catalog for 10 minutes; tag-invalidated when skills change.
-        $cacheKey = 'skill_catalog:'.md5($request->getQueryString() ?? '');
+        $cacheKey = 'skill_catalog:'.TenantContext::id().':'.md5($request->getQueryString() ?? '');
 
         $skills = TaggableCache::remember(['skills', 'catalog'], $cacheKey, 600, function () use ($request) {
             return AgentSkill::active()
