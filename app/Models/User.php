@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Support\OrgRoles;
+use App\Support\TenantContext;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -77,6 +79,19 @@ class User extends Authenticatable implements PasskeyUser
     {
         return $this->organizations()->wherePivot('is_primary', true)->first()
             ?? $this->organizations()->first();
+    }
+
+    /** The role held in a business, in the seven-role vocabulary. Null when the person is not a member. */
+    public function roleInOrganization(?int $organizationId = null): ?string
+    {
+        $organizationId ??= TenantContext::id() ?? $this->currentOrganization()?->id;
+
+        return OrgRoles::normalise($this->organizations()->where('organizations.id', $organizationId)->first()?->pivot->role);
+    }
+
+    public function canInOrganization(string $capability, ?int $organizationId = null): bool
+    {
+        return OrgRoles::allows($this->roleInOrganization($organizationId), $capability);
     }
 
     public function platformNotifications()

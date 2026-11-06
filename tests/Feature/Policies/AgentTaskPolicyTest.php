@@ -75,7 +75,7 @@ class AgentTaskPolicyTest extends TestCase
         $this->assertFalse($editor->can('update', $task));
     }
 
-    public function test_only_owner_can_delete_task(): void
+    public function test_only_someone_who_manages_agents_can_delete_a_task(): void
     {
         $org = Organization::factory()->create();
 
@@ -92,6 +92,6 @@ class AgentTaskPolicyTest extends TestCase
         ]);
 
         $this->assertTrue($owner->can('delete', $task));
-        $this->assertFalse($admin->can('delete', $task));
+        $this->assertTrue($admin->can('delete', $task));
     }
 }

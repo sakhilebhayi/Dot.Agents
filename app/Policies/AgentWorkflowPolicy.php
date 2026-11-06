@@ -24,17 +24,11 @@ class AgentWorkflowPolicy
 
     public function update(User $user, AgentWorkflow $agentWorkflow): bool
     {
-        return $user->organizations()
-            ->where('organizations.id', $agentWorkflow->organization_id)
-            ->wherePivotIn('role', ['owner', 'admin'])
-            ->exists();
+        return $user->canInOrganization('workflows.manage', $agentWorkflow->organization_id);
     }
 
     public function delete(User $user, AgentWorkflow $agentWorkflow): bool
     {
-        return $user->organizations()
-            ->where('organizations.id', $agentWorkflow->organization_id)
-            ->wherePivot('role', 'owner')
-            ->exists();
+        return $user->canInOrganization('workflows.manage', $agentWorkflow->organization_id);
     }
 }

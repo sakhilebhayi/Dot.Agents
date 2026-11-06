@@ -26,18 +26,12 @@ class AgentSessionPolicy
 
     public function update(User $user, AgentSession $session): bool
     {
-        return $user->organizations()
-            ->where('organizations.id', $session->organization_id)
-            ->wherePivotIn('role', ['owner', 'admin'])
-            ->exists();
+        return $user->canInOrganization('agents.manage', $session->organization_id);
     }
 
     public function delete(User $user, AgentSession $session): bool
     {
-        return $user->organizations()
-            ->where('organizations.id', $session->organization_id)
-            ->wherePivotIn('role', ['owner', 'admin'])
-            ->exists();
+        return $user->canInOrganization('agents.manage', $session->organization_id);
     }
 
     public function forceDelete(User $user, AgentSession $session): bool

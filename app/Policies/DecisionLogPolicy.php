@@ -25,10 +25,7 @@ class DecisionLogPolicy
     /** Human review annotation on decisions is admin-only. */
     public function update(User $user, DecisionLog $decisionLog): bool
     {
-        return $user->organizations()
-            ->where('organizations.id', $decisionLog->organization_id)
-            ->wherePivotIn('role', ['owner', 'admin'])
-            ->exists();
+        return $user->canInOrganization('approvals.review', $decisionLog->organization_id);
     }
 
     /** Decision logs cannot be deleted (governance requirement). */

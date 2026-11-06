@@ -24,17 +24,11 @@ class WorkflowNodePolicy
 
     public function update(User $user, WorkflowNode $node): bool
     {
-        return $user->organizations()
-            ->where('organizations.id', $node->organization_id)
-            ->wherePivotIn('role', ['owner', 'admin'])
-            ->exists();
+        return $user->canInOrganization('workflows.manage', $node->organization_id);
     }
 
     public function delete(User $user, WorkflowNode $node): bool
     {
-        return $user->organizations()
-            ->where('organizations.id', $node->organization_id)
-            ->wherePivotIn('role', ['owner', 'admin'])
-            ->exists();
+        return $user->canInOrganization('workflows.manage', $node->organization_id);
     }
 }

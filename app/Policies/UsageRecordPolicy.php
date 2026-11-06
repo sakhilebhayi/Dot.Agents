@@ -34,7 +34,7 @@ class UsageRecordPolicy
     /** Only platform admins can delete usage records. */
     public function delete(User $user, UsageRecord $record): bool
     {
-        return $user->hasRole('admin');
+        return $user->hasRole('platform_admin');
     }
 
     public function forceDelete(User $user, UsageRecord $record): bool

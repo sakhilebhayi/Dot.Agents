@@ -26,7 +26,7 @@ class SocialLeadPolicy
     {
         return $user->organizations()
             ->where('organizations.id', $lead->organization_id)
-            ->wherePivotIn('role', ['owner', 'admin', 'member'])
+            ->wherePivotIn('role', ['owner', 'admin', 'operator', 'member'])
             ->exists();
     }
 

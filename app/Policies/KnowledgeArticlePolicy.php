@@ -24,10 +24,7 @@ class KnowledgeArticlePolicy
     {
         $orgId = (int) session('current_organization_id');
 
-        return $user->organizations()
-            ->where('organizations.id', $orgId)
-            ->wherePivotIn('role', ['owner', 'admin', 'manager', 'member'])
-            ->exists();
+        return $user->canInOrganization('knowledge.contribute', $orgId);
     }
 
     public function update(User $user, KnowledgeArticle $article): bool
@@ -43,10 +40,7 @@ class KnowledgeArticlePolicy
             return true;
         }
 
-        return $user->organizations()
-            ->where('organizations.id', $orgId)
-            ->wherePivotIn('role', ['owner', 'admin', 'manager'])
-            ->exists();
+        return $user->canInOrganization('knowledge.manage', $orgId);
     }
 
     public function delete(User $user, KnowledgeArticle $article): bool
@@ -54,9 +48,6 @@ class KnowledgeArticlePolicy
         $orgId = (int) session('current_organization_id');
 
         return $article->organization_id === $orgId
-            && $user->organizations()
-                ->where('organizations.id', $orgId)
-                ->wherePivotIn('role', ['owner', 'admin'])
-                ->exists();
+            && $user->canInOrganization('knowledge.manage', $orgId);
     }
 }

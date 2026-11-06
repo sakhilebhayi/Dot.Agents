@@ -26,9 +26,6 @@ class AgentSkillApprovalPolicy
      */
     public function review(User $user, AgentSkillApproval $approval): bool
     {
-        return $user->organizations()
-            ->where('organizations.id', $approval->organization_id)
-            ->wherePivotIn('role', ['owner', 'admin'])
-            ->exists();
+        return $user->canInOrganization('approvals.review', $approval->organization_id);
     }
 }

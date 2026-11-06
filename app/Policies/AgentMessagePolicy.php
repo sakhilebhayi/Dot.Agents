@@ -29,9 +29,6 @@ class AgentMessagePolicy
 
     public function delete(User $user, AgentMessage $message): bool
     {
-        return $user->organizations()
-            ->where('organizations.id', $message->organization_id)
-            ->wherePivotIn('role', ['owner', 'admin'])
-            ->exists();
+        return $user->canInOrganization('agents.manage', $message->organization_id);
     }
 }

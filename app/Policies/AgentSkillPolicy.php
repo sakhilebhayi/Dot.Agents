@@ -32,10 +32,7 @@ class AgentSkillPolicy
      */
     public function create(User $user, int $organizationId): bool
     {
-        return $user->hasRole('admin') || $user->organizations()
-            ->where('organizations.id', $organizationId)
-            ->wherePivotIn('role', ['owner', 'admin'])
-            ->exists();
+        return $user->hasRole('platform_admin') || $user->canInOrganization('tools.manage', $organizationId);
     }
 
     /**
@@ -45,15 +42,12 @@ class AgentSkillPolicy
      */
     public function update(User $user, AgentSkill $skill): bool
     {
-        if ($user->hasRole('admin')) {
+        if ($user->hasRole('platform_admin')) {
             return true;
         }
 
         return $skill->organization_id !== null
-            && $user->organizations()
-                ->where('organizations.id', $skill->organization_id)
-                ->wherePivotIn('role', ['owner', 'admin'])
-                ->exists();
+            && $user->canInOrganization('tools.manage', $skill->organization_id);
     }
 
     /**
@@ -63,15 +57,12 @@ class AgentSkillPolicy
      */
     public function delete(User $user, AgentSkill $skill): bool
     {
-        if ($user->hasRole('admin')) {
+        if ($user->hasRole('platform_admin')) {
             return true;
         }
 
         return $skill->organization_id !== null
-            && $user->organizations()
-                ->where('organizations.id', $skill->organization_id)
-                ->wherePivotIn('role', ['owner', 'admin'])
-                ->exists();
+            && $user->canInOrganization('tools.manage', $skill->organization_id);
     }
 
     public function forceDelete(User $user, AgentSkill $skill): bool

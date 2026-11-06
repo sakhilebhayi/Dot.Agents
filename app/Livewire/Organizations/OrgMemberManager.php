@@ -4,6 +4,8 @@ namespace App\Livewire\Organizations;
 
 use App\Models\Organization;
 use App\Models\User;
+use App\Services\Governance\AuditService;
+use App\Support\OrgRoles;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
@@ -13,8 +15,7 @@ class OrgMemberManager extends Component
     #[Validate('required|email|max:255')]
     public string $inviteEmail = '';
 
-    #[Validate('required|in:owner,admin,member,viewer')]
-    public string $inviteRole = 'member';
+    public string $inviteRole = OrgRoles::OPERATOR;
 
     public bool $showInviteForm = false;
 
@@ -45,6 +46,7 @@ class OrgMemberManager extends Component
 
         $org = $this->organization;
         $this->authorize('update', $org);
+        $this->assertMayAssign($this->inviteRole);
 
         $user = User::where('email', $this->inviteEmail)->first();
 
@@ -68,7 +70,7 @@ class OrgMemberManager extends Component
 
         unset($this->members);
         $this->inviteEmail = '';
-        $this->inviteRole = 'member';
+        $this->inviteRole = OrgRoles::OPERATOR;
         $this->showInviteForm = false;
         session()->flash('member_success', 'Member added successfully.');
     }
@@ -108,8 +110,35 @@ class OrgMemberManager extends Component
         $org = $this->organization;
         $this->authorize('update', $org);
 
+        $this->assertMayAssign($role);
+
+        $current = $org->users()->where('users.id', $userId)->firstOrFail()->pivot->role;
+
+        abort_if($current === OrgRoles::OWNER && ! $this->actorIsOwner(), 403, 'Only an owner can change an owner.');
+        abort_if($userId === (int) $org->owner_id, 422, 'The business owner stays an owner.');
+
         $org->users()->updateExistingPivot($userId, ['role' => $role]);
+
+        app(AuditService::class)->logUserAction(
+            event: 'member.role_changed',
+            description: 'Changed a member\'s role',
+            data: ['user_id' => $userId, 'from' => $current, 'to' => $role],
+            subject: $org,
+        );
+
         unset($this->members);
+    }
+
+    /** Roles a person may hand out: any role they could hold, and only an owner makes another owner. */
+    private function assertMayAssign(string $role): void
+    {
+        abort_unless(in_array($role, OrgRoles::ALL, true), 422, 'That is not a role.');
+        abort_if($role === OrgRoles::OWNER && ! $this->actorIsOwner(), 403, 'Only an owner can make another owner.');
+    }
+
+    private function actorIsOwner(): bool
+    {
+        return auth()->user()->roleInOrganization($this->organization->id) === OrgRoles::OWNER;
     }
 
     public function render()

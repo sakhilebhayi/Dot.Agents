@@ -86,7 +86,7 @@ class InfoDotOrganizationSyncTest extends TestCase
         $this->signIn('ann@acme.test', [$this->company(self::ACME, 'Acme Ltd', 'owner')], self::ACME);
         $this->signIn('bob@acme.test', [$this->company(self::ACME, 'Acme Ltd', 'editor')], self::ACME);
 
-        $this->assertSame('member', $this->roleOf('bob@acme.test', $this->companyOrg()));
+        $this->assertSame('operator', $this->roleOf('bob@acme.test', $this->companyOrg()));
         $this->assertSame(1, Organization::where('infodot_team_uuid', self::ACME)->count());
     }
 
@@ -96,9 +96,9 @@ class InfoDotOrganizationSyncTest extends TestCase
         return [
             'owner' => ['owner', 'owner'],
             'admin' => ['admin', 'admin'],
-            'editor' => ['editor', 'member'],
+            'editor' => ['editor', 'operator'],
             'viewer' => ['viewer', 'viewer'],
-            'member (not an InfoDot role)' => ['member', 'viewer'],
+            'member (not an InfoDot role)' => ['operator', 'viewer'],
             'empty' => ['', 'viewer'],
             'nonsense' => ['superuser', 'viewer'],
             'wrong case' => ['Admin', 'viewer'],
@@ -115,7 +115,7 @@ class InfoDotOrganizationSyncTest extends TestCase
     {
         $this->signIn('ann@acme.test', [$this->company(self::ACME, 'Acme Ltd', 'owner')], self::ACME);
 
-        foreach (['admin' => 'admin', 'editor' => 'member', 'viewer' => 'viewer', 'weird' => 'viewer'] as $infodot => $local) {
+        foreach (['admin' => 'admin', 'editor' => 'operator', 'viewer' => 'viewer', 'weird' => 'viewer'] as $infodot => $local) {
             $this->signIn("{$infodot}@acme.test", [$this->company(self::ACME, 'Acme Ltd', $infodot)], self::ACME);
             $this->assertSame($local, $this->roleOf("{$infodot}@acme.test", $this->companyOrg()), $infodot);
         }
@@ -126,7 +126,7 @@ class InfoDotOrganizationSyncTest extends TestCase
         $this->signIn('ann@acme.test', [$this->company(self::ACME, 'Acme Ltd', 'owner')], self::ACME);
 
         $this->signIn('cat@acme.test', [$this->company(self::ACME, 'Acme Ltd', 'editor')], self::ACME);
-        $this->assertSame('member', $this->roleOf('cat@acme.test', $this->companyOrg()));
+        $this->assertSame('operator', $this->roleOf('cat@acme.test', $this->companyOrg()));
 
         $this->signIn('cat@acme.test', [$this->company(self::ACME, 'Acme Ltd', 'viewer')], self::ACME);
         $this->assertSame('viewer', $this->roleOf('cat@acme.test', $this->companyOrg()));
@@ -159,7 +159,7 @@ class InfoDotOrganizationSyncTest extends TestCase
         $this->signIn('dan@both.test', [$this->company(self::GLOBEX, 'Globex Corp', 'editor')], self::GLOBEX);
 
         $this->assertNull($this->roleOf('dan@both.test', $this->companyOrg(self::ACME)), 'removed from Acme in InfoDot');
-        $this->assertSame('member', $this->roleOf('dan@both.test', $this->companyOrg(self::GLOBEX)));
+        $this->assertSame('operator', $this->roleOf('dan@both.test', $this->companyOrg(self::GLOBEX)));
         $this->assertSame('owner', $this->roleOf('dan@both.test', $personal), 'personal organization untouched');
         $this->assertSame('admin', $this->roleOf('dan@both.test', $manual), 'manually joined organization untouched');
         $this->assertSame(2, Organization::whereNotNull('infodot_team_uuid')->count(), 'the Acme organization itself (and its data) stays');
@@ -171,13 +171,13 @@ class InfoDotOrganizationSyncTest extends TestCase
         $eve = User::where('email', 'eve@else.test')->firstOrFail();
         $personal = $this->personalOrganization($eve);
         $manual = Organization::factory()->create(['infodot_team_uuid' => null]);
-        $manual->users()->attach($eve->id, ['role' => 'member', 'is_primary' => false, 'joined_at' => now()]);
+        $manual->users()->attach($eve->id, ['role' => 'operator', 'is_primary' => false, 'joined_at' => now()]);
 
         $this->signIn('eve@else.test', []);
         $this->signIn('eve@else.test', [$this->company(self::ACME, 'Ann personal', 'owner', true)]);
 
         $this->assertSame('owner', $this->roleOf('eve@else.test', $personal));
-        $this->assertSame('member', $this->roleOf('eve@else.test', $manual));
+        $this->assertSame('operator', $this->roleOf('eve@else.test', $manual));
         $this->assertSame(0, Organization::whereNotNull('infodot_team_uuid')->count(), 'personal teams in the payload never become organizations');
     }
 
