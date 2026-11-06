@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Concerns\HasOrganizationScope;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
 /**
@@ -11,7 +12,7 @@ use Illuminate\Support\Str;
  *
  * @property array<string, mixed>|null $settings
  * @property ?string $secret
- * @property \Illuminate\Support\Carbon|null $next_run_at
+ * @property Carbon|null $next_run_at
  */
 class AgentTrigger extends Model
 {

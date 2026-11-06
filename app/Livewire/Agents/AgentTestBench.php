@@ -15,6 +15,7 @@ use App\Models\AgentDeployment;
 use App\Models\AgentRun;
 use App\Models\AgentTestCase;
 use App\Models\AgentTestResult;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Locked;
@@ -22,7 +23,7 @@ use Livewire\Component;
 
 /**
  * @property-read AgentDeployment $agent
- * @property-read \Illuminate\Support\Collection<int, AgentTestCase> $cases
+ * @property-read Collection<int, AgentTestCase> $cases
  */
 class AgentTestBench extends Component
 {
