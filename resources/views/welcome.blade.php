@@ -127,27 +127,45 @@
             </fieldset>
         </section>
 
-        <section class="band split" id="team" data-reach>
-            <div>
+        <section class="band wide" id="team" data-reach>
+            <div class="wide-head">
                 <h2>Work that takes more than one agent.</h2>
-                <p class="band-lede">Connect agents, tools and people in order, side by side or down different paths, or put a supervisor over a team and let it hand out the work.</p>
-                <p class="band-lede">A workflow is only finished when all of it worked. If one branch fails, it says which one and picks up from there.</p>
+                <div>
+                    <p class="band-lede">Connect agents, tools and people in order, side by side or down different paths, or put a supervisor over a team and let it hand out the work.</p>
+                    <p class="band-lede">A workflow is only finished when all of it worked. If one branch fails, it says which one and picks up from there.</p>
+                </div>
             </div>
             <figure class="branch">
-                <svg viewBox="0 0 520 220" role="img" aria-label="An example workflow. Read the order, then check stock and check credit side by side. Stock passed. Credit is held for a person. Dispatch waits for both.">
-                    <path class="done" d="M40 110 H110 C150 110 150 50 190 50 H300"/>
-                    <path class="done" d="M110 110 C150 110 150 170 190 170 H300"/>
-                    <path class="wait" d="M300 50 H340 C380 50 380 110 420 110 H480"/>
-                    <path class="wait" d="M300 170 H340 C380 170 380 110 420 110"/>
-                    <circle class="n-done" cx="40" cy="110" r="8"/>
-                    <circle class="n-done" cx="300" cy="50" r="8"/>
-                    <rect class="n-hold" x="291" y="161" width="18" height="18" rx="2" transform="rotate(45 300 170)"/>
-                    <circle class="n-wait" cx="480" cy="110" r="8"/>
-                    <text x="24" y="86">Read the order</text>
-                    <text x="190" y="30">Check stock</text>
-                    <text x="190" y="202">Check credit</text>
-                    <text class="t-hold" x="326" y="202">Waiting for a person</text>
-                    <text x="428" y="86">Dispatch</text>
+                <svg class="branch-wide" viewBox="0 0 1000 200" role="img" aria-label="An example workflow. Read the order, then check stock and check credit side by side. Stock passed. Credit is held for a person. Dispatch waits for both.">
+                    <path class="done" d="M10 100 H240 C300 100 300 40 360 40 H620"/>
+                    <path class="done" d="M240 100 C300 100 300 160 360 160 H620"/>
+                    <path class="wait" d="M620 40 H680 C740 40 740 100 800 100 H990"/>
+                    <path class="wait" d="M620 160 H680 C740 160 740 100 800 100"/>
+                    <circle class="n-done" cx="10" cy="100" r="8"/>
+                    <circle class="n-done" cx="620" cy="40" r="8"/>
+                    <rect class="n-hold" x="611" y="151" width="18" height="18" rx="2" transform="rotate(45 620 160)"/>
+                    <circle class="n-wait" cx="990" cy="100" r="8"/>
+                    <text x="0" y="76">Read the order</text>
+                    <text x="370" y="24">Check stock</text>
+                    <text x="370" y="190">Check credit</text>
+                    <text class="t-hold" x="600" y="196">Waiting for a person</text>
+                    <text x="930" y="76">Dispatch</text>
+                </svg>
+                <svg class="branch-tall" viewBox="0 0 320 380" role="img" aria-label="An example workflow. Read the order, then check stock and check credit side by side. Stock passed. Credit is held for a person. Dispatch waits for both.">
+                    <path class="done" d="M160 40 V90 C160 130 70 110 70 160 V230"/>
+                    <path class="done" d="M160 90 C160 130 250 110 250 160 V230"/>
+                    <path class="wait" d="M70 230 V270 C70 310 160 290 160 330 V350"/>
+                    <path class="wait" d="M250 230 V270 C250 310 160 290 160 330"/>
+                    <circle class="n-done" cx="160" cy="40" r="8"/>
+                    <circle class="n-done" cx="70" cy="230" r="8"/>
+                    <rect class="n-hold" x="241" y="221" width="18" height="18" rx="2" transform="rotate(45 250 230)"/>
+                    <circle class="n-wait" cx="160" cy="350" r="8"/>
+                    <text x="160" y="20" text-anchor="middle">Read the order</text>
+                    <text x="70" y="145" text-anchor="middle">Check stock</text>
+                    <text x="250" y="145" text-anchor="middle">Check credit</text>
+                    <text class="t-hold" x="250" y="262" text-anchor="middle">Waiting for</text>
+                    <text class="t-hold" x="250" y="282" text-anchor="middle">a person</text>
+                    <text x="160" y="376" text-anchor="middle">Dispatch</text>
                 </svg>
                 <figcaption>An example workflow, held at one step.</figcaption>
             </figure>
@@ -176,9 +194,17 @@
         </section>
 
         <section class="close" data-reach>
-            <h2>Start with one agent and one job.</h2>
-            <p>Dot.Agents is part of the Dot business platforms.</p>
-            <a class="button solid" href="{{ route('register') }}">Set up your first agent</a>
+            <div>
+                <h2>Start with one agent and one job.</h2>
+                <p>Dot.Agents is part of the Dot business platforms.</p>
+                <a class="button solid" href="{{ route('register') }}">Set up your first agent</a>
+            </div>
+            <dl class="finished" aria-label="How the example run ended">
+                <div><dt>Invoice check</dt><dd class="ok">Finished</dd></div>
+                <div><dt>Asked a person</dt><dd>Once</dd></div>
+                <div><dt>Messages sent</dt><dd>One, as approved</dd></div>
+                <div><dt>Payments made</dt><dd>None</dd></div>
+            </dl>
         </section>
     </div>
 </main>

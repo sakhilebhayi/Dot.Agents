@@ -117,22 +117,25 @@ h1 span { color: var(--gold); }
 .dial:has([value='1']:checked) [data-level='1'], .dial:has([value='2']:checked) [data-level='2'], .dial:has([value='3']:checked) [data-level='3'], .dial:has([value='4']:checked) [data-level='4'] { display: block; animation: rise 240ms var(--ease); }
 
 /* The branching run */
+.wide-head { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: clamp(32px, 6vw, 80px); align-items: end; margin-bottom: clamp(40px, 5vw, 64px); }
+.wide-head .band-lede:first-child { margin-top: 0; }
 .branch svg { display: block; width: 100%; height: auto; overflow: visible; }
+.branch-tall { display: none !important; max-width: 340px; }
 .branch path { fill: none; stroke-width: 2; }
 .branch .done { stroke: var(--clear); }
 .branch .wait { stroke: var(--control); }
 .branch .n-done { fill: var(--clear); }
 .branch .n-wait { fill: var(--ground); stroke: var(--control); stroke-width: 2; }
 .branch .n-hold { fill: var(--gold); }
-.branch text { fill: var(--ink); font: 500 15px var(--sans); }
+.branch text { fill: var(--ink); font: 500 15px var(--sans); paint-order: stroke; stroke: var(--ground); stroke-width: 8px; stroke-linejoin: round; }
 .branch .t-hold { fill: var(--gold); }
 .branch figcaption { margin-top: 12px; color: var(--muted); font-size: 14px; }
 
-.answer { min-height: 44px; padding: 0 18px; border: 0; border-bottom: 2px solid currentColor; background: none; font: 600 16px var(--sans); cursor: pointer; transition: translate 160ms var(--ease), background 160ms; }
-.answer:hover { background: color-mix(in srgb, currentColor 12%, transparent); translate: 0 -1px; }
+.answer { min-width: 112px; min-height: 44px; padding: 0 20px; border: 1px solid transparent; border-radius: 6px; font: 600 16px var(--sans); cursor: pointer; transition: translate 160ms var(--ease), filter 160ms; }
+.answer:hover { filter: brightness(1.1); translate: 0 -1px; }
 .answer:active { translate: 0 1px; }
-.answer.yes { color: var(--clear); }
-.answer.no { color: var(--stop); }
+.answer.yes { background: var(--clear); color: var(--on-gold); }
+.answer.no { border-color: var(--stop); background: none; color: var(--stop); }
 .record-figure { padding: 20px 24px; border-top: 2px solid var(--line); background: var(--surface); }
 .record-figure figcaption { margin-bottom: 16px; color: var(--muted); font-size: 14px; }
 .record li { position: relative; padding: 0 0 18px 24px; }
@@ -145,6 +148,11 @@ h1 span { color: var(--gold); }
 .record span { color: var(--muted); font-size: 15px; }
 
 .close { padding-top: clamp(64px, 10vw, 128px); padding-bottom: clamp(64px, 10vw, 128px); padding-right: var(--gutter); }
+.close { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: clamp(32px, 6vw, 80px); align-items: end; }
+.finished div { display: flex; justify-content: space-between; gap: 16px; padding: 12px 0; border-top: 1px solid var(--line); }
+.finished dt { color: var(--muted); }
+.finished dd { font-weight: 500; }
+.finished .ok { color: var(--clear); }
 .close p { max-width: 56ch; margin: 16px 0 28px; color: var(--muted); font-size: 19px; }
 .foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; padding: 24px var(--gutter); border-top: 1px solid var(--line); color: var(--muted); font-size: 14px; }
 .foot nav { display: flex; gap: 20px; }
@@ -158,7 +166,9 @@ h1 span { color: var(--gold); }
     .hero-signin { display: none; }
     .agent, .dial, .record-figure { padding: 16px; }
     .dial-steps label { font-size: 14px; }
-    .branch text { font-size: 20px; }
+    .branch-wide { display: none !important; }
+    .branch-tall { display: block !important; }
+    .wide-head, .close { grid-template-columns: minmax(0, 1fr); }
     .demo { padding: 16px; }
     .line { flex-direction: column; }
     .stop { display: flex; align-items: center; min-height: 40px; padding: 0 0 0 28px; }
