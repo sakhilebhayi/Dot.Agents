@@ -50,7 +50,7 @@ class PromptAssembler
         foreach (AgentRunStep::where('agent_run_id', $run->id)->orderBy('sequence')->get() as $step) {
             $message = $step->payload['message'] ?? null;
 
-            if ($step->status !== 'done' || $message === null) {
+            if ($message === null) {
                 continue;
             }
 

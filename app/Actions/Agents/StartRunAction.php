@@ -10,6 +10,7 @@ use App\Models\AgentRun;
 use App\Services\AI\AgentQuotaGuard;
 use App\Services\AI\AgentSandboxService;
 use App\Services\Runs\RunKick;
+use App\Support\RunTaint;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Str;
 use RuntimeException;
@@ -65,6 +66,7 @@ class StartRunAction
                 'limits' => $version->settings()['limits'],
                 'idempotency_key' => $data->idempotencyKey,
                 'is_test' => $data->isTest,
+                'taint' => RunTaint::forTrigger($data->triggerType),
             ]);
         } catch (UniqueConstraintViolationException) {
             return $this->existing($deployment, (string) $data->idempotencyKey);

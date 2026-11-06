@@ -9,6 +9,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 /**
  * One thing an agent asked a tool to do. Written before it happens, so a crash can never leave us unsure whether we
  * meant to do it, and marked `unknown` rather than retried when the tool's answer was lost.
+ *
+ * @property array<string, mixed> $arguments
+ * @property array<string, mixed>|null $result
  */
 class AgentEffect extends Model
 {
@@ -27,6 +30,9 @@ class AgentEffect extends Model
     public const DENIED = 'denied';
 
     public const UNKNOWN = 'unknown';
+
+    /** Unknown, the model has been told, and it stays that way until a person checks. */
+    public const UNRESOLVED = 'unresolved';
 
     protected $guarded = ['id'];
 

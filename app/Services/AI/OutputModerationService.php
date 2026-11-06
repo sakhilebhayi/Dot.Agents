@@ -186,6 +186,16 @@ class OutputModerationService
         return ['content' => $content, 'scan' => $scan];
     }
 
+    /** Tool results keep their ordinary content, but a credential in one never reaches the model or the journal. */
+    public function redactSecrets(string $content): string
+    {
+        foreach (self::SECRET_PATTERNS as $pattern) {
+            $content = (string) preg_replace($pattern, '[REDACTED:secret]', $content);
+        }
+
+        return $content;
+    }
+
     /**
      * Return a safe blocked response when verdict is BLOCK.
      */

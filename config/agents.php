@@ -1,5 +1,7 @@
 <?php
 
+use App\Services\Tools\BuiltIn;
+
 return [
     // The queue connection for agent steps: a database queue of its own, so a slow model call never holds up mail or
     // billing, with a retry window longer than any step.
@@ -37,5 +39,13 @@ return [
         'claude-opus-5-5' => 'claude-sonnet-5-5',
         'claude-sonnet-5-5' => 'claude-haiku-5-5',
         'gpt-4o' => 'gpt-4o-mini',
+    ],
+
+    // Everything an agent could be given. Being listed gives nothing: a tool runs only if a published version grants it.
+    'tools' => [
+        BuiltIn\Calculator::class,
+        BuiltIn\ReadWebPage::class,
+        BuiltIn\TeamDirectory::class,
+        BuiltIn\NotifyMember::class,
     ],
 ];
