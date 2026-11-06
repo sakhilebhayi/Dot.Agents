@@ -52,7 +52,7 @@ class AgentVersionsTest extends TestCase
     {
         return app(CreateAgentAction::class)->execute(new CreateAgentData(
             organizationId: $this->organization->id, createdBy: $this->manager->id,
-            name: 'Invoice checker', role: 'Accounts clerk', config: $config,
+            name: 'Invoice checker', role: 'Accounts clerk', responsibility: 'Check supplier invoices against our terms.', config: $config,
         ));
     }
 

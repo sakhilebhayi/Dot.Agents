@@ -28,7 +28,7 @@ class DeploymentManager extends Component
     {
         // No explicit organization_id filter needed: AgentDeployment's
         // HasOrganizationScope trait applies it automatically from the session.
-        return AgentDeployment::with(['agent.agentDepartment', 'latestScorecard'])
+        return AgentDeployment::with(['agent', 'owner'])
             ->when($this->search, fn ($q) => $q->where('name', 'like', "%{$this->search}%")
                 ->orWhereHas('agent', fn ($q2) => $q2->where('name', 'like', "%{$this->search}%")))
             ->when($this->filterStatus, fn ($q) => $q->where('status', $this->filterStatus))

@@ -80,7 +80,7 @@ class DeploymentOverviewTest extends TestCase
         $response->assertSeeText('Compliance Sentinel');
         $response->assertSeeText('Revenue Operations');
         $response->assertSeeText('Active');
-        $response->assertSeeText('Autonomous');
+        $response->assertSeeText('Autonomy');
         $response->assertSeeText('Priya Deployer');
         $response->assertSee(route('agents.chat', $this->deployment), false);
         $response->assertSee(route('agents.scorecard', $this->deployment), false);

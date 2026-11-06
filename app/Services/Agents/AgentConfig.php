@@ -33,6 +33,7 @@ final class AgentConfig
             'knowledge' => [],
             'memory' => ['conversation' => true, 'long_term' => false, 'retention_days' => 90],
             'tools' => [],
+            'autonomy' => 1,
             'limits' => [
                 'steps' => 12,
                 'tool_calls' => 20,
@@ -88,6 +89,7 @@ final class AgentConfig
             'memory.conversation' => ['boolean'],
             'memory.long_term' => ['boolean'],
             'memory.retention_days' => ['integer', 'min:1', 'max:3650'],
+            'autonomy' => ['required', 'integer', 'in:1,2,3,4'],
             'tools' => ['array', 'max:50'],
             'tools.*.key' => ['required', 'string', 'max:120'],
             'tools.*.mode' => ['required', 'in:auto,approve'],

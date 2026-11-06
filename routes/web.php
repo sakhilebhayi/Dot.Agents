@@ -14,11 +14,13 @@ use App\Http\Middleware\AuthenticateGuardian;
 use App\Models\AgentDeployment;
 use App\Models\AgentWorkflow;
 use App\Models\User;
+use App\Services\Agents\AgentPackage;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Laravel\Fortify\Features;
 
@@ -93,11 +95,22 @@ Route::middleware([
     // Active Agents (deployed workforce)
     Route::prefix('my-agents')->name('agents.')->group(function () {
         Route::get('/', fn () => view('agents.index'))->name('deployments');
+        Route::get('/new', fn () => view('agents.create'))->name('create');
         Route::get('/{deployment}', function (AgentDeployment $deployment) {
             abort_unless(Gate::allows('view', $deployment), 403);
 
             return view('agents.show', compact('deployment'));
         })->name('show');
+        Route::get('/{deployment}/setup', function (AgentDeployment $deployment) {
+            abort_unless(Gate::allows('update', $deployment), 403);
+
+            return view('agents.setup', compact('deployment'));
+        })->name('setup');
+        Route::get('/{deployment}/export', function (AgentDeployment $deployment) {
+            abort_unless(Gate::allows('update', $deployment), 403);
+
+            return response()->streamDownload(fn () => print (json_encode(AgentPackage::export($deployment), JSON_PRETTY_PRINT)), Str::slug($deployment->name).'.json', ['Content-Type' => 'application/json']);
+        })->name('export');
         Route::get('/{deployment}/chat', function (AgentDeployment $deployment) {
             abort_unless(Gate::allows('chat', $deployment), 403);
 
