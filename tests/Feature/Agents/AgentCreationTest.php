@@ -19,7 +19,6 @@ use App\Services\Agents\AgentDescriptionReader;
 use App\Services\Agents\AgentPackage;
 use App\Services\Models\ScriptedGateway;
 use App\Support\TenantContext;
-use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -202,8 +201,7 @@ class AgentCreationTest extends TestCase
         $this->organization->users()->attach($viewer, ['role' => 'viewer']);
         $agent = $this->agent();
 
-        $this->expectException(AuthorizationException::class);
-        Livewire::actingAs($viewer)->test(AgentSetup::class, ['deploymentId' => $agent->id]);
+        Livewire::actingAs($viewer)->test(AgentSetup::class, ['deploymentId' => $agent->id])->assertForbidden();
     }
 
     public function test_the_setup_saves_to_a_draft_and_leaves_what_runs_alone(): void
