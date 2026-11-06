@@ -3,8 +3,10 @@
 namespace App\Livewire\Agents;
 
 use App\Actions\Agents\StartAgentChatSessionAction;
+use App\Actions\Agents\StartRunAction;
 use App\DTOs\Agents\StartAgentChatSessionData;
-use App\Jobs\ProcessAgentMessage;
+use App\DTOs\Agents\StartRunData;
+use App\Exceptions\RunRefused;
 use App\Models\AgentDeployment;
 use App\Models\AgentMessage;
 use App\Models\AgentSession;
@@ -93,14 +95,22 @@ class AgentChat extends Component
         $chatAction = app(StartAgentChatSessionAction::class);
         $storedUserMessage = $chatAction->storeUserMessage($session, $userMessage);
 
-        // Process through orchestration service on the 'ai' queue rather
-        // than inline -- a real model completion can take several seconds,
-        // too long to hold open this request. pollForReply() picks up the
-        // assistant's reply once the job finishes.
+        // The engine works in the background; pollForReply() picks up the reply, and a run that fails still leaves one.
         $this->pendingMessageId = $storedUserMessage->id;
         $this->isTyping = true;
 
-        ProcessAgentMessage::dispatch($deployment, $session, $userMessage);
+        try {
+            app(StartRunAction::class)->execute($deployment, new StartRunData(
+                input: $userMessage,
+                triggerType: 'chat',
+                initiatedBy: Auth::id(),
+                sessionId: $session->id,
+            ));
+        } catch (RunRefused $e) {
+            $this->isTyping = false;
+            $this->pendingMessageId = null;
+            $this->dispatch('security-alert', message: $e->getMessage());
+        }
 
         // Refresh messages
         unset($this->chatMessages);

@@ -34,6 +34,8 @@ Schedule::command('retention:detect-purge-candidates')
     ->onOneServer();
 
 // Expire pending approvals past their deadline — runs every 30 minutes
+Schedule::command('agents:sweep-runs')->everyMinute()->withoutOverlapping(5)->name('agents-sweep-runs');
+
 Schedule::command('approvals:expire-overdue')
     ->everyThirtyMinutes()
     ->withoutOverlapping()

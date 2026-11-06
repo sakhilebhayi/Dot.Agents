@@ -49,7 +49,7 @@ class DWCAAuditService
         ]);
 
         $deployments = AgentDeployment::where('organization_id', $organizationId)
-            ->with(['agent.skills', 'latestScorecard', 'tasks'])
+            ->with(['agent', 'latestScorecard', 'tasks'])
             ->get();
 
         $agentResults = $deployments->map(fn ($d) => $this->auditDeployment($d))->all();

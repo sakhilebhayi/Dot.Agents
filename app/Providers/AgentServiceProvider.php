@@ -28,6 +28,9 @@ use App\Services\Governance\DelusionDetectionService;
 use App\Services\Governance\DigitalImmuneSystem;
 use App\Services\Governance\EnterpriseConstitutionService;
 use App\Services\Memory\DotMemoryClient;
+use App\Services\Models\ModelGateway;
+use App\Services\Models\PrismGateway;
+use App\Services\Models\ScriptedGateway;
 use App\Skills\Governance\AuditLoggingSkill;
 use Illuminate\Support\ServiceProvider;
 
@@ -51,9 +54,7 @@ class AgentServiceProvider extends ServiceProvider
                 $app->make(ModelRouterService::class),
                 $app->make(DelusionDetectionService::class),
                 $app->make(AuditService::class),
-                $app->make(MemoryService::class),
                 $app->make(AgentSandboxService::class),
-                $app->make(OutputModerationService::class),
                 $app->make(PromptBuilderService::class),
                 $app->make(ResponseProcessorService::class),
                 $app->make(AgentModelCaller::class),
@@ -98,6 +99,12 @@ class AgentServiceProvider extends ServiceProvider
         $this->app->bind(AuditLoggingSkill::class, function ($app) {
             return new AuditLoggingSkill($app->make(AuditService::class));
         });
+
+        // The stand-in model answers only outside production, and only when asked for by name.
+        $this->app->singleton(ScriptedGateway::class);
+        $this->app->bind(ModelGateway::class, fn ($app) => ! $app->isProduction() && config('prism.default_provider') === 'scripted'
+            ? $app->make(ScriptedGateway::class)
+            : $app->make(PrismGateway::class));
 
         // Skill Execution Pipeline — wraps task execution with skill hooks
         $this->app->singleton(SkillExecutionPipeline::class, function ($app) {

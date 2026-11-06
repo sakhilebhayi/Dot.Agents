@@ -169,18 +169,6 @@ parameters:
 			path: app/Jobs/GenerateSocialResponseJob.php
 
 		-
-			message: '#^Parameter \#1 \$deployment of method App\\Services\\AI\\AgentOrchestrationService\:\:executeTask\(\) expects App\\Models\\AgentDeployment, Illuminate\\Database\\Eloquent\\Model given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Jobs/ProcessAgentTask.php
-
-		-
-			message: '#^Parameter \#1 \$deployment of method App\\Services\\Governance\\AuditService\:\:logAgentAction\(\) expects App\\Models\\AgentDeployment, Illuminate\\Database\\Eloquent\\Model given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/Jobs/ProcessAgentTask.php
-
-		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$socialAccount\.$#'
 			identifier: property.notFound
 			count: 1
@@ -323,12 +311,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: app/Listeners/NotifyOnNegativeSentiment.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$slug\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Listeners/ProvisionSCCSSkillsAndScorecard.php
 
 		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
@@ -625,18 +607,6 @@ parameters:
 			path: app/Policies/PlatformNotificationPolicy.php
 
 		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$defaultPersona\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Services/AI/AgentOrchestrationService.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$slug\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Services/AI/AgentOrchestrationService.php
-
-		-
 			message: '#^Access to an undefined property App\\Models\\AgentSkillApproval\:\:\$approved\.$#'
 			identifier: property.notFound
 			count: 1
@@ -659,12 +629,6 @@ parameters:
 			identifier: property.notFound
 			count: 1
 			path: app/Services/AI/AgentReputationService.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$model_config\.$#'
-			identifier: property.notFound
-			count: 2
-			path: app/Services/AI/AgentSandboxService.php
 
 		-
 			message: '#^Access to an undefined property App\\Models\\AgentTask\:\:\$failures\.$#'
@@ -692,24 +656,6 @@ parameters:
 
 		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$content\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Services/AI/PromptBuilderService.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$defaultPersona\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Services/AI/PromptBuilderService.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$description\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Services/AI/PromptBuilderService.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
 			identifier: property.notFound
 			count: 1
 			path: app/Services/AI/PromptBuilderService.php
@@ -797,18 +743,6 @@ parameters:
 			identifier: property.notFound
 			count: 1
 			path: app/Services/Governance/Audit/Phase13Scorecard.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Services/Governance/DWCAAuditService.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$slug\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Services/Governance/DWCAAuditService.php
 
 		-
 			message: '#^Relation ''approval'' is not found in App\\Models\\AgentTask model\.$#'

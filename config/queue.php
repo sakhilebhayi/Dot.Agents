@@ -44,6 +44,17 @@ return [
             'after_commit' => false,
         ],
 
+        // Agent steps. A step takes up to 170 seconds, so the retry window sits above it, and a slow model call stays away
+        // from mail and billing on the default connection.
+        'agents' => [
+            'driver' => 'database',
+            'connection' => env('DB_QUEUE_CONNECTION'),
+            'table' => env('DB_QUEUE_TABLE', 'jobs'),
+            'queue' => 'agent-steps',
+            'retry_after' => 240,
+            'after_commit' => false,
+        ],
+
         'beanstalkd' => [
             'driver' => 'beanstalkd',
             'host' => env('BEANSTALKD_QUEUE_HOST', 'localhost'),
