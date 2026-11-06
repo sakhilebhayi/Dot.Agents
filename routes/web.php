@@ -25,6 +25,7 @@ use Laravel\Fortify\Features;
 // ── Health Checks ─────────────────────────────────────────────────────────────
 // Public ping — used by load balancers and uptime monitors
 Route::post('/auth/ecosystem', [EcosystemAuthController::class, 'handle'])
+    ->middleware('throttle:30,1')
     ->withoutMiddleware(['Illuminate\Foundation\Http\Middleware\PreventRequestForgery', 'Illuminate\Foundation\Http\Middleware\VerifyCsrfToken', 'Illuminate\Foundation\Http\Middleware\ValidateCsrfToken'])->name('auth.ecosystem');
 
 // Links minted before the token moved into a POST body carried it in the URL. They are no longer honoured:
@@ -176,12 +177,12 @@ Route::middleware([
 
 // Stripe webhook — must be outside auth middleware + CSRF exempt (handled in VerifyCsrfToken)
 
-Route::post('/webhooks/stripe', [BillingController::class, 'webhook'])->name('stripe.webhook');
+Route::post('/webhooks/stripe', [BillingController::class, 'webhook'])->middleware('throttle:120,1')->name('stripe.webhook');
 
 // Social platform webhooks — must be outside auth middleware + CSRF exempt (handled in VerifyCsrfToken)
 
 Route::get('/social/webhooks/{platform}', [SocialWebhookController::class, 'verify'])->name('social.webhooks.verify');
-Route::post('/social/webhooks/{platform}', [SocialWebhookController::class, 'receive'])->name('social.webhooks.receive');
+Route::post('/social/webhooks/{platform}', [SocialWebhookController::class, 'receive'])->middleware('throttle:300,1')->name('social.webhooks.receive');
 
 // Public liveness probe for the cron scheduler and queue worker, watched from GitHub every
 // 15 minutes by .github/workflows/scheduler-watchdog.yml.

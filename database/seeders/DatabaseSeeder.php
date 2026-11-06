@@ -14,6 +14,9 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // These accounts have passwords in a public repository.
+        abort_if(app()->isProduction(), 500, 'Demo accounts are never seeded in production. Seed the catalogue with AgentPlatformSeeder.');
+
         // User::factory(10)->withPersonalTeam()->create();
 
         User::factory()->withPersonalTeam()->create([

@@ -26,6 +26,7 @@ class DisconnectSocialAccountAction
 
         $count = 0;
         foreach ($accounts as $account) {
+            Gate::authorize('delete', $account);
             $this->disconnectAccount($account);
             $count++;
         }

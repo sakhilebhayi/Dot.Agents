@@ -73,6 +73,7 @@ class RespondToSocialMessageAction
         string $messageType = 'text',
         array $mediaAttachments = [],
         ?int $agentDeploymentId = null,
+        ?string $platformMessageId = null,
     ): SocialMessage {
         // ── SECURITY: Prompt injection scan on all inbound user content ───────
         $isInjectionAttempt = $this->auditService->detectPromptInjection($content);
@@ -104,6 +105,7 @@ class RespondToSocialMessageAction
             'organization_id' => $organizationId,
             'social_conversation_id' => $socialConversationId,
             'agent_deployment_id' => $agentDeploymentId,
+            'platform_message_id' => $platformMessageId,
             'direction' => 'inbound',
             'sender_type' => 'contact',
             'sender_id' => $senderPlatformId,

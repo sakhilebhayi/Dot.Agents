@@ -4,6 +4,7 @@ namespace App\Actions\Social;
 
 use App\Models\SocialAccount;
 use App\Models\SocialConversation;
+use App\Models\SocialMessage;
 use App\Support\TenantContext;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -73,6 +74,13 @@ class ReceiveFacebookWebhookAction
 
     private function recordMessage(SocialAccount $socialAccount, array $messagingEvent, string $senderPlatformId, string $messageText): void
     {
+        // Meta redelivers until it sees a 200, so the same message can arrive more than once.
+        $messageId = $messagingEvent['message']['mid'] ?? null;
+
+        if ($messageId !== null && SocialMessage::where('platform_message_id', $messageId)->exists()) {
+            return;
+        }
+
         $conversation = SocialConversation::withoutGlobalScope('organization')
             ->where('social_account_id', $socialAccount->id)
             ->where('contact_platform_id', $senderPlatformId)
@@ -103,6 +111,7 @@ class ReceiveFacebookWebhookAction
             messageType: $attachments ? 'image' : 'text',
             mediaAttachments: $attachments,
             agentDeploymentId: $socialAccount->agent_deployment_id,
+            platformMessageId: $messageId,
         );
     }
 }

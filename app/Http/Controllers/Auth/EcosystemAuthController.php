@@ -56,6 +56,9 @@ class EcosystemAuthController extends Controller
 
         abort_unless(is_string($token) && $token !== '', 403);
 
+        // A shared browser must not carry the last person's business into this sign-in.
+        $request->session()->forget('current_organization_id');
+
         $user = $this->userFromLocalToken($token);
 
         // Production gives each Dot app its own database, so InfoDot's token is not
