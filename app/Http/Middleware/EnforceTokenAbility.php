@@ -26,7 +26,7 @@ class EnforceTokenAbility
         return match (true) {
             $request->isMethodSafe() => 'read',
             $request->routeIs('api.v1.skill-approvals.*') => 'approve',
-            $request->routeIs('api.v1.deployments.skills.execute') => 'run',
+            $request->routeIs('api.v1.deployments.skills.execute', 'api.v1.runs.*', 'api.v1.workflows.runs.*') => 'run',
             default => 'write',
         };
     }

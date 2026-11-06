@@ -78,7 +78,7 @@ class ToolRuntime
 
         return match ($decision->verdict) {
             GateDecision::ALLOW => $this->execute($run, $effect),
-            GateDecision::ASK => $this->wait($run, $effect, $decision),
+            GateDecision::ASK => $run->is_test ? $this->wouldAsk($run, $effect, $decision) : $this->wait($run, $effect, $decision),
             default => $this->deny($run, $effect, $decision),
         };
     }
@@ -114,6 +114,17 @@ class ToolRuntime
         ]);
 
         return self::WAITING;
+    }
+
+    /** A test never waits for anyone. It records that a person would have been asked, and carries on. */
+    private function wouldAsk(AgentRun $run, AgentEffect $effect, GateDecision $decision): string
+    {
+        $this->journal->write($run, AgentRunStep::APPROVAL, 'A person would be asked here', [
+            'tool_key' => $effect->tool_key,
+            'payload' => ['effect' => $effect->id, 'code' => $decision->code, 'reason' => $decision->reason],
+        ]);
+
+        return $this->execute($run, $effect);
     }
 
     private function deny(AgentRun $run, AgentEffect $effect, GateDecision $decision): string

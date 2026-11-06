@@ -6,6 +6,7 @@ use App\Models\KnowledgeArticle;
 use App\Models\KnowledgeChunk;
 use App\Services\Http\SafeHttp;
 use App\Services\Http\UnsafeUrl;
+use App\Services\Triggers\BusinessEvents;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -18,6 +19,7 @@ class KnowledgeIndexer
         private readonly TextExtractor $extractor,
         private readonly Chunker $chunker,
         private readonly SafeHttp $http,
+        private readonly BusinessEvents $events,
     ) {}
 
     public function index(KnowledgeArticle $article): void
@@ -46,6 +48,8 @@ class KnowledgeIndexer
 
             $article->update(['index_status' => 'indexed', 'index_error' => null, 'indexed_at' => now()]);
         });
+
+        $this->events->raise($article->organization_id, 'knowledge.added', "{$article->id}-{$article->indexed_at?->timestamp}", "The document {$article->title} was added.");
     }
 
     private function text(KnowledgeArticle $article): string

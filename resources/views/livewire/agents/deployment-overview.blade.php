@@ -8,6 +8,7 @@
     <x-slot:actions>
         @can('update', $agent)
             <a class="btn" href="{{ route('agents.setup', $agent) }}">Set up</a>
+            <a class="btn" href="{{ route('agents.test', $agent) }}">Test</a>
             <a class="btn quiet" href="{{ route('agents.export', $agent) }}">Export</a>
             <button type="button" class="btn quiet" wire:click="duplicate">Duplicate</button>
         @endcan
@@ -59,6 +60,7 @@
                 </section>
             @endif
 
+            <livewire:agents.agent-triggers target-type="agent" :target-id="$agent->id" />
             <livewire:agents.agent-versions :deployment-id="$agent->id" />
         </div>
 

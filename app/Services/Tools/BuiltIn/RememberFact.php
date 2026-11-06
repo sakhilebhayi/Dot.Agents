@@ -41,6 +41,11 @@ class RememberFact implements AgentTool
     public function run(ToolContext $context, array $arguments): ToolOutput
     {
         $run = $context->run;
+
+        if ($run->is_test) {
+            return new ToolOutput('[Test run] Nothing was saved.');
+        }
+
         $scan = $this->moderation->scan($arguments['fact']);
 
         if (isset($scan['flags']['secrets'])) {

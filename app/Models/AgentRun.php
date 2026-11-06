@@ -12,7 +12,7 @@ use Illuminate\Support\Str;
 /**
  * One agent doing one thing on one pinned version of its setup.
  *
- * @property array<string, int|float> $limits
+ * @property array<string, int|float|string|null> $limits
  * @property ?string $input
  * @property ?string $output
  * @property Carbon|null $started_at
