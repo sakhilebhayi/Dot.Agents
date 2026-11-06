@@ -72,6 +72,8 @@ Fifteen migrations dated 2026-11-08. About 1,800 lines of old engines removed in
 
 The first deploy moves existing memories to review, and it drops `memory_embeddings`.
 
+The upgrade was rehearsed. A database built by the code that is live today, with its demo seed plus old-shape memories, approvals, audit entries, a webhook and decisions, migrated forward cleanly through all 18 waiting migrations. Memories moved to review, the webhook secret was encrypted, the audit chain sealed and verified, the restore check passed, and 29 main pages answered 200 for a signed-in owner. That database was built locally. It is not a copy of production, so the deploy's rollback copy still matters.
+
 A load test found a real bug: `busy_timeout` was set twice in `config/database.php`, and the second value cancelled the first, so writers failed instead of waiting. Fixed, and transactions now take the write lock at the start.
 
 Laravel Boost stays a development tool only. No change was needed.
