@@ -34,11 +34,11 @@ class ToolPermissionServiceTest extends TestCase
         Cache::flush();
     }
 
-    public function test_tool_is_allowed_by_default_when_no_rules_exist(): void
+    public function test_tool_is_refused_by_default_when_no_rules_exist(): void
     {
         $permitted = $this->service->isToolPermitted($this->deployment, 'financial_reports');
 
-        $this->assertTrue($permitted);
+        $this->assertFalse($permitted);
     }
 
     public function test_org_level_deny_blocks_tool(): void
@@ -94,6 +94,14 @@ class ToolPermissionServiceTest extends TestCase
             'is_active' => true,
         ]);
 
+        AgentToolPermission::create([
+            'organization_id' => $this->organization->id,
+            'agent_deployment_id' => null,
+            'tool_name' => 'hr_data',
+            'permission' => 'allow',
+            'is_active' => true,
+        ]);
+
         Cache::flush();
 
         // Developer should be blocked
@@ -127,13 +135,13 @@ class ToolPermissionServiceTest extends TestCase
             'organization_id' => $this->organization->id,
             'agent_deployment_id' => null,
             'tool_name' => 'some_tool',
-            'permission' => 'deny',
+            'permission' => 'allow',
             'is_active' => false, // inactive
         ]);
 
         Cache::flush();
         $permitted = $this->service->isToolPermitted($this->deployment, 'some_tool');
 
-        $this->assertTrue($permitted);
+        $this->assertFalse($permitted);
     }
 }

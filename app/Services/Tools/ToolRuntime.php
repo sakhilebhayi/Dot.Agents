@@ -2,9 +2,17 @@
 
 namespace App\Services\Tools;
 
+use App\Models\AgentEffect;
 use App\Models\AgentRun;
+use App\Models\AgentRunStep;
+use App\Services\Governance\AuditService;
+use App\Services\Runs\Journal;
+use App\Services\Runs\ToolJournal;
 
-/** Placeholder until the tool layer lands in A4: no agent has tools yet. */
+/**
+ * Between one model turn and the next, this works through what the model asked for, one effect per step. Effects are
+ * planned from the journal, so a worker that dies after the model answered loses nothing.
+ */
 class ToolRuntime
 {
     public const WORKED = 'worked';
@@ -13,17 +21,131 @@ class ToolRuntime
 
     public const NOTHING = 'nothing';
 
-    /** @return list<array{name: string, description: string, schema: array<string, mixed>}> */
+    public function __construct(
+        private readonly ToolCatalogue $catalogue,
+        private readonly ToolGate $gate,
+        private readonly ToolExecutor $executor,
+        private readonly Journal $journal,
+        private readonly ToolJournal $toolJournal,
+        private readonly AuditService $audit,
+    ) {}
+
+    /** @return list<array{name: string, description: string, schema: array<string, mixed>}> What the model is offered. */
     public function definitions(AgentRun $run): array
     {
-        return [];
-    }
+        $offered = [];
 
-    /** @param  list<array{id: string, name: string, arguments: array<string, mixed>}>  $calls */
-    public function plan(AgentRun $run, array $calls): void {}
+        foreach ($this->grants($run) as $key => $grant) {
+            $definition = $this->catalogue->find($run->organization_id, $key)?->definition();
+
+            if ($definition !== null && $this->gate->refused($run, $definition, $grant) === null) {
+                $offered[] = ['name' => $key, 'description' => $definition->description, 'schema' => $definition->schema];
+            }
+        }
+
+        return $offered;
+    }
 
     public function work(AgentRun $run): string
     {
-        return self::NOTHING;
+        $this->planFromJournal($run);
+
+        $effect = AgentEffect::where('agent_run_id', $run->id)
+            ->whereIn('status', [AgentEffect::PLANNED, AgentEffect::APPROVED, AgentEffect::EXECUTING, AgentEffect::UNKNOWN])
+            ->orderBy('id')->first();
+
+        if ($effect === null) {
+            return self::NOTHING;
+        }
+
+        return match ($effect->status) {
+            AgentEffect::PLANNED => $this->decide($run, $effect),
+            AgentEffect::APPROVED => $this->execute($run, $effect),
+            default => $this->reconcile($run, $effect),
+        };
+    }
+
+    private function decide(AgentRun $run, AgentEffect $effect): string
+    {
+        $definition = $this->catalogue->find($run->organization_id, $effect->tool_key)?->definition();
+        $decision = $this->gate->decide($run, $definition, $this->grants($run)[$effect->tool_key] ?? null, $effect->arguments);
+
+        return match ($decision->verdict) {
+            GateDecision::ALLOW => $this->execute($run, $effect),
+            GateDecision::ASK => $this->wait($run, $effect, $decision),
+            default => $this->deny($run, $effect, $decision),
+        };
+    }
+
+    private function execute(AgentRun $run, AgentEffect $effect): string
+    {
+        $tool = $this->catalogue->find($run->organization_id, $effect->tool_key);
+
+        if ($tool === null) {
+            return $this->deny($run, $effect, GateDecision::deny('unknown_tool', 'That tool no longer exists.'));
+        }
+
+        $this->executor->execute($run, $effect, $tool);
+
+        return self::WORKED;
+    }
+
+    private function wait(AgentRun $run, AgentEffect $effect, GateDecision $decision): string
+    {
+        $this->journal->write($run, AgentRunStep::APPROVAL, 'Waiting for a person', [
+            'tool_key' => $effect->tool_key,
+            'status' => 'waiting',
+            'payload' => ['effect' => $effect->id, 'code' => $decision->code, 'reason' => $decision->reason],
+        ]);
+
+        return self::WAITING;
+    }
+
+    private function deny(AgentRun $run, AgentEffect $effect, GateDecision $decision): string
+    {
+        $effect->update(['status' => AgentEffect::DENIED, 'error_code' => $decision->code, 'error_message' => $decision->reason]);
+
+        $this->toolJournal->result($run, $effect, 'A tool call was refused', "Refused: {$decision->reason}", ['error' => true, 'code' => $decision->code]);
+        $this->audit->logAgentAction($run->deployment, 'tool_denied', ['run' => $run->uuid, 'tool' => $effect->tool_key, 'code' => $decision->code]);
+
+        return self::WORKED;
+    }
+
+    /**
+     * An effect left mid-call. What can safely be asked again is asked again. Anything else is never repeated blind:
+     * the model is told it is unknown, and the record stays for a person to check.
+     */
+    private function reconcile(AgentRun $run, AgentEffect $effect): string
+    {
+        $tool = $this->catalogue->find($run->organization_id, $effect->tool_key);
+
+        if ($tool !== null && $tool->definition()->safeToRepeat && $effect->attempts <= $tool->definition()->retries + 1) {
+            return $this->execute($run, $effect);
+        }
+
+        $effect->update(['status' => AgentEffect::UNRESOLVED, 'error_code' => 'outcome_unknown', 'error_message' => 'Whether this happened is not known.']);
+
+        $this->toolJournal->result($run, $effect, 'A tool call has an unknown outcome', 'Whether this happened is not known, and it was not repeated. Do not try it again. Tell the person.', ['error' => true]);
+        $this->audit->logAgentAction($run->deployment, 'tool_outcome_unknown', ['run' => $run->uuid, 'tool' => $effect->tool_key, 'effect' => $effect->id]);
+
+        return self::WORKED;
+    }
+
+    private function planFromJournal(AgentRun $run): void
+    {
+        $turn = AgentRunStep::where('agent_run_id', $run->id)->where('kind', AgentRunStep::MODEL)->where('status', 'done')->orderByDesc('sequence')->first();
+
+        foreach ($turn?->payload['message']['calls'] ?? [] as $call) {
+            AgentEffect::firstOrCreate(
+                ['idempotency_key' => "{$run->uuid}:{$turn->sequence}:{$call['id']}"],
+                ['organization_id' => $run->organization_id, 'agent_run_id' => $run->id, 'call_id' => $call['id'], 'tool_key' => $call['name'], 'arguments' => $call['arguments']],
+            );
+        }
+    }
+
+    /** @return array<string, array{key: string, mode: string}> */
+    private function grants(AgentRun $run): array
+    {
+        return collect($run->configVersion->settings()['tools'])->keyBy('key')->all();
     }
 }

@@ -22,11 +22,12 @@ class RunFinisher
         private readonly UsageLedger $ledger,
         private readonly MemoryService $memory,
         private readonly AuditService $audit,
+        private readonly OutputChannels $channels,
     ) {}
 
     public function complete(AgentRun $run, string $text, bool $cutOff = false): void
     {
-        ['content' => $clean, 'scan' => $scan] = $this->moderation->scanAndRedact($text, ['run_id' => $run->id]);
+        ['content' => $clean, 'scan' => $scan] = $this->moderation->scanAndRedact($this->channels->close($run, $text), ['run_id' => $run->id]);
 
         if ($scan['verdict'] === OutputModerationService::BLOCK) {
             $clean = $this->moderation->blockedResponse();

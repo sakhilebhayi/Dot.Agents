@@ -105,8 +105,6 @@ class RunStepper
         $run->update(['attempt' => 0]);
 
         if ($reply->calls !== []) {
-            $this->tools->plan($run, $reply->calls);
-
             return self::CONTINUE;
         }
 

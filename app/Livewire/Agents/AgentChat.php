@@ -10,7 +10,6 @@ use App\Exceptions\RunRefused;
 use App\Models\AgentDeployment;
 use App\Models\AgentMessage;
 use App\Models\AgentSession;
-use App\Services\Governance\AuditService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
 use Livewire\Attributes\Computed;
@@ -82,14 +81,6 @@ class AgentChat extends Component
         $session = $this->session;
         $userMessage = $this->message;
         $this->message = '';
-
-        // Security check: prompt injection detection
-        $auditService = app(AuditService::class);
-        if ($auditService->detectPromptInjection($userMessage, $deployment)) {
-            $this->dispatch('security-alert', message: 'Suspicious input detected and logged.');
-
-            return;
-        }
 
         // Store user message via Action
         $chatAction = app(StartAgentChatSessionAction::class);

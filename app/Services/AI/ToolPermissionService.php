@@ -6,6 +6,7 @@ use App\Models\AgentDeployment;
 use App\Models\AgentToolPermission;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 /**
  * Tool Permission Service
@@ -18,7 +19,7 @@ use Illuminate\Support\Facades\Log;
  *   2. Org-level DENY         → denied
  *   3. Deployment-level ALLOW → allowed
  *   4. Org-level ALLOW        → allowed
- *   5. No rule found          → default = ALLOW (open by default)
+ *   5. No rule found          → DENY: a tool has to be given, never assumed
  *
  * Role-scoped rules are evaluated if the requesting user has a matching role.
  */
@@ -58,11 +59,22 @@ class ToolPermissionService
         string $toolName,
         ?string $userRole = null
     ): bool {
-        $cacheKey = "tool_perm_{$deployment->id}_{$toolName}_".($userRole ?? 'any');
+        $generation = Cache::get("tool_perm_generation_{$deployment->id}", '0');
+        $cacheKey = "tool_perm_{$generation}_{$deployment->id}_{$toolName}_".($userRole ?? 'any');
 
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($deployment, $toolName, $userRole) {
             return $this->evaluatePermission($deployment, $toolName, $userRole);
         });
+    }
+
+    /** A business can take a tool away from an agent that was given it. Asked of the database, every time. */
+    public function isDenied(AgentDeployment $deployment, string $toolName): bool
+    {
+        return AgentToolPermission::query()
+            ->where('organization_id', $deployment->organization_id)
+            ->where(fn ($query) => $query->whereNull('agent_deployment_id')->orWhere('agent_deployment_id', $deployment->id))
+            ->where('tool_name', $toolName)->whereNull('role_scope')->where('permission', 'deny')->where('is_active', true)
+            ->exists();
     }
 
     /**
@@ -102,8 +114,8 @@ class ToolPermissionService
      */
     public function invalidateCache(int $deploymentId): void
     {
-        // Tags not available with file/array driver — clear all tool_perm_ keys
-        Cache::flush(); // In production this should use Cache::tags(['tool_permissions'])
+        // Rules are few and the cache short, so a generation number retires every key at once.
+        Cache::forever("tool_perm_generation_{$deploymentId}", (string) Str::ulid());
     }
 
     // ─── Private helpers ──────────────────────────────────────────────────────
@@ -154,8 +166,7 @@ class ToolPermissionService
             }
         }
 
-        // No rule found → open by default (tools are allowed unless explicitly denied)
-        return true;
+        return false;
     }
 
     private function ruleApplies(AgentToolPermission $rule, ?string $userRole): bool
