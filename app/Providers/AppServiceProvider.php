@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Http\Middleware\OrganizationContextMiddleware;
 use App\Models\AgentCategory;
 use App\Models\AgentDepartment;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -11,6 +12,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
+use Livewire\Livewire;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -32,6 +34,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Livewire's update route skips page middleware unless told otherwise: a person removed from a business must
+        // lose it on their next click, not their next page load.
+        Livewire::addPersistentMiddleware([OrganizationContextMiddleware::class]);
+
         // Enforce strong password policy platform-wide (min 12 chars, mixed case, numbers, symbols)
         // In testing, use a relaxed rule so test factories and Jetstream tests still pass.
         Password::defaults(function () {

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Support\TenantRules;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ExecuteSkillRequest extends FormRequest
@@ -16,7 +17,7 @@ class ExecuteSkillRequest extends FormRequest
         return [
             'trigger' => ['required', 'string', 'in:on_demand,pre_task,post_task,scheduled,delegated'],
             'input' => ['nullable', 'array'],
-            'task_id' => ['nullable', 'integer', 'exists:agent_tasks,id'],
+            'task_id' => ['nullable', 'integer', TenantRules::exists('agent_tasks')],
             'justification' => ['nullable', 'string', 'max:1000'],
         ];
     }

@@ -5,6 +5,7 @@ namespace App\Actions\Social;
 use App\DTOs\Social\SocialPostData;
 use App\Events\SocialPostScheduled;
 use App\Jobs\PublishSocialPostJob;
+use App\Models\SocialPage;
 use App\Models\SocialPost;
 use App\Services\Governance\AuditService;
 use Illuminate\Support\Facades\Gate;
@@ -18,6 +19,11 @@ class ScheduleSocialPostAction
     public function execute(SocialPostData $data, int $actorId): SocialPost
     {
         Gate::authorize('create', [SocialPost::class, $data->organizationId]);
+
+        // The page id comes from the browser, so it has to be this business's page.
+        SocialPage::withoutGlobalScopes()
+            ->where('organization_id', $data->organizationId)
+            ->findOrFail($data->socialPageId);
 
         $isScheduled = $data->scheduledAt !== null && $data->scheduledAt > now();
         $status = $data->requiresApproval ? 'draft' : ($isScheduled ? 'scheduled' : 'draft');

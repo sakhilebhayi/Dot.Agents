@@ -2,6 +2,7 @@
 
 namespace App\Models\Scopes;
 
+use App\Support\TenantContext;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
@@ -16,20 +17,25 @@ use Illuminate\Database\Eloquent\Scope;
  *
  *   WHERE (organization_id IS NULL OR organization_id = ?)
  *
- * This scope only activates when there is an active org context in the
- * session, keeping admin/artisan/CLI contexts unrestricted.
+ * With no business in context, only the shared rows are visible.
  */
 class SkillOrganizationScope implements Scope
 {
     public function apply(Builder $builder, Model $model): void
     {
-        $orgId = session('current_organization_id');
+        $orgId = TenantContext::id();
 
-        if ($orgId) {
-            $builder->where(function (Builder $q) use ($orgId): void {
-                $q->whereNull('organization_id')
-                    ->orWhere('organization_id', (int) $orgId);
-            });
+        if (TenantContext::isSystem() || ($orgId === null && TenantContext::isLenient())) {
+            return;
         }
+
+        // With no business in context only what is shared with everyone can be seen.
+        $builder->where(function (Builder $q) use ($orgId): void {
+            $q->whereNull('organization_id');
+
+            if ($orgId !== null) {
+                $q->orWhere('organization_id', $orgId);
+            }
+        });
     }
 }

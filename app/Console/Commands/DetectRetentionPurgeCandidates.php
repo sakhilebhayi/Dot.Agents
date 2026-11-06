@@ -9,6 +9,7 @@ use App\Models\AgentTask;
 use App\Models\AuditLog;
 use App\Models\PlatformMegaScorecard;
 use App\Models\RetentionPurgeProposal;
+use App\Support\TenantContext;
 use Illuminate\Console\Command;
 
 /**
@@ -41,6 +42,11 @@ class DetectRetentionPurgeCandidates extends Command
     ];
 
     public function handle(): int
+    {
+        return TenantContext::system(fn () => $this->propose());
+    }
+
+    private function propose(): int
     {
         $proposed = 0;
 

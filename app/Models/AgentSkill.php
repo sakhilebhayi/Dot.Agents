@@ -49,8 +49,10 @@ class AgentSkill extends Model
         'sort_order',
     ];
 
+    protected $hidden = ['webhook_url', 'webhook_headers'];
+
     protected $casts = [
-        'webhook_headers' => 'array',
+        'webhook_headers' => 'encrypted:array',
         'manifest' => 'array',
         'required_permissions' => 'array',
         'required_data_sources' => 'array',

@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Events\SocialPostPublished;
+use App\Models\SocialPage;
 use App\Models\SocialPost;
 use App\Services\Governance\AuditService;
 use App\Services\Social\SocialPublishingService;
@@ -11,6 +12,7 @@ use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Middleware\WithoutOverlapping;
 use Illuminate\Support\Facades\Log;
+use RuntimeException;
 use Throwable;
 
 class PublishSocialPostJob implements ShouldQueue
@@ -37,6 +39,13 @@ class PublishSocialPostJob implements ShouldQueue
     public function handle(SocialPublishingService $publisher, AuditService $auditService): void
     {
         if ($this->post->status === 'published') {
+            return;
+        }
+
+        if (SocialPage::withoutGlobalScopes()->whereKey($this->post->social_page_id)->value('organization_id') !== $this->post->organization_id) {
+            Log::critical('PublishSocialPostJob: post and page belong to different businesses', ['post_id' => $this->post->id]);
+            $this->fail(new RuntimeException('Social post and page belong to different businesses.'));
+
             return;
         }
 

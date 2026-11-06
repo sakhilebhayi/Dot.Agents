@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Models\Organization;
 use App\Services\Governance\DigitalImmuneSystem;
+use App\Support\TenantContext;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\InteractsWithQueue;
@@ -49,7 +50,7 @@ class RunDigitalImmuneSystemCheck implements ShouldQueue
 
     private function runForOrganization(DigitalImmuneSystem $dis, int $orgId): void
     {
-        $report = $dis->runHealthCheck($orgId);
+        $report = TenantContext::forOrganization($orgId, fn () => $dis->runHealthCheck($orgId));
 
         Log::info('[DIS] Health check complete', [
             'organization_id' => $orgId,
