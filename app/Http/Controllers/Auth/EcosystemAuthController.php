@@ -6,6 +6,7 @@ use App\Actions\Ecosystem\ProvisionUserFromInfoDot;
 use App\Actions\Ecosystem\SyncTeamsFromInfoDot;
 use App\Http\Controllers\Auth\Concerns\HandlesEcosystemHandoff;
 use App\Http\Controllers\Controller;
+use App\Http\Middleware\ReverifyWithInfoDot;
 use App\Services\InfoDot\IdentityClient;
 use App\Services\InfoDot\InfoDotUnavailable;
 use Illuminate\Http\RedirectResponse;
@@ -77,6 +78,7 @@ class EcosystemAuthController extends Controller
 
         // Auth::login() also regenerates the session id (no fixation).
         Auth::login($user);
+        $request->session()->put(ReverifyWithInfoDot::VERIFIED_AT, now()->getTimestamp());
 
         return $this->safeRedirect($request->post('redirect')) ?? redirect()->route('dashboard');
     }

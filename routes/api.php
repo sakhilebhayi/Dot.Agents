@@ -15,7 +15,7 @@ Route::get('/health', HealthController::class)->name('api.health');
 
 // All API routes are versioned under /v1 with auth:sanctum + org.context; `writable` refuses
 // every non-GET request from a read-only (viewer) role, whatever abilities its token carries
-Route::prefix('v1')->name('api.v1.')->middleware(['auth:sanctum', 'org.context', 'writable'])->group(function () {
+Route::prefix('v1')->name('api.v1.')->middleware(['auth:sanctum', 'org.context', 'writable', 'token.ability'])->group(function () {
 
     // Authenticated user — only safe, non-sensitive fields returned
     Route::get('/me', fn (Request $request) => response()->json(

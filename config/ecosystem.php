@@ -76,6 +76,16 @@ return [
     | refuses to redeem for a platform it has not marked live.
     */
 
+    /*
+    | InfoDot is the only front door when this is on: the local sign-in, sign-up and recovery pages send people there,
+    | and password posts are refused. On by default in production once this app can redeem InfoDot's tokens, so a host
+    | with no service secret keeps its password sign-in. ECOSYSTEM_SSO_ONLY=false is the way back without a deploy.
+    */
+    'sso_only' => (bool) env('ECOSYSTEM_SSO_ONLY', env('APP_ENV') === 'production' && filled(env('INFODOT_SERVICE_SECRET'))),
+
+    // How long a session lasts before InfoDot is asked again.
+    'reverify_hours' => (int) env('ECOSYSTEM_REVERIFY_HOURS', 12),
+
     'infodot' => [
         'redeem_url' => env('INFODOT_REDEEM_URL', 'https://infodot.co.za/api/ecosystem/redeem'),
         'platform' => env('INFODOT_PLATFORM_KEY', 'agents'),

@@ -118,6 +118,7 @@ class SyncOrganizationsFromInfoDot
             }
 
             $organization->users()->detach($user->id);
+            $user->tokens()->where('organization_id', $organization->id)->delete();
 
             if ((int) session('current_organization_id') === $organization->id) {
                 session()->forget('current_organization_id');

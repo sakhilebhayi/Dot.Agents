@@ -3,6 +3,7 @@
 namespace App\Livewire\Organizations;
 
 use App\Actions\Organizations\RevokeApiTokenAction;
+use App\Models\PersonalAccessToken;
 use App\Services\Governance\AuditService;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
@@ -16,6 +17,11 @@ use Livewire\Component;
  */
 class ApiKeyManager extends Component
 {
+    public const DAYS_VALID = 90;
+
+    /** @var list<string> */
+    public array $newKeyAbilities = ['read'];
+
     public string $newKeyName = '';
 
     public ?string $plainTextToken = null;
@@ -50,13 +56,16 @@ class ApiKeyManager extends Component
         $orgId = session('current_organization_id');
         abort_if(! $orgId, 403, 'No active organization context.');
 
-        // Prefix with org ID for scoping visibility
+        abort_unless(Auth::user()->canInOrganization('api.manage', (int) $orgId), 403);
+
         $tokenName = "org-{$orgId}:{$this->newKeyName}";
 
         $newToken = Auth::user()->createToken(
             $tokenName,
-            ['read', 'write'],
+            array_values(array_intersect($this->newKeyAbilities, array_keys(PersonalAccessToken::ABILITIES))),
+            now()->addDays(self::DAYS_VALID),
         );
+        $newToken->accessToken->forceFill(['organization_id' => (int) $orgId])->save();
 
         $this->plainTextToken = $newToken->plainTextToken;
         $this->newKeyName = '';

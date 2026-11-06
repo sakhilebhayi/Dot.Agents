@@ -3,8 +3,11 @@
 use App\Http\Middleware\BlockWritesForReadOnlyUsers;
 use App\Http\Middleware\ConsentRequiredMiddleware;
 use App\Http\Middleware\CorrelationIdMiddleware;
+use App\Http\Middleware\EnforceTokenAbility;
 use App\Http\Middleware\OrganizationContextMiddleware;
+use App\Http\Middleware\RefuseLocalSignIn;
 use App\Http\Middleware\ResetTenantContext;
+use App\Http\Middleware\ReverifyWithInfoDot;
 use App\Http\Middleware\SecurityHeadersMiddleware;
 use App\Services\Guardian\ErrorCounter;
 use Illuminate\Foundation\Application;
@@ -40,6 +43,9 @@ return Application::configure(basePath: dirname(__DIR__))
         // Custom aliases
         $middleware->alias([
             'org.context' => OrganizationContextMiddleware::class,
+            'token.ability' => EnforceTokenAbility::class,
+            'reverify' => ReverifyWithInfoDot::class,
+            'local.signin' => RefuseLocalSignIn::class,
             'consent.required' => ConsentRequiredMiddleware::class,
             'writable' => BlockWritesForReadOnlyUsers::class,
         ]);
