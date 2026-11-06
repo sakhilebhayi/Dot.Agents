@@ -27,7 +27,7 @@
                 @if($this->agents->isEmpty())
                     <div class="empty">No finished work in this period.</div>
                 @else
-                    <div class="table-scroll">
+                    <div class="table-scroll" tabindex="0" role="region" aria-label="Table, scrolls sideways">
                         <table class="table">
                             <thead><tr><th>Agent</th><th class="right">Runs</th><th class="right">Completed</th><th class="right">Tokens</th><th class="right">Cost</th></tr></thead>
                             <tbody>
@@ -45,7 +45,7 @@
                 @if($this->models->isEmpty())
                     <div class="empty">No model has been called in this period.</div>
                 @else
-                    <div class="table-scroll">
+                    <div class="table-scroll" tabindex="0" role="region" aria-label="Table, scrolls sideways">
                         <table class="table">
                             <thead><tr><th>Model</th><th class="right">Calls</th><th class="right">Tokens in</th><th class="right">Tokens out</th><th class="right">Cost</th></tr></thead>
                             <tbody>

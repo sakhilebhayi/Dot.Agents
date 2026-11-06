@@ -40,7 +40,7 @@
             @if($this->plans->isEmpty())
                 <div class="empty">No plans are currently available.</div>
             @else
-                <div class="table-scroll">
+                <div class="table-scroll" tabindex="0" role="region" aria-label="Table, scrolls sideways">
                     <table class="table wide">
                         <thead>
                             <tr><th>Plan</th><th class="right">A month</th><th class="right">Agents</th><th class="right">Users</th><th class="right">Tokens a month</th><th class="right">Workflows</th><th aria-label="Change plan"></th></tr>
@@ -72,7 +72,7 @@
         @if($this->invoices->isNotEmpty())
             <section class="card" aria-label="Invoice history">
                 <div class="card-head"><h2>Invoice history</h2></div>
-                <div class="table-scroll">
+                <div class="table-scroll" tabindex="0" role="region" aria-label="Table, scrolls sideways">
                     <table class="table wide">
                         <thead>
                             <tr><th>Invoice</th><th>Date</th><th class="right">Amount</th><th>Status</th><th>Action</th></tr>

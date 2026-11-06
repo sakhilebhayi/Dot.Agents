@@ -1,4 +1,4 @@
-<x-sig.page title="Decision log" sub="What people decided about agent work, and why.">
+<x-sig.page title="Decisions" sub="What people decided about agent work, and why.">
     <x-slot:actions>
         <div class="segmented" role="group" aria-label="Period">
             @foreach(['24h' => '24 hours', '7d' => '7 days', '30d' => '30 days', '90d' => '90 days'] as $key => $label)
@@ -40,7 +40,7 @@
         @if($this->decisions->isEmpty())
             <div class="empty">No decision logs in this period.</div>
         @else
-            <div class="table-scroll">
+            <div class="table-scroll" tabindex="0" role="region" aria-label="Table, scrolls sideways">
                 <table class="table wide">
                     <thead>
                         <tr><th>Decision</th><th>Agent</th><th class="right">Risk</th><th class="right">Delusion risk</th><th>Date</th><th aria-label="Open"></th></tr>

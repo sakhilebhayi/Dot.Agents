@@ -39,7 +39,7 @@ class LogAgentPausedAudit implements ShouldQueue
             message: 'The deployment has been paused and will not process new tasks.',
             severity: 'warning',
             data: ['deployment_id' => $deployment->id],
-            actionUrl: "/agents/{$deployment->id}"
+            actionUrl: "/my-agents/{$deployment->id}"
         );
     }
 

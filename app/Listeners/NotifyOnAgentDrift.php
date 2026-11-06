@@ -46,7 +46,7 @@ class NotifyOnAgentDrift implements ShouldQueue
             message: "Drift type '{$event->driftType}' detected. Review agent performance.",
             severity: $severity === 'critical' ? 'error' : 'warning',
             data: array_merge(['deployment_id' => $deployment->id], $event->details),
-            actionUrl: "/agents/{$deployment->id}/scorecard"
+            actionUrl: "/my-agents/{$deployment->id}/scorecard"
         );
 
         // Auto-escalate critical drift: pause the deployment

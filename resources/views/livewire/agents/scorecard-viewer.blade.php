@@ -80,7 +80,7 @@
         @if($this->history->isNotEmpty())
             <section class="card" aria-label="Score history">
                 <div class="card-head"><h2>Score history</h2></div>
-                <div class="table-scroll">
+                <div class="table-scroll" tabindex="0" role="region" aria-label="Table, scrolls sideways">
                     <table class="table score-table">
                         <thead>
                             <tr>

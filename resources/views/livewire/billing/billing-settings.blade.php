@@ -51,7 +51,7 @@
                 </form>
             </div>
             @if($this->invoices->isNotEmpty())
-                <div class="table-scroll">
+                <div class="table-scroll" tabindex="0" role="region" aria-label="Table, scrolls sideways">
                     <table class="table wide">
                         <thead>
                             <tr><th>Date</th><th>Invoice</th><th class="right">Amount</th><th>Status</th><th>PDF</th></tr>

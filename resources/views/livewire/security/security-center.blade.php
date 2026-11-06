@@ -94,7 +94,7 @@
             @if($this->events->isEmpty())
                 <div class="empty">No security events found.</div>
             @else
-                <div class="table-scroll">
+                <div class="table-scroll" tabindex="0" role="region" aria-label="Table, scrolls sideways">
                     <table class="table wide">
                         <thead>
                             <tr><th>Time</th><th>Event</th><th>Severity</th><th>Status</th><th>Action</th></tr>

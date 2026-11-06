@@ -61,7 +61,7 @@ class UpdateReputationOnTaskComplete implements ShouldQueue
                 message: $task->result_summary ? 'Your task has been completed. View the result.' : 'Task completed successfully.',
                 severity: 'info',
                 data: ['task_id' => $task->id, 'deployment_id' => $deployment->id],
-                actionUrl: "/agents/{$deployment->id}"
+                actionUrl: "/my-agents/{$deployment->id}"
             );
         }
     }

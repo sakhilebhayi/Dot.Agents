@@ -2,15 +2,21 @@
 
 namespace Tests\Feature\Agents;
 
+use App\Livewire\Organizations\ApiKeyManager;
+use App\Models\Agent;
 use App\Models\AgentDeployment;
 use App\Models\AgentMemory;
 use App\Models\AuditLog;
 use App\Models\Organization;
+use App\Models\RetentionPurgeProposal;
 use App\Models\User;
+use App\Models\Webhook;
 use App\Services\Governance\AuditChain;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
+use Laravel\Sanctum\Sanctum;
+use Livewire\Livewire;
 use SQLite3;
 use Tests\TestCase;
 
@@ -70,6 +76,20 @@ class ReadinessTest extends TestCase
         DB::table('audit_logs')->where('id', $middle->id)->delete();
 
         $this->artisan('agents:verify-audit')->assertFailed();
+    }
+
+    public function test_an_approved_retention_purge_does_not_read_as_tampering(): void
+    {
+        $first = $this->entry();
+        $this->entry();
+        app(AuditChain::class)->seal();
+        DB::table('audit_logs')->where('id', $first->id)->delete();
+
+        $this->artisan('agents:verify-audit')->assertFailed();
+
+        RetentionPurgeProposal::create(['model_class' => AuditLog::class, 'eligible_count' => 1, 'retention_summary' => 'Old', 'status' => 'approved']);
+
+        $this->artisan('agents:verify-audit')->assertSuccessful();
     }
 
     public function test_new_entries_carry_on_the_chain_across_seals(): void
@@ -179,5 +199,59 @@ class ReadinessTest extends TestCase
     public function test_the_openai_client_is_gone(): void
     {
         $this->assertStringNotContainsString('openai-php', (string) file_get_contents(base_path('composer.json')));
+    }
+
+    public function test_a_backup_with_damaged_pages_fails_the_check(): void
+    {
+        $file = tempnam(sys_get_temp_dir(), 'backup');
+        $database = new SQLite3($file);
+        $database->exec('PRAGMA page_size = 4096');
+        foreach (['migrations', 'users', 'organizations', 'agent_deployments', 'agent_config_versions', 'agent_runs', 'agent_run_steps', 'agent_effects', 'agent_approvals', 'audit_logs'] as $table) {
+            $database->exec("CREATE TABLE {$table} (id INTEGER PRIMARY KEY, input TEXT)");
+        }
+        $database->exec('CREATE TABLE filler (id INTEGER PRIMARY KEY, words TEXT)');
+        $database->exec('CREATE INDEX filler_words ON filler (words)');
+        for ($i = 0; $i < 500; $i++) {
+            $database->exec("INSERT INTO filler (words) VALUES ('".str_repeat('x', 200).$i."')");
+        }
+        $database->close();
+
+        $bytes = file_get_contents($file);
+        file_put_contents($file, substr_replace($bytes, str_repeat("\xFF", 4096), 4096 * 20, 4096));
+
+        $this->artisan('agents:verify-restore', ['file' => $file])->assertFailed();
+        unlink($file);
+    }
+
+    public function test_a_webhook_secret_is_not_stored_in_the_clear(): void
+    {
+        $webhook = Webhook::create(['organization_id' => $this->organization->id, 'created_by' => $this->owner->id, 'name' => 'Out', 'url' => 'https://example.com/hook', 'events' => ['run.finished']]);
+
+        $this->assertNotSame($webhook->secret, DB::table('webhooks')->where('id', $webhook->id)->value('secret'));
+        $this->assertSame(64, strlen($webhook->fresh()->secret));
+    }
+
+    public function test_the_catalogue_api_leaves_out_figures_nobody_measured(): void
+    {
+        $agent = Agent::factory()->create(['status' => 'active', 'avg_rating' => 4.9, 'total_deployments' => 900]);
+        Sanctum::actingAs($this->owner, ['read']);
+
+        $this->getJson("/api/v1/agents/{$agent->getRouteKey()}")->assertOk()->assertJsonMissingPath('avg_rating')->assertJsonMissingPath('total_deployments');
+        $this->getJson('/api/v1/agents')->assertOk()->assertJsonMissingPath('data.0.avg_rating');
+    }
+
+    public function test_api_keys_stay_with_their_business(): void
+    {
+        $other = Organization::factory()->create();
+        $other->users()->attach($this->owner, ['role' => 'owner']);
+        $theirs = $this->owner->createToken('elsewhere', ['read']);
+        $theirs->accessToken->forceFill(['organization_id' => $other->id])->save();
+
+        $page = Livewire::actingAs($this->owner)->test(ApiKeyManager::class);
+
+        $this->assertCount(0, $page->instance()->tokens());
+
+        $page->call('revokeToken', $theirs->accessToken->id);
+        $this->assertSame(1, $this->owner->tokens()->count());
     }
 }

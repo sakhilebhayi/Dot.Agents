@@ -4,7 +4,6 @@ use App\Http\Controllers\Auth\EcosystemAuthController;
 use App\Http\Controllers\BillingController;
 use App\Http\Controllers\CspReportController;
 use App\Http\Controllers\GuardianHealthController;
-use App\Http\Controllers\HealthCheckController;
 use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\PrivacyController;
 use App\Http\Controllers\ReadyController;
@@ -37,14 +36,6 @@ Route::post('/auth/ecosystem', [EcosystemAuthController::class, 'handle'])
 // the visitor is sent to the normal sign-in page and the token in the URL is never read.
 Route::get('/auth/ecosystem', [EcosystemAuthController::class, 'legacy']);
 
-Route::get('/health', [HealthCheckController::class, 'ping'])->name('health.ping');
-
-// Authenticated detailed health report — for internal monitoring dashboards
-
-Route::middleware(['auth:sanctum', config('jetstream.auth_session')])->group(function () {
-    Route::get('/health/detailed', [HealthCheckController::class, 'detailed'])->name('health.detailed');
-});
-
 // Landing page
 
 Route::get('/', function () {
@@ -64,6 +55,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     ->group(function () {
         Route::get('/', fn () => view('consent.show'))->name('show');
         Route::post('/', function () {
+            request()->validate(['accept' => ['accepted']]);
+
             /** @var User $user */
             $user = Auth::user();
             $records = $user->consent_records ?? [];

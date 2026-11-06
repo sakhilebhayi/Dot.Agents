@@ -56,7 +56,7 @@ class UpdateReputationOnTaskFailed implements ShouldQueue
                     'deployment_id' => $deployment->id,
                     'reason' => $event->reason,
                 ],
-                actionUrl: "/agents/{$deployment->id}"
+                actionUrl: "/my-agents/{$deployment->id}"
             );
         }
     }

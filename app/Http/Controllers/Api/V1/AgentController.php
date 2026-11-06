@@ -11,6 +11,9 @@ use Illuminate\Support\Facades\Cache;
 
 class AgentController extends Controller
 {
+    /** Figures that came with the catalogue rows and were never measured. */
+    private const SEEDED = ['accuracy_score', 'reliability_score', 'avg_rating', 'review_count', 'total_deployments', 'pricing_model', 'base_price'];
+
     public function index(Request $request): JsonResponse
     {
         $this->authorize('viewAny', Agent::class);
@@ -37,9 +40,7 @@ class AgentController extends Controller
                 }))
                 ->select([
                     'id', 'uuid', 'name', 'slug', 'tagline', 'avatar', 'version',
-                    'agent_type', 'specialization', 'primary_model', 'status',
-                    'accuracy_score', 'reliability_score', 'avg_rating', 'review_count',
-                    'total_deployments', 'pricing_model', 'base_price', 'is_featured',
+                    'agent_type', 'specialization', 'primary_model', 'status', 'is_featured',
                 ])
                 ->paginate($validated['per_page'] ?? 20);
         });
@@ -55,6 +56,6 @@ class AgentController extends Controller
             return response()->json(['message' => 'Agent not found'], 404);
         }
 
-        return response()->json($agent->load(['category', 'agentDepartment']));
+        return response()->json($agent->load(['category', 'agentDepartment'])->makeHidden(self::SEEDED));
     }
 }

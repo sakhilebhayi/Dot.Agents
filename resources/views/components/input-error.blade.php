@@ -1,5 +1,5 @@
 @props(['for'])
 
 @error($for)
-    <p {{ $attributes->merge(['class' => 'da-error-msg']) }}>{{ $message }}</p>
+    <p {{ $attributes->merge(['class' => 'error']) }} role="alert">{{ $message }}</p>
 @enderror

@@ -2,6 +2,8 @@
 
 namespace App\Services\Governance;
 
+use App\Models\AuditLog;
+use App\Models\RetentionPurgeProposal;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -35,12 +37,16 @@ class AuditChain
     {
         $problems = [];
         $heads = [];
+        $purged = RetentionPurgeProposal::where('model_class', AuditLog::class)->where('status', 'approved')->exists();
 
         foreach (DB::table('audit_logs')->whereNotNull('entry_hash')->orderBy('id')->cursor() as $row) {
             $key = (string) $row->organization_id;
             $head = $heads[$key] ?? null;
 
-            if ($row->previous_hash !== $head) {
+            // An approved retention purge takes the oldest entries, so a business's chain may start part way along.
+            $startsAfterPurge = $purged && $head === null;
+
+            if ($row->previous_hash !== $head && ! $startsAfterPurge) {
                 $problems[] = "An entry before {$row->id} is missing or was changed.";
             }
 

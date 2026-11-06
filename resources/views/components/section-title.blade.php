@@ -1,13 +1,10 @@
-<div class="md:col-span-1 flex justify-between">
-    <div class="px-4 sm:px-0">
-        <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">{{ $title }}</h3>
-
-        <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-            {{ $description }}
-        </p>
+<div class="card-head acct-head">
+    <div>
+        <h2>{{ $title }}</h2>
+        <p class="muted">{{ $description }}</p>
     </div>
 
-    <div class="px-4 sm:px-0">
-        {{ $aside ?? '' }}
-    </div>
+    @isset($aside)
+        <div class="acct-aside">{{ $aside }}</div>
+    @endisset
 </div>

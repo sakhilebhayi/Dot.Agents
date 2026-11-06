@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="robots" content="noindex">
+    <meta name="description" content="Sign in to Dot.Agents, AI agents that stop and ask.">
     <title>{{ $title ?? 'Sign in' }} · Dot.Agents</title>
     <link rel="icon" href="/favicon-32x32.png" sizes="32x32" type="image/png">
     <link rel="icon" href="/favicon-16x16.png" sizes="16x16" type="image/png">

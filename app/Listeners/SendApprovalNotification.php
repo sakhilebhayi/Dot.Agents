@@ -42,7 +42,7 @@ class SendApprovalNotification implements ShouldQueue
             userId: $approver->id,
             organizationId: $approval->organization_id,
             type: 'approval_required',
-            title: "Action Required: {$approval->title}",
+            title: "Needs your answer: {$approval->title}",
             message: $approval->description ?? 'An agent requires your approval to proceed.',
             severity: $approval->risk_level === 'high' ? 'warning' : 'info',
             data: [

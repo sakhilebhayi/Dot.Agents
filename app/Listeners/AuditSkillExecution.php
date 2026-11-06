@@ -62,7 +62,7 @@ class AuditSkillExecution implements ShouldQueue
                     'confidence' => $confidence,
                     'threshold' => $threshold,
                 ],
-                actionUrl: "/agents/{$deployment?->id}/scorecard"
+                actionUrl: "/my-agents/{$deployment?->id}/scorecard"
             );
         }
     }

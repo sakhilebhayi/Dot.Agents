@@ -1,0 +1,50 @@
+/* Your account: the sign-in, device and data sections, and the dialogs they open. See DESIGN.md.
+   Imported before the rules in signal.css, so an override needs a more specific selector. */
+.acct { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--gap); }
+.acct .field { max-width: 440px; }
+.acct .field:last-child { margin-bottom: 0; }
+.acct .tech summary { padding-block: 4px; }
+.acct .tech form { max-width: 520px; }
+.card-head.acct-head { align-items: flex-start; padding-block: 12px; }
+.card-head.acct-head p { margin-top: 2px; font-size: 13px; line-height: 18px; }
+.acct-aside { flex: none; line-height: 20px; }
+.acct-foot { display: flex; flex-direction: row-reverse; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 12px; padding: 12px 16px; border-top: 1px solid var(--rule); }
+.acct-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 16px; }
+.card-body > .acct-actions:first-child { margin-top: 0; }
+.acct .acct-gap { margin-top: 12px; }
+.acct .field.acct-gap { margin-top: 16px; }
+.acct-rows { margin: 12px 0 0; padding: 0; list-style: none; border-block: 1px solid var(--rule); }
+.acct-rows .row { flex-wrap: wrap; gap: 4px 12px; padding-inline: 0; }
+.acct-rows .row-main { flex: 1 1 200px; }
+.acct-qr { width: fit-content; margin-top: 12px; padding: 12px; border-radius: var(--radius); --paper: #fff; background: var(--paper); } /* A scanner needs a light quiet zone in either theme. */
+.acct-qr svg { display: block; max-width: 100%; height: auto; }
+.acct-codes { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 4px 16px; margin-top: 8px; padding: 12px; border-radius: var(--radius); background: var(--raised); font: 13px/20px var(--mono); overflow-wrap: anywhere; }
+.acct-photo { display: block; width: 72px; height: 72px; border-radius: 50%; object-fit: cover; background-position: center; background-repeat: no-repeat; background-size: cover; }
+.acct-link { padding: 0; border: 0; background: none; color: var(--text); font: inherit; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.acct-rule { margin: var(--gap) 0; border: 0; border-top: 1px solid var(--rule); }
+.acct-problems { margin: 4px 0 0; padding: 0 0 0 18px; }
+.acct-banner { align-items: center; justify-content: space-between; margin: 0; border-width: 0 0 1px; border-radius: 0; }
+.acct-banner-text { min-width: 0; overflow-wrap: anywhere; }
+.checkbox { width: 18px; height: 18px; flex: none; accent-color: var(--accent); }
+
+/* Dialogs. They are the only surface here that casts a shadow. */
+.dialog-wrap { position: fixed; inset: 0; z-index: 60; display: flex; align-items: flex-start; justify-content: center; padding: 72px 16px 16px; overflow-y: auto; }
+.dialog { position: relative; z-index: 41; width: 100%; max-width: 560px; box-shadow: 0 12px 28px rgb(0 0 0 / 0.3); }
+.dialog.is-sm { max-width: 384px; }
+.dialog.is-md { max-width: 448px; }
+.dialog.is-lg { max-width: 512px; }
+.dialog.is-xl { max-width: 576px; }
+.dialog.is-2xl { max-width: 640px; }
+.dialog-foot { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; padding: 12px 16px; border-top: 1px solid var(--rule); }
+
+/* Phones: every control is a 44px target */
+@media (max-width: 720px), (pointer: coarse) {
+    .acct, .acct-banner { --control-h: 44px; }
+    .acct .field { max-width: none; }
+    .acct .tech summary { padding-block: 12px; }
+    .acct-actions .btn, .acct-foot .btn, .dialog-foot .btn, .acct form > .btn { width: 100%; }
+    .acct-actions > span { display: block; width: 100%; }
+    .acct-link { min-height: 44px; }
+    .acct-rows .row { padding-block: 8px; }
+    .dialog-wrap { padding-top: 16px; }
+}

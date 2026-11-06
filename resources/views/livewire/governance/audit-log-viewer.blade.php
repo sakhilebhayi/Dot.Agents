@@ -63,7 +63,7 @@
         @if($this->logs->isEmpty())
             <div class="empty">No audit log entries found matching your filters.</div>
         @else
-            <div class="table-scroll">
+            <div class="table-scroll" tabindex="0" role="region" aria-label="Table, scrolls sideways">
                 <table class="table wide">
                     <thead>
                         <tr><th>Time</th><th>Event</th><th>Actor</th><th>Category</th><th>Risk</th><th>Status</th></tr>

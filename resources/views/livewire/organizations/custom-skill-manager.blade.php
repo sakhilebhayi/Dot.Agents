@@ -1,4 +1,4 @@
-<x-sig.page title="Custom skills" sub="Add your own API or automation as a skill. Your code stays on your own server, and Dot.Agents calls it by web address." narrow>
+<x-sig.page title="Custom tools" sub="Add your own API or automation as a skill. Your code stays on your own server, and Dot.Agents calls it by web address." narrow>
     <x-slot:actions>
         @writable
             @if(! $showForm)

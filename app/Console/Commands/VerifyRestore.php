@@ -61,7 +61,7 @@ class VerifyRestore extends Command
             if ((int) @$database->querySingle("SELECT count(*) FROM sqlite_master WHERE type='table' AND name='{$table}'") === 0) {
                 $problems[] = "The table {$table} is missing.";
             } else {
-                $this->line("{$table}: ".$database->querySingle("SELECT count(*) FROM {$table}"));
+                $this->line("{$table}: ".@$database->querySingle("SELECT count(*) FROM {$table}"));
             }
         }
 
@@ -72,7 +72,7 @@ class VerifyRestore extends Command
     private function readable(SQLite3 $database): array
     {
         $table = (int) @$database->querySingle("SELECT count(*) FROM sqlite_master WHERE type='table' AND name='agent_runs'");
-        $sample = $table === 0 ? null : $database->querySingle('SELECT input FROM agent_runs WHERE input IS NOT NULL ORDER BY id DESC LIMIT 1');
+        $sample = $table === 0 ? null : @$database->querySingle('SELECT input FROM agent_runs WHERE input IS NOT NULL ORDER BY id DESC LIMIT 1');
 
         if (! is_string($sample)) {
             return [];
