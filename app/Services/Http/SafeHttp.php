@@ -2,6 +2,7 @@
 
 namespace App\Services\Http;
 
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 
@@ -21,6 +22,7 @@ class SafeHttp
      * @param  array<string, mixed>|null  $json
      *
      * @throws UnsafeUrl
+     * @throws ConnectionException
      */
     public function send(string $method, string $url, array $headers, ?array $json, int $timeout): Response
     {

@@ -52,6 +52,7 @@ class AgentMemory extends Model
         });
     }
 
+    /** @return BelongsTo<AgentDeployment, $this> */
     public function deployment(): BelongsTo
     {
         return $this->belongsTo(AgentDeployment::class, 'agent_deployment_id');
