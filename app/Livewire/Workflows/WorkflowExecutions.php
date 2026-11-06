@@ -11,6 +11,7 @@ use Livewire\Attributes\Locked;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
+/** @property-read ?WorkflowExecution $execution */
 class WorkflowExecutions extends Component
 {
     public const READ_ONLY_ACTIONS = ['open', 'openStep', 'refresh'];

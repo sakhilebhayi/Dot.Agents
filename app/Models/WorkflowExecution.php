@@ -47,6 +47,7 @@ class WorkflowExecution extends Model
         return $this->hasMany(WorkflowStep::class);
     }
 
+    /** @return BelongsTo<AgentWorkflow, $this> */
     public function workflow(): BelongsTo
     {
         return $this->belongsTo(AgentWorkflow::class);

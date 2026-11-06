@@ -20,7 +20,7 @@ class AgentTeams extends Component
 
     public ?int $supervisorId = null;
 
-    /** @var array<int, array{on: bool, responsibility: string}> */
+    /** @var array<int, array<string, mixed>> */
     public array $members = [];
 
     #[Computed]
