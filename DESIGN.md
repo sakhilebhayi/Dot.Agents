@@ -110,6 +110,8 @@ Flat. One 1px line or one tone step. Only sheets and dialogs cast a shadow.
 - **Card for approval:** rendered by the system from typed arguments. Model text is labelled as model text and sits apart.
 
 - **Public pages:** the landing page, sign-in and legal pages share the same ground, ink and gold in `resources/css/landing.css`. A public page may set type larger than the app, up to 112px on the one headline, and body text at 16 to 21px. Its signature is the line with a held stop: a run that waits until the visitor answers, labelled as an example.
+- **Arrival:** the head of the first signed-in page, where a person lands from InfoDot. The original logo file at its own colours (the light-ink file on the dark theme, the dark-ink file on the light theme), a welcome made from the person's first name, the business and their role, one headline, one sentence, and the only large button in the app: 46px, gold, one per state, marked `data-primary-action`. The headline is the one signed-in title allowed above 24px (30px, 26px on a phone). Beside it sits one real run drawn as the line, upright; with no run it says so. Links back to InfoDot and to its Platforms page sit opposite the logo. The head enters once, 360ms, and not at all under reduced motion.
+- **Tally:** figures that belong together are rows on rules, a label left and a mono figure right. Never a grid of equal tiles.
 - **Invitation, account and business pages:** rows, cards and the same lamps. A dialog is a card with one shadow.
 
 ## Do's and Don'ts

@@ -435,3 +435,69 @@ a.row:hover, button.row:hover { background: var(--raised); }
 .defs { display: grid; gap: 2px; margin: 0; font-size: 13px; }
 .defs dt { font-weight: 500; }
 .defs dd { margin: 0 0 8px; color: var(--muted); }
+
+/* The arrival: where a person lands from InfoDot. The logo, a welcome, one headline, one action, and the latest run. */
+.arrive { margin-bottom: var(--pad); padding-bottom: var(--pad); border-bottom: 1px solid var(--border); }
+.arrive-top { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--gap); }
+/* The logo file carries its own clear space. The negative margins set its artwork on the page's left edge. */
+.arrive-logo { display: block; margin: -20px 0 -6px -19px; }
+.arrive-logo img { display: block; width: auto; height: 120px; }
+.arrive-logo .on-light, :root[data-theme='light'] .arrive-logo .on-dark { display: none; }
+:root[data-theme='light'] .arrive-logo .on-light { display: block; }
+.arrive-back, .arrive-more { display: flex; flex-wrap: wrap; gap: 4px 20px; }
+.arrive-back a, .arrive-more a { display: inline-flex; align-items: center; min-height: 28px; color: var(--muted); text-decoration: underline; text-decoration-color: var(--control); text-underline-offset: 4px; transition: color 120ms var(--ease); }
+.arrive-back a:hover, .arrive-more a:hover { color: var(--text); text-decoration-color: currentColor; }
+.arrive-body { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: var(--pad) 48px; align-items: start; }
+.arrive-lead { min-width: 0; }
+.arrive-welcome { color: var(--muted); font-size: 15px; line-height: 22px; }
+.arrive h1 { margin-top: 8px; max-width: 22ch; font-size: 30px; line-height: 36px; font-weight: 600; letter-spacing: -0.015em; text-wrap: balance; overflow-wrap: break-word; }
+.arrive-what { margin-top: 12px; max-width: 58ch; color: var(--muted); font-size: 16px; line-height: 24px; }
+.arrive-act { display: flex; align-items: center; gap: 12px 20px; margin-top: var(--pad); }
+.btn.lead { flex: none; height: 46px; padding: 0 22px; font-size: 15px; }
+.arrive-why { max-width: 46ch; font-size: 13px; line-height: 18px; }
+.arrive-more { margin-top: var(--gap); }
+.arrive-run .card-body { display: grid; gap: 12px; justify-items: start; }
+.arrive-run-what b { display: block; font-weight: 500; overflow-wrap: anywhere; }
+.arrive-run-what span { display: block; color: var(--muted); font-size: 12px; line-height: 16px; }
+.arrive-run .small-note { padding-top: 0; }
+
+/* The line, upright at every width: the same drawing a phone gets. */
+.line.upright { flex-direction: column; overflow: visible; width: 100%; padding-bottom: 0; }
+.upright .stop-point { flex: none; width: 100%; min-width: 0; padding: 0 0 14px 22px; }
+.upright .stop-point::before { top: 0; bottom: 0; left: 5px; right: auto; width: 2px; height: auto; }
+.upright .stop-point:last-child { padding-bottom: 0; }
+.upright .stop-point:last-child::before { display: none; }
+.upright .stop-point b { white-space: normal; }
+
+/* The board under the arrival keeps to the width it is given. */
+.board > .grid { grid-template-columns: minmax(0, 1fr); min-width: 0; }
+.card-head.wraps { flex-wrap: wrap; padding-block: 6px; }
+
+/* Figures as rows: a label and a figure on a rule. */
+.tally { display: grid; margin: 0; }
+.tally > div { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: var(--row); padding: 0 16px; border-top: 1px solid var(--rule); }
+.tally > div:first-child { border-top: 0; }
+.tally dt { color: var(--muted); }
+.tally dd { margin: 0; font-size: 15px; font-weight: 500; }
+
+@media (prefers-reduced-motion: no-preference) {
+    .arrive-lead h1, .arrive-lead .arrive-what, .arrive-act { animation: arrive 360ms var(--ease) backwards; }
+    .arrive-act { animation-delay: 70ms; }
+    @keyframes arrive { from { opacity: 0; transform: translateY(8px); } }
+}
+
+@media (max-width: 960px) {
+    .arrive-body { grid-template-columns: minmax(0, 1fr); }
+    .arrive-logo { margin: -16px 0 -4px -15px; }
+    .arrive-logo img { height: 96px; }
+    .arrive h1 { font-size: 26px; line-height: 32px; }
+    .arrive-act { flex-direction: column; align-items: stretch; }
+    .btn.lead { width: 100%; }
+    .arrive-back a, .arrive-more a { min-height: 44px; }
+    .arrive-run .btn.small, .segmented .btn.small { height: 44px; padding: 0 12px; }
+    .star { width: 44px; height: 44px; margin-left: -14px; }
+    .board .card-head .btn.small { height: 44px; padding: 0 12px; margin-right: -12px; }
+    .board a.row-main { display: flex; flex-direction: column; justify-content: center; min-height: 44px; }
+    .board .row { flex-wrap: wrap; }
+    .board .row-main { flex-basis: 60%; }
+}

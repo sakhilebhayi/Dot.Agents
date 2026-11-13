@@ -2,18 +2,66 @@
     $definitions = \App\Services\Insights\RunMetrics::DEFINITIONS;
     $peak = max(1, collect($this->daily)->max(fn ($day) => $day['completed'] + $day['failed']));
     $seconds = $this->summary['duration'];
+    $arrival = $this->arrival;
+    $featured = $this->featured;
+    $infodot = rtrim((string) config('ecosystem.platforms.infodot.url', 'https://infodot.co.za'), '/');
 @endphp
 
-<x-sig.page title="Command centre" sub="What needs you, what is under way, and how the work has gone.">
-    <x-slot:actions>
-        <div class="segmented" role="group" aria-label="Period">
-            @foreach(['24h' => '24 hours', '7d' => '7 days', '30d' => '30 days'] as $value => $label)
-                <button type="button" class="btn small {{ $timeframe === $value ? 'is-on' : 'quiet' }}" wire:click="setTimeframe('{{ $value }}')" aria-pressed="{{ $timeframe === $value ? 'true' : 'false' }}">{{ $label }}</button>
-            @endforeach
+<div class="page">
+    <section class="arrive" aria-labelledby="arrive-title">
+        <div class="arrive-top">
+            <span class="arrive-logo">
+                <img class="on-dark" src="{{ asset('dot.logos3-light.png') }}" alt="Dot.Agents" width="1181" height="886">
+                <img class="on-light" src="{{ asset('coming-soon/dot.logos3.png') }}" alt="Dot.Agents" width="1181" height="886">
+            </span>
+            <nav class="arrive-back" aria-label="Dot ecosystem">
+                <a href="{{ $infodot }}/home">InfoDot</a>
+                <a href="{{ $infodot }}/platforms">Platforms</a>
+            </nav>
         </div>
-    </x-slot:actions>
 
-    <div class="grid two" wire:poll.30s>
+        <div class="arrive-body">
+            <div class="arrive-lead">
+                <p class="arrive-welcome" data-welcome>{{ $arrival['welcome'] }}</p>
+                <h1 id="arrive-title">Agents do the work. You make the decisions.</h1>
+                <p class="arrive-what">Set up an agent for a job, follow every step it takes, and answer when it stops to ask for approval.</p>
+                <div class="arrive-act">
+                    <a class="btn primary lead" href="{{ $arrival['href'] }}" data-primary-action data-state="{{ $arrival['state'] }}">{{ $arrival['label'] }}</a>
+                    <p class="arrive-why">{{ $arrival['reason'] }}</p>
+                </div>
+                @if($arrival['more'] !== [])
+                    <nav class="arrive-more" aria-label="Also here">
+                        @foreach($arrival['more'] as [$label, $href])<a href="{{ $href }}">{{ $label }}</a>@endforeach
+                    </nav>
+                @endif
+            </div>
+
+            @if($featured)
+                <section class="card arrive-run" aria-label="{{ $featured['run']->status === \App\Models\AgentRun::WAITING_APPROVAL ? 'The run that is waiting' : 'The latest run' }}" data-featured-run>
+                    <div class="card-head">
+                        <h2>{{ $featured['run']->status === \App\Models\AgentRun::WAITING_APPROVAL ? 'The run that is waiting' : 'The latest run' }}</h2>
+                        <x-sig.lamp :state="$featured['run']->status" />
+                    </div>
+                    <div class="card-body">
+                        <p class="arrive-run-what"><b>{{ $featured['run']->summary ?: 'Untitled work' }}</b><span>{{ $featured['run']->deployment?->name }}, {{ $featured['run']->created_at->diffForHumans() }}</span></p>
+                        @if($featured['stops'] !== [])
+                            <x-sig.line :stops="$featured['stops']" class="upright" aria-label="The last steps of this run" />
+                            @if($featured['total'] > count($featured['stops']))<p class="muted small-note">The last {{ count($featured['stops']) }} of {{ $featured['total'] }} steps.</p>@endif
+                        @else
+                            <p class="muted">No step has been written down for this run yet.</p>
+                        @endif
+                        <a class="btn small" href="{{ route('runs.show', $featured['run']) }}">Open this run</a>
+                    </div>
+                </section>
+            @else
+                <section class="card arrive-run" aria-label="The latest run" data-no-run>
+                    <div class="empty"><b>No run yet.</b> The first piece of work an agent does is drawn here, step by step.</div>
+                </section>
+            @endif
+        </div>
+    </section>
+
+    <div class="grid two board" wire:poll.30s>
         <div class="grid">
             @if($this->approvals->isNotEmpty() || $this->failures->isNotEmpty())
                 <section class="card" aria-label="Needs you">
@@ -81,12 +129,21 @@
         </div>
 
         <div class="grid">
-            <div class="stats side-stats">
-                <div class="stat" title="{{ $definitions['finished'] }}"><span>Finished</span><b>{{ number_format($this->summary['finished']) }}</b></div>
-                <div class="stat" title="{{ $definitions['rate'] }}"><span>Completed</span><b>{{ $this->summary['rate'] === null ? '–' : $this->summary['rate'].'%' }}</b></div>
-                <div class="stat" title="{{ $definitions['cost'] }}"><span>Cost</span><b>{{ number_format($this->summary['cost'], 2) }}</b></div>
-                <div class="stat" title="{{ $definitions['duration'] }}"><span>Average time</span><b>{{ $seconds === null ? '–' : ($seconds >= 60 ? round($seconds / 60, 1).' min' : $seconds.' s') }}</b></div>
-            </div>
+            <section class="card" aria-label="How the work has gone">
+                <div class="card-head wraps"><h2>How the work has gone</h2>
+                    <div class="segmented" role="group" aria-label="Period">
+                        @foreach(['24h' => '24 hours', '7d' => '7 days', '30d' => '30 days'] as $value => $label)
+                            <button type="button" class="btn small {{ $timeframe === $value ? 'is-on' : 'quiet' }}" wire:click="setTimeframe('{{ $value }}')" aria-pressed="{{ $timeframe === $value ? 'true' : 'false' }}">{{ $label }}</button>
+                        @endforeach
+                    </div>
+                </div>
+                <dl class="tally">
+                    <div title="{{ $definitions['finished'] }}"><dt>Finished</dt><dd class="num" data-figure="finished">{{ number_format($this->summary['finished']) }}</dd></div>
+                    <div title="{{ $definitions['rate'] }}"><dt>Completed</dt><dd class="num" data-figure="rate">{{ $this->summary['rate'] === null ? '–' : $this->summary['rate'].'%' }}</dd></div>
+                    <div title="{{ $definitions['cost'] }}"><dt>Cost</dt><dd class="num" data-figure="cost">{{ number_format($this->summary['cost'], 2) }}</dd></div>
+                    <div title="{{ $definitions['duration'] }}"><dt>Average time</dt><dd class="num" data-figure="duration">{{ $seconds === null ? '–' : ($seconds >= 60 ? round($seconds / 60, 1).' min' : $seconds.' s') }}</dd></div>
+                </dl>
+            </section>
             @if($this->summary['unpriced'] > 0)
                 <p class="muted small-note"><a href="{{ route('usage') }}">Cost is missing {{ $this->summary['unpriced'] }} {{ Str::plural('call', $this->summary['unpriced']) }}</a> with no price on file.</p>
             @endif
@@ -102,9 +159,9 @@
                         <x-sig.lamp :state="$agent->status" class="desk-lamp" />
                     </div>
                 @empty
-                    <div class="empty"><b>No agents yet.</b> <a class="btn small" href="{{ route('agents.create') }}">New agent</a></div>
+                    <div class="empty"><b>None of your own yet.</b> Agents you own, star or start work with are kept here.</div>
                 @endforelse
             </section>
         </div>
     </div>
-</x-sig.page>
+</div>
