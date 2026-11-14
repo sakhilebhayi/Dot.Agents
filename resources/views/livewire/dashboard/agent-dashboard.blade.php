@@ -1,6 +1,9 @@
 @php
     $definitions = \App\Services\Insights\RunMetrics::DEFINITIONS;
-    $peak = max(1, collect($this->daily)->max(fn ($day) => $day['completed'] + $day['failed']));
+    $daily = collect($this->daily);
+    $peak = max(1, $daily->max(fn ($day) => $day['completed'] + $day['failed']));
+    $busiest = $daily->sortByDesc(fn ($day) => $day['completed'] + $day['failed'])->first();
+    $busiestTotal = $busiest ? $busiest['completed'] + $busiest['failed'] : 0;
     $seconds = $this->summary['duration'];
     $delay = $this->summary['approval_delay'];
     $arrival = $this->arrival;
@@ -19,6 +22,20 @@
                 <img class="on-dark" src="{{ asset('dot.logos3-light.png') }}" alt="Dot.Agents" width="1181" height="886">
                 <img class="on-light" src="{{ asset('coming-soon/dot.logos3.png') }}" alt="Dot.Agents" width="1181" height="886">
             </span>
+            @unless($none)
+                @php
+                    $held = $this->approvals->count();
+                    $failed = $this->failures->count();
+                    $going = $this->running->count() + $this->workflows->count();
+                    $lamps = fn (int $n) => min($n, 8);
+                @endphp
+                {{-- A strip of the platform's own lamp shapes, one lamp per real item (at most eight a kind). Every count is also written as words, so the shapes are decoration. --}}
+                <p class="board-strip" data-board>
+                    <span class="bs held" @if($held === 0) data-zero @endif><span class="bs-lamps" aria-hidden="true">@for($i = 0; $i < $lamps($held); $i++)<i style="--i: {{ $i }}"></i>@endfor</span>{{ $held }} held</span>
+                    <span class="bs failed" @if($failed === 0) data-zero @endif><span class="bs-lamps" aria-hidden="true">@for($i = 0; $i < $lamps($failed); $i++)<i style="--i: {{ $i }}"></i>@endfor</span>{{ $failed }} failed today</span>
+                    <span class="bs going" @if($going === 0) data-zero @endif><span class="bs-lamps" aria-hidden="true">@for($i = 0; $i < $lamps($going); $i++)<i style="--i: {{ $i }}"></i>@endfor</span>{{ $going }} under way</span>
+                </p>
+            @endunless
         </div>
 
         <div class="arrive-body">
@@ -153,6 +170,7 @@
                 <header class="sec-head"><h2>The last two weeks</h2>
                     <span class="legend"><i class="done"></i>Completed <i class="bad"></i>Failed</span>
                 </header>
+                <p class="chart-peak" data-busiest>@if($busiestTotal > 0)Busiest day {{ $busiest['day'] }}: {{ $busiestTotal }} {{ Str::plural('run', $busiestTotal) }}@else No finished runs in these days.@endif</p>
                 <div class="bars" role="img" aria-label="Completed and failed work each day. The table below has the same figures.">
                     @foreach($this->daily as $day)
                         <div class="bar" style="--i: {{ $loop->index }}" title="{{ $day['day'] }}: {{ $day['completed'] }} completed, {{ $day['failed'] }} failed">
@@ -161,6 +179,7 @@
                         </div>
                     @endforeach
                 </div>
+                <p class="chart-axis" aria-hidden="true"><span>{{ $daily->first()['day'] ?? '' }}</span><span>Today</span></p>
                 <details class="tech"><summary>See the figures</summary>
                     <table class="table"><thead><tr><th>Day</th><th class="right">Completed</th><th class="right">Failed</th></tr></thead><tbody>
                         @foreach($this->daily as $day)<tr><td>{{ $day['day'] }}</td><td class="right num">{{ $day['completed'] }}</td><td class="right num">{{ $day['failed'] }}</td></tr>@endforeach

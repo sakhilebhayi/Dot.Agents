@@ -260,4 +260,29 @@ class CommandCentreDashboardTest extends TestCase
         $this->assertStringNotContainsString(' onclick=', $main);
         $this->assertSame(0, preg_match('/<script/', $main));
     }
+
+    public function test_the_lamp_strip_counts_only_this_businesss_records_and_the_chart_names_its_busiest_day(): void
+    {
+        $agent = $this->agent();
+        $this->hold($agent);
+        $this->work($agent, AgentRun::FAILED, ['finished_at' => now()->subHour(), 'error_message' => 'x']);
+        $this->work($agent, AgentRun::COMPLETED);
+        $other = Organization::factory()->create();
+        $theirs = $this->agent('Their agent', $other);
+        $this->hold($theirs, 'Their hold');
+        $this->work($theirs, AgentRun::FAILED, ['finished_at' => now()->subHour(), 'error_message' => 'y']);
+
+        $html = $this->page($this->member(OrgRoles::OWNER))->getContent();
+
+        $this->assertSame(1, preg_match('/data-board>(.*?)<\/p>/s', $html, $strip));
+        $this->assertStringContainsString('1 held', $strip[1]);
+        $this->assertStringContainsString('1 failed today', $strip[1]);
+        $this->assertSame(1, preg_match('/data-busiest>(.*?)<\/p>/s', $html, $busiest));
+        $this->assertStringContainsString('2 runs', strip_tags($busiest[1]));
+    }
+
+    public function test_the_lamp_strip_is_absent_while_there_are_no_agents(): void
+    {
+        $this->page($this->member(OrgRoles::OWNER))->assertDontSee('data-board', false);
+    }
 }
