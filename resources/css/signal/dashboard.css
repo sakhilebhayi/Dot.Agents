@@ -1,0 +1,155 @@
+/* The command centre (R-51). Sections are headed rows on 1px rules, not cards. Scale: space 4/8/12/16/24/48, radius 6
+   for controls and circles for lamps, type 12/13/14/16 with a 28 headline (24 on a phone), figures in mono. */
+.dash { --row-2: 52px; }
+.dash h1, .dash h2 { margin: 0; }
+.btn.lead { flex: none; height: 46px; padding: 0 20px; font-size: 15px; }
+
+/* The arrival: one band. */
+.arrive { position: relative; display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: var(--pad) 48px; padding-bottom: var(--pad); border-bottom: 1px solid var(--border); }
+.arrive-head { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; gap: var(--gap); }
+.arrive-body { display: contents; }
+.board-strip { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 4px 24px; margin: 0; color: var(--muted); font-size: 13px; }
+.bs { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+.bs-lamps { display: inline-flex; gap: 4px; align-items: center; }
+.bs-lamps i { display: block; width: 8px; height: 8px; border-radius: 50%; background: var(--running); }
+.bs.held .bs-lamps i { width: 9px; height: 9px; border-radius: 1px; rotate: 45deg; background: var(--hold); }
+.bs.failed .bs-lamps i { border-radius: 1px; background: var(--stop); }
+.bs[data-zero] { color: var(--muted); }
+.bs:not([data-zero]).held { color: var(--text); }
+.arrive-logo { display: block; margin-left: -10px; }
+.arrive-logo img { display: block; width: auto; height: 64px; }
+.arrive-logo .on-light, :root[data-theme='light'] .arrive-logo .on-dark { display: none; }
+:root[data-theme='light'] .arrive-logo .on-light { display: block; }
+.arrive-lead { min-width: 0; grid-column: 1; }
+.arrive-welcome { color: var(--muted); }
+.arrive h1 { margin-top: 6px; max-width: 26ch; font-size: 28px; line-height: 34px; font-weight: 600; letter-spacing: -0.015em; text-wrap: balance; overflow-wrap: break-word; }
+.arrive-act { display: flex; align-items: center; gap: 12px 20px; margin-top: var(--gap); }
+.arrive-why { max-width: 46ch; color: var(--muted); font-size: 13px; line-height: 18px; }
+.arrive-more { display: flex; flex-wrap: wrap; gap: 4px 20px; margin-top: 12px; }
+.arrive-more a { display: inline-flex; align-items: center; min-height: 28px; color: var(--muted); text-decoration: underline; text-decoration-color: var(--control); text-underline-offset: 4px; transition: color 120ms var(--ease); }
+.arrive-more a:hover { color: var(--text); text-decoration-color: currentColor; }
+.arrive-run { grid-column: 2; grid-row: 2; min-width: 0; display: grid; gap: 8px; justify-items: start; align-content: start; }
+.arrive-run .sec-head { width: 100%; border-bottom: 0; }
+.arrive-run-what b { display: block; font-weight: 500; overflow-wrap: anywhere; }
+.arrive-run-what span { display: block; color: var(--muted); font-size: 12px; line-height: 16px; }
+.arrive-run .small-note { padding-top: 0; }
+.empty-line { padding: 16px 4px; color: var(--muted); }
+.empty-line b { color: var(--text); font-weight: 500; }
+.calm { margin-bottom: 28px; padding: 12px 4px; border-bottom: 1px solid var(--rule); color: var(--muted); }
+
+/* The rail: a drawing made of the platform's own stops, along the foot of the arrival. */
+.rail { grid-column: 1 / -1; display: block; width: 100%; height: 20px; margin-bottom: -10px; }
+.rail-line { stroke: var(--control); stroke-width: 2; }
+.rail-stop.done { fill: var(--clear); }
+.rail-stop.off { fill: var(--ground); stroke: var(--control); stroke-width: 1.5; }
+.rail-stop.held { fill: var(--hold); }
+
+/* Headed sections and rows */
+.sec { margin-bottom: 28px; }
+.sec-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 30px; border-bottom: 1px solid var(--border); }
+.sec-head h2 { font-size: 14px; line-height: 20px; font-weight: 600; }
+.sec-head .n { margin-left: 8px; color: var(--muted); font-size: 12px; font-weight: 500; }
+.desk-grid { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(280px, 1fr); gap: 0 48px; padding-top: var(--pad); }
+.desk-grid.single { grid-template-columns: minmax(0, 1fr); max-width: 520px; }
+.col { min-width: 0; }
+.dash .row { position: relative; min-height: var(--row); padding: 6px 4px; border-top: 0; border-bottom: 1px solid var(--rule); transition: background 120ms var(--ease); }
+.dash .row.two { min-height: var(--row-2); }
+.dash a.row:hover { background: var(--raised); }
+.dash .row[aria-current='true'] { background: var(--raised); box-shadow: inset 1px 0 0 var(--accent); }
+.row-age { flex: none; color: var(--muted); font-size: 13px; white-space: nowrap; }
+.dash .segmented .btn { border-color: transparent; }
+.dash .segmented .btn.is-on { border-color: var(--control); }
+.facts { margin: 0; }
+.fig dt { flex: 1; color: var(--muted); }
+.fig dd { margin: 0; font-size: 15px; font-weight: 500; }
+.dash .meter { height: 4px; margin: 4px 4px 12px; overflow: hidden; border-radius: 2px; background: var(--raised); }
+.meter i { display: block; width: 100%; height: 100%; background: var(--clear); transform-origin: left; }
+.meter.warn i { background: var(--hold); }
+.dash .small-note { padding: 0 4px 8px; font-size: 12px; line-height: 16px; }
+.dash .legend i { margin-left: 0; }
+.dash .legend i.bad { margin-left: 8px; }
+.dash .bars { height: 84px; padding: 12px 4px 0; gap: 4px; border-bottom: 1px solid var(--rule); }
+.dash .bar { border-bottom: 0; }
+.dash .bar i { border-radius: 0; }
+.chart-peak { margin: 0; padding: 8px 4px 0; color: var(--muted); font-size: 12px; line-height: 16px; }
+.chart-axis { display: flex; justify-content: space-between; margin: 0; padding: 4px 4px 0; color: var(--muted); font-size: 11px; line-height: 14px; }
+.dash .tech { padding: 0 4px; }
+.dash .tech summary { min-height: 28px; display: flex; align-items: center; }
+
+/* The agents table: the whole name cell is the link; the star is its own control. */
+.roster { width: 100%; border-collapse: collapse; }
+.roster th { height: 30px; padding: 0 4px; color: var(--muted); font-size: 12px; font-weight: 500; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+.roster td { height: var(--row-2); padding: 0 4px; border-bottom: 1px solid var(--rule); transition: background 120ms var(--ease); }
+.roster .right { text-align: right; }
+.roster .star-col { width: 36px; padding: 0; }
+.roster tbody tr:hover td { background: var(--raised); }
+.roster td.name a { display: flex; flex-direction: column; justify-content: center; min-height: var(--row-2); text-decoration: none; }
+.roster td.name b { display: block; font-weight: 500; }
+.roster td.name span { display: block; color: var(--muted); font-size: 12px; line-height: 16px; }
+.dash .star { width: 36px; height: 36px; margin: 0; }
+
+/* Motion: content only; the bar, rail of navigation and foot never move. Compositor properties, ease-out, once on load. */
+@media (prefers-reduced-motion: no-preference) {
+    .arrive-welcome, .arrive h1, .arrive-act, .arrive-more, .arrive-run { animation: dash-rise 360ms var(--ease) backwards; }
+    .arrive h1 { animation-delay: 50ms; }
+    .arrive-act { animation-delay: 100ms; }
+    .arrive-more { animation-delay: 140ms; }
+    .arrive-run { animation-delay: 160ms; }
+    .rail-line { transform-box: fill-box; transform-origin: left center; animation: dash-draw 600ms var(--ease) 120ms backwards; }
+    .rail-stop { animation: dash-fade 300ms var(--ease) backwards; animation-delay: calc(260ms + var(--i, 0) * 45ms); }
+    .stop-point { animation: dash-rise 300ms var(--ease) backwards; }
+    .arrive-run .stop-point:nth-child(2) { animation-delay: 220ms; }
+    .arrive-run .stop-point:nth-child(3) { animation-delay: 280ms; }
+    .arrive-run .stop-point:nth-child(n+4) { animation-delay: 340ms; }
+    .desk-grid .sec .row, .roster tbody tr { animation: dash-rise 300ms var(--ease) backwards; }
+    .desk-grid .sec .row:nth-of-type(1), .roster tbody tr:nth-child(1) { animation-delay: 200ms; }
+    .desk-grid .sec .row:nth-of-type(2), .roster tbody tr:nth-child(2) { animation-delay: 240ms; }
+    .desk-grid .sec .row:nth-of-type(3), .roster tbody tr:nth-child(3) { animation-delay: 280ms; }
+    .desk-grid .sec .row:nth-of-type(n+4), .roster tbody tr:nth-child(n+4) { animation-delay: 320ms; }
+    .fig dd { animation: dash-rise 240ms var(--ease) backwards; }
+    .meter i { animation: dash-grow 500ms var(--ease) 250ms backwards; }
+    .bar { transform-origin: bottom; animation: dash-up 420ms var(--ease) backwards; animation-delay: calc(200ms + var(--i, 0) * 24ms); }
+    .dash .btn:active { translate: 0 1px; }
+    .bs-lamps i { animation: dash-lamp 260ms var(--ease) backwards; animation-delay: calc(160ms + var(--i, 0) * 40ms); }
+    .rail-stop.held { transform-box: fill-box; transform-origin: center; animation: dash-settle 420ms var(--ease) 700ms backwards; }
+    .dash a.row .row-age { transition: translate 120ms var(--ease); }
+    .dash a.row:hover .row-age { translate: -2px 0; }
+    .chart-peak, .chart-axis { animation: dash-fade 300ms var(--ease) 500ms backwards; }
+    @keyframes dash-lamp { from { opacity: 0; scale: 0.4; } }
+    @keyframes dash-settle { from { opacity: 0; scale: 1.6; } }
+    @keyframes dash-rise { from { opacity: 0; transform: translateY(8px); } }
+    @keyframes dash-fade { from { opacity: 0; } }
+    @keyframes dash-draw { from { transform: scaleX(0); } }
+    @keyframes dash-grow { from { transform: scaleX(0); } }
+    @keyframes dash-up { from { transform: scaleY(0); } }
+}
+
+@media (max-width: 960px) {
+    .arrive { grid-template-columns: minmax(0, 1fr); }
+    .arrive-lead, .arrive-run { grid-column: 1; grid-row: auto; }
+    .desk-grid { grid-template-columns: minmax(0, 1fr); }
+    .arrive-more a { min-height: 44px; }
+    .dash .btn.small, .dash .segmented .btn.small { height: 44px; padding: 0 12px; }
+    .dash .sec-head .btn.small { margin-right: -12px; }
+    .dash .star { width: 44px; height: 44px; }
+    .roster .star-col { width: 44px; }
+    .roster td { height: 56px; }
+    .roster td.name a { min-height: 56px; }
+}
+@media (max-width: 600px) {
+    .arrive-head { align-items: flex-start; flex-direction: column; }
+    .board-strip { justify-content: flex-start; }
+    .arrive-logo img { height: 52px; }
+    .arrive h1 { font-size: 24px; line-height: 30px; }
+    .arrive-act { flex-direction: column; align-items: stretch; }
+    .btn.lead { width: 100%; }
+    .dash .row.two { flex-wrap: wrap; gap: 0 12px; }
+    .dash .row.two .row-main { flex: 1 0 100%; }
+    .dash .row.two .row-age { margin-right: auto; }
+    .roster .hide-s { display: none; }
+}
+
+/* Chart: red and green are not told apart by everyone (dataviz validator: deutan separation fails), so failed work also
+   carries a diagonal hatch, in the bars and in the legend. The table under the chart holds the same figures. */
+.dash .bar i.bad, .dash .legend i.bad { background-image: repeating-linear-gradient(135deg, transparent 0 2px, color-mix(in srgb, var(--ground) 55%, transparent) 2px 4px); }
+.dash .bar { gap: 2px; }

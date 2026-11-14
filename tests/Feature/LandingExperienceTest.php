@@ -145,7 +145,8 @@ class LandingExperienceTest extends TestCase
 
         $response->assertSee('Welcome, Lerato. You are in Karoo Freight as agent manager.');
         $response->assertDontSee('Welcome, Lerato Nkosi');
-        $response->assertSee('Agents do the work. You make the decisions.');
+        $response->assertSee('Karoo Freight has no agents yet.');
+        $response->assertDontSee('Agents do the work. You make the decisions.');
     }
 
     public function test_the_landing_shows_the_original_logo_files(): void
@@ -178,13 +179,12 @@ class LandingExperienceTest extends TestCase
         $response = $this->actingAs($this->member(OrgRoles::OWNER, 'Sipho Dlamini'))->get('/dashboard')->assertOk();
 
         $response->assertSee('data-no-run', false)->assertDontSee('data-featured-run', false);
-        $response->assertSee('No run yet.')->assertSee('Karoo Freight has no agents yet.')->assertSee('Nothing is running right now.');
+        $response->assertSee('No run yet.')->assertSee('Karoo Freight has no agents yet.');
         $response->assertDontSee('Needs you');
 
-        $this->assertSame('0', $this->figure($response, 'finished'));
-        $this->assertSame('–', $this->figure($response, 'rate'));
-        $this->assertSame('0.00', $this->figure($response, 'cost'));
-        $this->assertSame('–', $this->figure($response, 'duration'));
+        // A business with no agents gets one sentence and one button: no work figures, no table, no bars.
+        $response->assertDontSee('data-figure="finished"', false)->assertDontSee('Nothing is running right now.')->assertDontSee('The last two weeks');
+        $this->assertSame('0.00', $this->figure($response, 'spent'));
     }
 
     public function test_every_figure_on_the_landing_is_counted_from_the_records(): void
@@ -204,8 +204,10 @@ class LandingExperienceTest extends TestCase
         $response->assertSee('2 actions are held until a person answers.');
         $this->assertSame('4', $this->figure($response, 'finished'));
         $this->assertSame('75%', $this->figure($response, 'rate'));
-        $this->assertSame('1.10', $this->figure($response, 'cost'));
+        // Spent is the month's total that the budget watch holds a limit against, so it includes the 9.00 test run.
+        $this->assertSame('10.10', $this->figure($response, 'spent'));
         $this->assertSame('2 min', $this->figure($response, 'duration'));
+        $this->assertSame('–', $this->figure($response, 'approval-wait'));
     }
 
     public function test_the_run_drawn_on_the_landing_is_a_real_one_with_its_own_steps(): void
