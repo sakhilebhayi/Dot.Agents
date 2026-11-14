@@ -73,7 +73,7 @@
 .roster .right { text-align: right; }
 .roster .star-col { width: 36px; padding: 0; }
 .roster tbody tr:hover td { background: var(--raised); }
-.roster td.name a { display: block; text-decoration: none; }
+.roster td.name a { display: flex; flex-direction: column; justify-content: center; min-height: var(--row-2); text-decoration: none; }
 .roster td.name b { display: block; font-weight: 500; }
 .roster td.name span { display: block; color: var(--muted); font-size: 12px; line-height: 16px; }
 .dash .star { width: 36px; height: 36px; margin: 0; }
@@ -117,6 +117,7 @@
     .dash .star { width: 44px; height: 44px; }
     .roster .star-col { width: 44px; }
     .roster td { height: 56px; }
+    .roster td.name a { min-height: 56px; }
 }
 @media (max-width: 600px) {
     .arrive-logo img { height: 52px; }
@@ -128,3 +129,8 @@
     .dash .row.two .row-age { margin-right: auto; }
     .roster .hide-s { display: none; }
 }
+
+/* Chart: red and green are not told apart by everyone (dataviz validator: deutan separation fails), so failed work also
+   carries a diagonal hatch, in the bars and in the legend. The table under the chart holds the same figures. */
+.dash .bar i.bad, .dash .legend i.bad { background-image: repeating-linear-gradient(135deg, transparent 0 2px, color-mix(in srgb, var(--ground) 55%, transparent) 2px 4px); }
+.dash .bar { gap: 2px; }

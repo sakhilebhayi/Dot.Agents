@@ -7,13 +7,10 @@ use App\DTOs\Agents\ToggleFavouriteData;
 use App\Models\AgentApproval;
 use App\Models\AgentDeployment;
 use App\Models\AgentRun;
-use App\Models\AgentTrigger;
-use App\Models\UsageBudget;
 use App\Models\WorkflowExecution;
 use App\Services\Insights\Arrival;
-use App\Services\Insights\BudgetWatch;
+use App\Services\Insights\CommandCentre;
 use App\Services\Insights\RunMetrics;
-use App\Support\OrgRoles;
 use App\Support\TenantContext;
 use Illuminate\Database\Eloquent\Collection;
 use Livewire\Attributes\Computed;
@@ -24,6 +21,11 @@ use Livewire\Component;
  * answers what needs a person, what is under way, and how the work has gone.
  *
  * @property-read Collection<int, AgentApproval> $approvals
+ * @property-read Collection<int, AgentRun> $failures
+ * @property-read array<string, mixed> $arrival
+ * @property-read \Illuminate\Support\Collection<int, array<string, mixed>> $agents
+ * @property-read Collection<int, AgentDeployment> $mine
+ * @property-read \Illuminate\Support\Collection<int, int> $starredIds
  */
 class AgentDashboard extends Component
 {
@@ -105,7 +107,10 @@ class AgentDashboard extends Component
     #[Computed]
     public function starredIds()
     {
-        return auth()->user()->favouriteAgents()->allRelatedIds();
+        /** @var \Illuminate\Support\Collection<int, int> $ids */
+        $ids = auth()->user()->favouriteAgents()->allRelatedIds();
+
+        return $ids;
     }
 
     /** The agents this person keeps coming back to: starred first, then the ones they used last. */
@@ -131,54 +136,25 @@ class AgentDashboard extends Component
     #[Computed]
     public function budget(): ?array
     {
-        $organizationId = $this->organizationId();
-
-        if (! OrgRoles::allows($this->arrival['role'], 'usage.view')) {
-            return null;
-        }
-
-        $spent = app(BudgetWatch::class)->spentThisMonth($organizationId);
-        $limit = UsageBudget::where('organization_id', $organizationId)->first();
-        $max = $limit ? (float) $limit->monthly_limit : null;
-        $percent = $max !== null && $max > 0 ? min(100, round(100 * $spent / $max, 1)) : null;
-
-        return [
-            'spent' => $spent,
-            'limit' => $max,
-            'percent' => $percent,
-            'warn' => $percent !== null && $percent >= (int) $limit->warn_at_percent,
-            'stop' => (bool) $limit?->stop_at_limit,
-        ];
+        return app(CommandCentre::class)->budget($this->organizationId(), $this->arrival['role']);
     }
 
     /** The next schedules to start. Read only: nothing here starts, pauses or edits one. */
     #[Computed]
     public function schedules()
     {
-        return AgentTrigger::where('organization_id', $this->organizationId())->where('kind', AgentTrigger::SCHEDULE)->where('is_active', true)->whereNotNull('next_run_at')->orderBy('next_run_at')->limit(3)->get();
+        return app(CommandCentre::class)->schedules($this->organizationId());
     }
 
     /**
-     * One list of agents: the ones this person keeps coming back to first, then the busiest in the period. One query adds
-     * role and state for the busy ones.
+     * One list of agents: the ones this person keeps coming back to first, then the busiest in the period.
      *
      * @return list<array{agent: AgentDeployment, runs: int|null, rate: float|null, starred: bool}>
      */
     #[Computed]
     public function roster(): array
     {
-        $busy = $this->agents->filter(fn ($row) => $row['agent'] !== null)->keyBy(fn ($row) => $row['agent']->id);
-        $mine = $this->mine->keyBy('id');
-        $ids = $mine->keys()->merge($busy->keys())->unique()->take(8)->values();
-        $starred = $this->starredIds;
-        $known = AgentDeployment::where('organization_id', $this->organizationId())->whereIn('id', $ids)->get(['id', 'name', 'role', 'status'])->keyBy('id');
-
-        return $ids->filter(fn ($id) => $known->has($id))->map(fn ($id) => [
-            'agent' => $known[$id],
-            'runs' => $busy[$id]['runs'] ?? null,
-            'rate' => $busy[$id]['rate'] ?? null,
-            'starred' => $starred->contains($id),
-        ])->values()->all();
+        return app(CommandCentre::class)->roster($this->organizationId(), $this->mine->pluck('id'), $this->agents, $this->starredIds);
     }
 
     /** The number of rows under "Needs you". */

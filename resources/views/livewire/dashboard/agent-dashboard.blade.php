@@ -69,14 +69,14 @@
                     @foreach($this->approvals as $approval)
                         <a class="row two" href="{{ route('governance.approvals', ['approval' => $approval->uuid]) }}" wire:key="approval-{{ $approval->id }}" @if($featured && $featured['run']->id === $approval->agent_run_id) aria-current="true" @endif>
                             <span class="row-main"><b>{{ $approval->title }}</b><span>{{ $approval->deployment?->name }}, {{ $approval->risk_level }} risk</span></span>
-                            <span class="row-age num">{{ $approval->created_at->diffForHumans(null, true) }}</span>
+                            <span class="row-age num">{{ $approval->created_at->diffForHumans(null, true, true) }}</span>
                             <x-sig.lamp state="waiting_approval" />
                         </a>
                     @endforeach
                     @foreach($this->failures as $run)
                         <a class="row two" href="{{ route('runs.show', $run) }}" wire:key="failed-{{ $run->id }}">
                             <span class="row-main"><b>{{ $run->summary }}</b><span>{{ $run->deployment?->name }}: {{ $run->error_message }}</span></span>
-                            <span class="row-age num">{{ $run->finished_at?->diffForHumans(null, true) }}</span>
+                            <span class="row-age num">{{ $run->finished_at?->diffForHumans(null, true, true) }}</span>
                             <x-sig.lamp :state="$run->status" />
                         </a>
                     @endforeach
@@ -143,7 +143,7 @@
             <section class="sec" aria-label="Coming up">
                 <header class="sec-head"><h2>Coming up</h2><a class="btn quiet small" href="{{ route('runs.index', ['tab' => 'scheduled']) }}">Schedules</a></header>
                 @forelse($this->schedules as $schedule)
-                    <div class="row two fig" wire:key="schedule-{{ $schedule->id }}"><div class="row-main"><b>{{ $schedule->name }}</b><span>{{ \App\Services\Triggers\ScheduleClock::words($schedule->settings ?? []) }}</span></div><span class="row-age num">{{ $schedule->next_run_at->diffForHumans() }}</span></div>
+                    <div class="row two fig" wire:key="schedule-{{ $schedule->id }}"><div class="row-main"><b>{{ $schedule->name }}</b><span>{{ \App\Services\Triggers\ScheduleClock::words($schedule->settings ?? []) }}</span></div><span class="row-age num">in {{ $schedule->next_run_at->diffForHumans(null, true, true) }}</span></div>
                 @empty
                     <div class="empty-line">No schedule is set.</div>
                 @endforelse
