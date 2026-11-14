@@ -1,8 +1,0 @@
-# Keep the default rules; skip the shared Dot UI manifest, whose only content is sha256 file hashes
-# (one of them trips the generic-api-key rule).
-[extend]
-useDefault = true
-
-[allowlist]
-description = "dot-ui manifest: sha256 hashes of copied files, no secrets"
-paths = ['''^dot-ui/MANIFEST\.json$''']
