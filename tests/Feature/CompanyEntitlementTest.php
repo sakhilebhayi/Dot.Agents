@@ -359,6 +359,21 @@ class CompanyEntitlementTest extends TestCase
         $this->open($user, $acme)->post(route('organization.switch'), ['organization_id' => $stranger->id])->assertForbidden();
     }
 
+    public function test_a_refused_persons_own_data_rights_stay_open_and_nothing_else_does(): void
+    {
+        [$user, $acme] = $this->member();
+        $this->infodotSays([self::readUrl(self::ACME) => Http::response(self::platforms(self::ACME, false, 'payment_required'))]);
+
+        // Everything else stays shut, billing included.
+        $this->open($user, $acme)->get(route('dashboard'))->assertStatus(403);
+        $this->get(route('billing.index'))->assertStatus(403);
+        $this->get(route('runs.index'))->assertStatus(403);
+
+        $this->post(route('privacy.export'))->assertOk()->assertHeader('Content-Type', 'application/json');
+
+        $this->post(route('privacy.erase'), ['confirm_email' => $user->email])->assertRedirect('/');
+    }
+
     // ------------------------------------------------------------------ personal workspaces
 
     private function signInThenWorkPersonally(?bool $personalEntitled): array

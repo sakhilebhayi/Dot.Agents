@@ -29,12 +29,18 @@ class EnsureCompanyEntitled
     /** Session key: redeem's `entitled` for the person's personal workspace, remembered at sign-in (absent: not set). */
     public const PERSONAL = 'infodot.personal_entitled';
 
+    /**
+     * A person's own data rights are never blocked by a commercial access state: they stay behind sign-in and their
+     * own policy, and nothing else is opened by this list.
+     */
+    private const EXEMPT = ['privacy.export', 'privacy.erase'];
+
     public function __construct(private readonly EntitlementClient $entitlements) {}
 
     public function handle(Request $request, Closure $next): Response
     {
         // Machine-to-machine (a bearer token) and signed-out requests are not this middleware's business.
-        if (! $this->entitlements->enabled() || $request->bearerToken()) {
+        if (! $this->entitlements->enabled() || $request->bearerToken() || $request->routeIs(...self::EXEMPT)) {
             return $next($request);
         }
 
