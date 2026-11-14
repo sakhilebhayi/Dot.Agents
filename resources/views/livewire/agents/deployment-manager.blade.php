@@ -10,7 +10,7 @@
 
     <section class="card">
         <div class="card-head roster-tools">
-            <input class="input" type="search" aria-label="Search agents" placeholder="Search" wire:model.live.debounce.300ms="search">
+            <x-dot.filter-search name="search" label="Search agents" placeholder="Search" wire:model.live.debounce.300ms="search" />
             <select class="select" aria-label="Status" wire:model.live="filterStatus">
                 <option value="">Every status</option>
                 @foreach(['draft' => 'Draft', 'active' => 'Active', 'paused' => 'Paused', 'decommissioned' => 'Archived'] as $value => $label)
