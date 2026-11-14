@@ -33,19 +33,23 @@ use Illuminate\Support\Str;
 class SyncOrganizationsFromInfoDot
 {
     /**
-     * @param  Collection<int|string, mixed>  $listed  non-personal companies from the redeem response, keyed by uuid
+     * @param  Collection<int|string, mixed>  $listed  non-personal companies that hold this platform, keyed by uuid
+     * @param  list<string>|null  $named  every company InfoDot listed, entitled or not (R-50); a listed company that
+     *                                    does not hold this platform is never revoked or changed here. Null: $listed.
      */
-    public function __invoke(User $user, Collection $listed, ?string $currentUuid): void
+    public function __invoke(User $user, Collection $listed, ?string $currentUuid, ?array $named = null): void
     {
-        DB::transaction(function () use ($user, $listed, $currentUuid) {
+        $named ??= $listed->keys()->map(fn ($k) => (string) $k)->all();
+
+        DB::transaction(function () use ($user, $listed, $currentUuid, $named) {
             foreach ($listed as $uuid => $info) {
                 if (is_array($info)) {
                     $this->apply($user, (string) $uuid, $info);
                 }
             }
 
-            $this->revoke($user, $listed->keys()->map(fn ($k) => (string) $k)->all());
-            $this->selectCurrent($user, $currentUuid);
+            $this->revoke($user, $named);
+            $this->selectCurrent($user, $currentUuid, $listed, collect($named));
         });
     }
 
@@ -126,16 +130,26 @@ class SyncOrganizationsFromInfoDot
         }
     }
 
-    private function selectCurrent(User $user, ?string $currentUuid): void
+    private function selectCurrent(User $user, ?string $currentUuid, Collection $listed, Collection $named): void
     {
-        if (! filled($currentUuid)) {
-            return;
-        }
-
-        $organization = $user->organizations()->where('organizations.infodot_team_uuid', $currentUuid)->first();
+        $organization = filled($currentUuid) && $listed->has($currentUuid)
+            ? $user->organizations()->where('organizations.infodot_team_uuid', $currentUuid)->first()
+            : null;
 
         if ($organization) {
             session(['current_organization_id' => $organization->id]);
+
+            return;
+        }
+
+        // R-50: InfoDot's current company does not hold this platform. Do not let it become the open business by
+        // default: open an entitled company the person belongs to, else leave it unset.
+        if (filled($currentUuid) && ! $listed->has($currentUuid) && $named->contains($currentUuid)) {
+            $other = $user->organizations()->whereIn('organizations.infodot_team_uuid', $listed->keys()->map(fn ($k) => (string) $k)->all())->first();
+
+            if ($other) {
+                session(['current_organization_id' => $other->id]);
+            }
         }
     }
 

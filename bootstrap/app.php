@@ -4,6 +4,7 @@ use App\Http\Middleware\BlockWritesForReadOnlyUsers;
 use App\Http\Middleware\ConsentRequiredMiddleware;
 use App\Http\Middleware\CorrelationIdMiddleware;
 use App\Http\Middleware\EnforceTokenAbility;
+use App\Http\Middleware\EnsureCompanyEntitled;
 use App\Http\Middleware\OrganizationContextMiddleware;
 use App\Http\Middleware\RefuseLocalSignIn;
 use App\Http\Middleware\ResetTenantContext;
@@ -49,6 +50,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'reverify' => ReverifyWithInfoDot::class,
             'local.signin' => RefuseLocalSignIn::class,
             'consent.required' => ConsentRequiredMiddleware::class,
+            'entitled' => EnsureCompanyEntitled::class,
             'writable' => BlockWritesForReadOnlyUsers::class,
         ]);
     })

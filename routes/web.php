@@ -11,6 +11,7 @@ use App\Http\Controllers\SchedulerProbeController;
 use App\Http\Controllers\SocialAccountController;
 use App\Http\Controllers\SocialOAuthController;
 use App\Http\Controllers\SocialWebhookController;
+use App\Http\Controllers\SwitchOrganizationController;
 use App\Http\Middleware\AuthenticateGuardian;
 use App\Models\AgentDeployment;
 use App\Models\AgentRun;
@@ -84,6 +85,7 @@ Route::middleware([
     'reverify',
     'consent.required',
     'org.context',
+    'entitled', // R-50: the company must still hold Dot.Agents; sits before `writable` so a refusal wins
     'writable', // a read-only (viewer) role gets 403 on every non-GET request
 ])->group(function () {
 
@@ -209,6 +211,11 @@ Route::middleware([
         Route::get('/auth/{platform}/callback', [SocialOAuthController::class, 'callback'])->middleware('writable:any')->name('auth.callback');
     });
 });
+
+// Switching to another business the person belongs to (R-50). Outside the entitled group: it is how a person whose
+// current company was refused reaches one that is not.
+Route::post('/organization/current', SwitchOrganizationController::class)
+    ->middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified', 'throttle:30,1'])->name('organization.switch');
 
 // Stripe webhook — must be outside auth middleware + CSRF exempt (handled in VerifyCsrfToken)
 
