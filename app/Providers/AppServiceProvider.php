@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Http\Middleware\EnsureCompanyEntitled;
 use App\Http\Middleware\OrganizationContextMiddleware;
 use App\Models\AgentCategory;
 use App\Models\AgentDepartment;
@@ -40,7 +41,7 @@ class AppServiceProvider extends ServiceProvider
 
         // Livewire's update route skips page middleware unless told otherwise: a person removed from a business must
         // lose it on their next click, not their next page load.
-        Livewire::addPersistentMiddleware([OrganizationContextMiddleware::class]);
+        Livewire::addPersistentMiddleware([OrganizationContextMiddleware::class, EnsureCompanyEntitled::class]);
 
         // Enforce strong password policy platform-wide (min 12 chars, mixed case, numbers, symbols)
         // In testing, use a relaxed rule so test factories and Jetstream tests still pass.

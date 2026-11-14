@@ -8,18 +8,47 @@ use App\Models\AgentApproval;
 use App\Models\AgentDeployment;
 use App\Models\AgentRun;
 use App\Models\WorkflowExecution;
+use App\Services\Insights\Arrival;
 use App\Services\Insights\RunMetrics;
 use App\Support\TenantContext;
+use Illuminate\Database\Eloquent\Collection;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
-/** The first page. It answers what needs a person, what is under way, and how the work has gone. */
+/**
+ * The first page, and where a person arrives from InfoDot. It welcomes them, offers the one thing to do next, and then
+ * answers what needs a person, what is under way, and how the work has gone.
+ *
+ * @property-read Collection<int, AgentApproval> $approvals
+ */
 class AgentDashboard extends Component
 {
     /** Actions a read-only (viewer) role may still call; every other action is refused for it. */
     public const READ_ONLY_ACTIONS = ['setTimeframe', 'toggleFavourite'];
 
     public string $timeframe = '7d';
+
+    /**
+     * Who has arrived, and the one thing to do next.
+     *
+     * @return array{welcome: string, state: string, label: string, href: string, reason: string, more: list<array{0: string, 1: string}>, pending: int, agents: int}
+     */
+    #[Computed]
+    public function arrival(): array
+    {
+        return app(Arrival::class)->greet(auth()->user(), $this->organizationId(), $this->approvals->first());
+    }
+
+    /**
+     * The one real run drawn on the first page.
+     *
+     * @return array{run: AgentRun, stops: list<array{label: string, detail: string, state: string}>, total: int}|null
+     */
+    #[Computed]
+    public function featured(): ?array
+    {
+        return app(Arrival::class)->featured($this->organizationId(), $this->approvals->first());
+    }
 
     /** @return array<string, mixed> */
     #[Computed]

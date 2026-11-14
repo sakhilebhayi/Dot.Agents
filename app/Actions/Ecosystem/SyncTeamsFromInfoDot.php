@@ -22,6 +22,9 @@ use Illuminate\Support\Facades\Log;
  *   someone in InfoDot removes their access here at their next sign-in.
  * - The company InfoDot says is active becomes the person's current team.
  * - Personal teams are never linked or removed.
+ * - R-50: a company InfoDot marks `entitled: false` for this platform is left exactly as it is here: not created,
+ *   not renamed, no membership or role change, and it is not selected as the current company. A company without
+ *   the key (an InfoDot from before R-50) is treated as it always was.
  * - Each company also gets an organization here, with the person's role in it,
  *   because the data policies check organizations (see SyncOrganizationsFromInfoDot).
  */
@@ -32,27 +35,33 @@ class SyncTeamsFromInfoDot
      */
     public function __invoke(User $user, array $identity): void
     {
-        $listed = collect($identity['teams'] ?? [])
+        $named = collect($identity['teams'] ?? [])
             ->filter(fn ($t) => is_array($t) && filled($t['uuid'] ?? null) && ! ($t['personal'] ?? false))
             ->keyBy('uuid');
 
-        DB::transaction(function () use ($user, $listed, $identity) {
+        // Present and anything but exactly true is a refusal; absent is not.
+        $refused = $named->filter(fn ($t) => array_key_exists('entitled', $t) && $t['entitled'] !== true);
+        $listed = $named->diffKeys($refused);
+
+        DB::transaction(function () use ($user, $named, $listed, $identity) {
             foreach ($listed as $uuid => $info) {
                 $this->apply($user, (string) $uuid, $info);
                 $this->forgetCachedTeams($user);
             }
 
-            $this->revoke($user, $listed->keys()->all());
+            // Revocation is about companies InfoDot no longer lists at all; a listed company that does not hold
+            // this platform keeps whatever membership it has here.
+            $this->revoke($user, $named->keys()->map(fn ($uuid) => (string) $uuid)->all());
             $this->forgetCachedTeams($user);
 
             $active = $identity['current_team_uuid'] ?? null;
-            $team = $active ? Team::where('infodot_team_uuid', $active)->first() : null;
+            $team = $active && $listed->has($active) ? Team::where('infodot_team_uuid', $active)->first() : null;
 
             if ($team && $user->belongsToTeam($team)) {
                 $user->switchTeam($team);
             }
 
-            app(SyncOrganizationsFromInfoDot::class)($user, $listed, is_string($active) ? $active : null);
+            app(SyncOrganizationsFromInfoDot::class)($user, $listed, is_string($active) ? $active : null, $named->keys()->map(fn ($uuid) => (string) $uuid)->all());
         });
     }
 

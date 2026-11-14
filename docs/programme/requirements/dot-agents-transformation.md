@@ -1028,7 +1028,7 @@ Provide:
 * Usage history.
 
 Do not invent pricing or assume provider costs.
-Build the technical foundation for future Dot.Billing integration, using actual supported billing capabilities.
+Build the technical foundation for future central billing integration, using actual supported billing capabilities.
 20. Implementation Roadmap
 Do not attempt to implement every capability in one uncontrolled development cycle.
 Work in phases.
