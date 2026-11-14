@@ -12,6 +12,12 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+    {{-- Shared Dot UI (platform switcher, compact filter), served from this site's own public/dot-ui. --}}
+    <link rel="stylesheet" href="{{ asset('dot-ui/css/dot-fonts.css') }}">
+    <link rel="stylesheet" href="{{ asset('dot-ui/css/dot-tokens.css') }}">
+    <link rel="stylesheet" href="{{ asset('dot-ui/css/dot-search.css') }}">
+    <link rel="stylesheet" href="{{ asset('dot-ui/css/dot-switcher-fonts.css') }}">
+    <link rel="stylesheet" href="{{ asset('dot-ui/css/dot-switcher.css') }}">
     @vite(['resources/css/app.css', 'resources/css/signal.css', 'resources/js/app.js'])
     <style>
         @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; scroll-behavior:auto !important; } }
@@ -128,6 +134,8 @@
             @endisset
         </div>
         @auth
+        @php $switcherOrganization = Auth::user()->organizations()->where('organizations.id', \App\Support\TenantContext::id())->first(); @endphp
+        <x-dot.switcher platform="agents" :company="$switcherOrganization?->infodot_team_uuid" :company-name="$switcherOrganization?->name" logos="/dot-ui/img/platforms" />
         <span class="topbar-team">{{ Auth::user()->currentTeam->name ?? 'Personal' }}</span>
         @endauth
         <a href="{{ route('profile.show') }}" class="topbar-btn" title="Profile">
@@ -142,6 +150,7 @@
     </div>
 
     @stack('modals')
+    <script src="{{ asset('dot-ui/js/dot-switcher.js') }}" defer></script>
     @livewireScripts
 </body>
 </html>

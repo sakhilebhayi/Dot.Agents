@@ -162,14 +162,15 @@ class LandingExperienceTest extends TestCase
         }
     }
 
-    public function test_the_way_back_to_infodot_comes_from_the_ecosystem_configuration(): void
+    public function test_the_way_back_to_infodot_comes_from_the_ecosystem_configuration_through_the_switcher(): void
     {
         config(['ecosystem.platforms.infodot.url' => 'https://infodot.example/']);
 
         $response = $this->actingAs($this->member(OrgRoles::VIEWER))->get('/dashboard')->assertOk();
 
-        $response->assertSee('<a href="https://infodot.example/home">InfoDot</a>', false);
-        $response->assertSee('<a href="https://infodot.example/platforms">Platforms</a>', false);
+        // The interim two-link nav is gone: the shared switcher (R-51) carries the way to InfoDot and to the platforms.
+        $response->assertDontSee('arrive-back', false);
+        $response->assertSee('href="https://infodot.example/platforms"', false);
     }
 
     public function test_a_business_with_nothing_yet_is_told_so_plainly(): void

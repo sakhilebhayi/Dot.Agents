@@ -1,0 +1,10 @@
+# Keep the default rules; skip the shared Dot UI manifest as it was written before MANIFEST.sha256 (JSON, where a sha256
+# value sat next to a key such as "dot-tokens.css" and tripped the generic-api-key rule). dot-ui/MANIFEST.json is gone from
+# the tree, but the Secrets scan reads every commit of the PR, so the two commits that carried it still need this entry.
+# The current dot-ui/MANIFEST.sha256 needs no allowlist (hash first, no key or colon next to it).
+[extend]
+useDefault = true
+
+[allowlist]
+description = "dot-ui manifest, historical commits: sha256 hashes of copied files, no secrets"
+paths = ['''^dot-ui/MANIFEST\.json$''']

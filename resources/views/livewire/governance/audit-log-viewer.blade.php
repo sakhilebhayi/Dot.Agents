@@ -10,7 +10,7 @@
         <div class="filters">
             <label class="field filters-wide">
                 <span>Search</span>
-                <input class="input" type="search" wire:model.live.debounce.300ms="search" placeholder="Search logs">
+                <x-dot.filter-search name="search" label="Search logs" placeholder="Search logs" wire:model.live.debounce.300ms="search" />
             </label>
             <label class="field">
                 <span>Category</span>

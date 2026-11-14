@@ -4,7 +4,6 @@
     $seconds = $this->summary['duration'];
     $arrival = $this->arrival;
     $featured = $this->featured;
-    $infodot = rtrim((string) config('ecosystem.platforms.infodot.url', 'https://infodot.co.za'), '/');
 @endphp
 
 <div class="page">
@@ -14,10 +13,6 @@
                 <img class="on-dark" src="{{ asset('dot.logos3-light.png') }}" alt="Dot.Agents" width="1181" height="886">
                 <img class="on-light" src="{{ asset('coming-soon/dot.logos3.png') }}" alt="Dot.Agents" width="1181" height="886">
             </span>
-            <nav class="arrive-back" aria-label="Dot ecosystem">
-                <a href="{{ $infodot }}/home">InfoDot</a>
-                <a href="{{ $infodot }}/platforms">Platforms</a>
-            </nav>
         </div>
 
         <div class="arrive-body">

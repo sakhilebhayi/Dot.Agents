@@ -494,6 +494,11 @@ jobs:
             CODE=$(curl -s --max-time 30 -o /dev/null -w '%{http_code}' "$SITE_URL/build/$ASSET" || true)
             if [ "$CODE" = "200" ]; then echo "200 $SITE_URL/build/$ASSET"; else echo "::error::$SITE_URL/build/$ASSET answered ${CODE:-no response} (expected 200): the docroot is not serving the new build"; FAILED=1; fi
           done
+          # The shared Dot UI (switcher, filter) is committed under public/dot-ui and served from this site's own origin.
+          for ASSET in dot-ui/css/dot-switcher.css dot-ui/css/dot-search.css dot-ui/js/dot-switcher.js; do
+            CODE=$(curl -s --max-time 30 -o /dev/null -w '%{http_code}' "$SITE_URL/$ASSET" || true)
+            if [ "$CODE" = "200" ]; then echo "200 $SITE_URL/$ASSET"; else echo "::error::$SITE_URL/$ASSET answered ${CODE:-no response} (expected 200): the docroot is not serving public/dot-ui"; FAILED=1; fi
+          done
           # A GET-only route answering POST is a harmless 405: ~1 KB in
           # production, an ~840 KB stack-trace page when APP_DEBUG is on.
           curl -s --max-time 30 -o "$WORK/probe.html" -X POST "$SITE_URL/up" || true

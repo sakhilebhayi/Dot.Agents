@@ -21,6 +21,12 @@
             }
         })();
     </script>
+    {{-- Shared Dot UI (platform switcher, compact filter), served from this site's own public/dot-ui. --}}
+    <link rel="stylesheet" href="{{ asset('dot-ui/css/dot-fonts.css') }}">
+    <link rel="stylesheet" href="{{ asset('dot-ui/css/dot-tokens.css') }}">
+    <link rel="stylesheet" href="{{ asset('dot-ui/css/dot-search.css') }}">
+    <link rel="stylesheet" href="{{ asset('dot-ui/css/dot-switcher-fonts.css') }}">
+    <link rel="stylesheet" href="{{ asset('dot-ui/css/dot-switcher.css') }}">
     @vite(['resources/css/app.css', 'resources/css/signal.css', 'resources/js/app.js'])
     @livewireStyles
 </head>
@@ -103,6 +109,7 @@
             <button type="button" class="icon-btn menu-btn" aria-label="Open the menu" x-on:click="menu = true"><x-sig.icon name="menu" /></button>
             @isset($header)<div class="top-title">{{ $header }}</div>@endisset
             <div class="top-space"></div>
+            <x-dot.switcher platform="agents" :company="$organization?->infodot_team_uuid" :company-name="$organization?->name" logos="/dot-ui/img/platforms" />
             @livewire('notification-bell')
             <button type="button" class="icon-btn" aria-label="Switch between light and dark" x-on:click="toggleTheme"><x-sig.icon name="moon" /></button>
         </header>
@@ -115,6 +122,7 @@
 </div>
 
 @stack('modals')
+<script src="{{ asset('dot-ui/js/dot-switcher.js') }}" defer></script>
 @livewireScripts
 </body>
 </html>

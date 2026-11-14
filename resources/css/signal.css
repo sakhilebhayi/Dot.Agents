@@ -318,7 +318,7 @@ a.row:hover, button.row:hover { background: var(--raised); }
 
 /* The roster */
 .roster-tools { gap: 8px; padding-block: 8px; }
-.roster-tools .input { flex: 1; min-width: 0; }
+.roster-tools .input, .roster-tools .dsr-filter { flex: 1; min-width: 0; }
 .roster-tools .select { width: auto; flex: none; }
 .roster .row-main { color: inherit; text-decoration: none; }
 .roster .row-main:hover b { text-decoration: underline; text-underline-offset: 3px; }
@@ -444,9 +444,9 @@ a.row:hover, button.row:hover { background: var(--raised); }
 .arrive-logo img { display: block; width: auto; height: 120px; }
 .arrive-logo .on-light, :root[data-theme='light'] .arrive-logo .on-dark { display: none; }
 :root[data-theme='light'] .arrive-logo .on-light { display: block; }
-.arrive-back, .arrive-more { display: flex; flex-wrap: wrap; gap: 4px 20px; }
-.arrive-back a, .arrive-more a { display: inline-flex; align-items: center; min-height: 28px; color: var(--muted); text-decoration: underline; text-decoration-color: var(--control); text-underline-offset: 4px; transition: color 120ms var(--ease); }
-.arrive-back a:hover, .arrive-more a:hover { color: var(--text); text-decoration-color: currentColor; }
+.arrive-more { display: flex; flex-wrap: wrap; gap: 4px 20px; }
+.arrive-more a { display: inline-flex; align-items: center; min-height: 28px; color: var(--muted); text-decoration: underline; text-decoration-color: var(--control); text-underline-offset: 4px; transition: color 120ms var(--ease); }
+.arrive-more a:hover { color: var(--text); text-decoration-color: currentColor; }
 .arrive-body { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: var(--pad) 48px; align-items: start; }
 .arrive-lead { min-width: 0; }
 .arrive-welcome { color: var(--muted); font-size: 15px; line-height: 22px; }
@@ -493,11 +493,38 @@ a.row:hover, button.row:hover { background: var(--raised); }
     .arrive h1 { font-size: 26px; line-height: 32px; }
     .arrive-act { flex-direction: column; align-items: stretch; }
     .btn.lead { width: 100%; }
-    .arrive-back a, .arrive-more a { min-height: 44px; }
+    .arrive-more a { min-height: 44px; }
     .arrive-run .btn.small, .segmented .btn.small { height: 44px; padding: 0 12px; }
     .star { width: 44px; height: 44px; margin-left: -14px; }
     .board .card-head .btn.small { height: 44px; padding: 0 12px; margin-right: -12px; }
     .board a.row-main { display: flex; flex-direction: column; justify-content: center; min-height: 44px; }
     .board .row { flex-wrap: wrap; }
     .board .row-main { flex-basis: 60%; }
+}
+
+/* Shared Dot UI (public/dot-ui): the host maps its own tokens onto the package's. Plain :root, so it wins in both
+   themes; the switcher's panel stays InfoDot's paper sheet, only its button follows the Signal Box. */
+:root {
+    --dsr-panel: var(--raised);
+    --dsr-hover: var(--active);
+    --dsr-rule: var(--border);
+    --dsr-rule-strong: var(--control);
+    --dsr-text: var(--text);
+    --dsr-text-2: var(--muted);
+    --dsr-text-3: var(--muted);
+    --dsr-radius-panel: var(--radius);
+    --dsr-filter-radius: var(--radius);
+    --dsr-filter-bg: var(--surface);
+    --dsr-filter-ink: var(--text);
+    --dsr-filter-placeholder: var(--muted);
+    --dsr-filter-border: var(--control);
+    --dsr-filter-border-hover: var(--muted);
+    --dsr-filter-border-focus: var(--accent);
+}
+.top .dsw, .topbar .dsw {
+    --dsw-btn-ink: var(--muted);
+    --dsw-btn-border: var(--control);
+    --dsw-btn-bg-hover: var(--raised);
+    --dsw-focus: var(--accent);
+    --dsw-radius: var(--radius);
 }
