@@ -135,8 +135,8 @@ class R52ShellTest extends TestCase
         $this->assertStringContainsString('data-dh-theme-key="dot-agents-theme"', $html);
         $this->assertStringContainsString('data-dh-theme-default="dark"', $html);
         $this->assertStringContainsString('data-dh-theme-class="dark"', $html);
-        $this->assertMatchesRegularExpression('#<script src="[^"]*/dot-ui/js/dot-theme-boot\.js"></script>#', $html, 'synchronous, in <head>');
-        $this->assertLessThan(strpos($html, '</head>'), strpos($html, 'dot-theme-boot.js'));
+        $this->assertMatchesRegularExpression('#<script src="[^"]*/dot-ui/js/dot-theme-boot\.min\.js"></script>#', $html, 'synchronous, in <head>');
+        $this->assertLessThan(strpos($html, '</head>'), strpos($html, 'dot-theme-boot.min.js'));
     }
 
     // -- Roboto, self-hosted ----------------------------------------------------------------
@@ -155,9 +155,9 @@ class R52ShellTest extends TestCase
 
         $html = $this->page('dashboard');
         $this->assertStringContainsString('class="dark dot-roboto"', $html);
-        $this->assertStringContainsString(asset('dot-ui/css/dot-roboto.css'), $html);
-        $this->assertStringContainsString(asset('dot-ui/css/dot-type.css'), $html);
-        $this->assertStringContainsString('as="font" type="font/woff2" crossorigin', $html);
+        // dot-ui 0.6.1: one bundle (Roboto, type scale, tokens, search, switcher, header), no font preload (it delayed a text LCP).
+        $this->assertStringContainsString(asset('dot-ui/css/dot-ui.min.css'), $html);
+        $this->assertStringNotContainsString('as="font"', $html);
     }
 
     public function test_no_page_or_stylesheet_reaches_a_font_host_or_names_another_text_face(): void
@@ -208,7 +208,7 @@ class R52ShellTest extends TestCase
         foreach (['/', route('login'), route('terms.show'), route('policy.show')] as $url) {
             $html = $this->get($url)->assertOk()->getContent();
             $this->assertStringContainsString('class="dot-roboto"', $html, $url);
-            $this->assertStringContainsString('/dot-ui/css/dot-roboto.css', $html, $url);
+            $this->assertStringContainsString('/dot-ui/css/dot-roboto.min.css', $html, $url);
             $this->assertStringNotContainsString('googleapis', $html, $url);
         }
     }

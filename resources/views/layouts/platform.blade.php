@@ -9,15 +9,9 @@
     <link rel="icon" href="/favicon-16x16.png" sizes="16x16" type="image/png">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     {{-- Theme first, before any paint: night is the default, a stored choice wins (dot-ui reads the data-dh-theme-* attributes on <html>). --}}
-    <script src="{{ asset('dot-ui/js/dot-theme-boot.js') }}"></script>
-    {{-- Shared Dot UI (Roboto, type scale, header, search, switcher), served from this site's own public/dot-ui: no CDN, no inline script. --}}
-    <link rel="preload" href="{{ asset('dot-ui/fonts/roboto/roboto-latin-wght-normal.woff2') }}" as="font" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="{{ asset('dot-ui/css/dot-roboto.css') }}">
-    <link rel="stylesheet" href="{{ asset('dot-ui/css/dot-type.css') }}">
-    <link rel="stylesheet" href="{{ asset('dot-ui/css/dot-tokens.css') }}">
-    <link rel="stylesheet" href="{{ asset('dot-ui/css/dot-search.css') }}">
-    <link rel="stylesheet" href="{{ asset('dot-ui/css/dot-switcher.css') }}">
-    <link rel="stylesheet" href="{{ asset('dot-ui/css/dot-header.css') }}">
+    <script src="{{ asset('dot-ui/js/dot-theme-boot.min.js') }}"></script>
+    {{-- Shared Dot UI 0.6.1 (Roboto, type scale, header, search, switcher: one stylesheet, first before the host CSS; dot-ui-core.min.js at the end), served from this site's own public/dot-ui: no CDN, no inline script. --}}
+    <link rel="stylesheet" href="{{ asset('dot-ui/css/dot-ui.min.css') }}">
     @vite(['resources/css/app.css', 'resources/css/signal.css', 'resources/js/app.js'])
     @livewireStyles
 </head>
@@ -126,10 +120,7 @@
 </div>
 
 @stack('modals')
-<script src="{{ asset('dot-ui/js/dot-search.js') }}" defer></script>
-<script src="{{ asset('dot-ui/js/dot-search-results.js') }}" defer></script>
-<script src="{{ asset('dot-ui/js/dot-switcher.js') }}" defer></script>
-<script src="{{ asset('dot-ui/js/dot-nav.js') }}" defer></script>
+<script src="{{ asset('dot-ui/js/dot-ui-core.min.js') }}" defer></script>
 @livewireScripts
 </body>
 </html>

@@ -18,9 +18,8 @@
     <link rel="icon" href="/favicon-16x16.png" sizes="16x16" type="image/png">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <script type="application/ld+json" nonce="{{ \Illuminate\Support\Facades\Vite::cspNonce() }}">{!! json_encode(['@context' => 'https://schema.org', '@type' => 'SoftwareApplication', 'name' => 'Dot.Agents', 'applicationCategory' => 'BusinessApplication', 'operatingSystem' => 'Web', 'url' => url('/'), 'description' => 'AI agents for business that do real work with the tools you allow, and stop for a person when it matters.'], JSON_UNESCAPED_SLASHES) !!}</script>
-    <link rel="preload" href="/dot-ui/fonts/roboto/roboto-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="/dot-ui/css/dot-roboto.css">
-    <link rel="stylesheet" href="/dot-ui/css/dot-type.css">
+    <link rel="stylesheet" href="/dot-ui/css/dot-roboto.min.css">
+    <link rel="stylesheet" href="/dot-ui/css/dot-type.min.css">
     @vite(['resources/css/landing.css', 'resources/js/landing.js'])
 </head>
 <body>
