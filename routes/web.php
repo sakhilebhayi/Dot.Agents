@@ -8,6 +8,7 @@ use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\PrivacyController;
 use App\Http\Controllers\ReadyController;
 use App\Http\Controllers\SchedulerProbeController;
+use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SocialAccountController;
 use App\Http\Controllers\SocialOAuthController;
 use App\Http\Controllers\SocialWebhookController;
@@ -91,6 +92,9 @@ Route::middleware([
 
     // Dashboard
     Route::get('/dashboard', fn () => view('dashboard'))->name('dashboard');
+
+    // Search across this business (the header search submits here)
+    Route::get('/search', [SearchController::class, 'index'])->middleware('throttle:60,1')->name('search');
 
     // Marketplace
     Route::get('/marketplace', fn () => view('marketplace.index'))->name('marketplace');

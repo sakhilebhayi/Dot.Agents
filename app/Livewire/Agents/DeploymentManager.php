@@ -29,8 +29,9 @@ class DeploymentManager extends Component
         // No explicit organization_id filter needed: AgentDeployment's
         // HasOrganizationScope trait applies it automatically from the session.
         return AgentDeployment::with(['agent', 'owner'])
-            ->when($this->search, fn ($q) => $q->where('name', 'like', "%{$this->search}%")
-                ->orWhereHas('agent', fn ($q2) => $q2->where('name', 'like', "%{$this->search}%")))
+            // One grouped condition: the OR sits inside its own parentheses, so it cannot outvote the status filter or the business scope.
+            ->when($this->search, fn ($q) => $q->where(fn ($match) => $match->where('name', 'like', "%{$this->search}%")
+                ->orWhereHas('agent', fn ($q2) => $q2->where('name', 'like', "%{$this->search}%"))))
             ->when($this->filterStatus, fn ($q) => $q->where('status', $this->filterStatus))
             ->orderByDesc('created_at')
             ->paginate(12);

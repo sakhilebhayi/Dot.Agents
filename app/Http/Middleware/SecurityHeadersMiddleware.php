@@ -36,8 +36,8 @@ class SecurityHeadersMiddleware
             "default-src 'self'",
             "script-src 'self' 'nonce-{$nonce}' 'unsafe-eval'",
             "script-src-attr 'none'",
-            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-            "font-src 'self' https://fonts.gstatic.com data:",
+            "style-src 'self' 'unsafe-inline'",
+            "font-src 'self' data:", // Roboto is self-hosted (public/dot-ui/fonts/roboto): no font origin
             "img-src 'self' data: blob: https://ui-avatars.com https://images.unsplash.com",
             "connect-src 'self'",
             "frame-ancestors 'none'",

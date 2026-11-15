@@ -19,27 +19,27 @@ colors:
   running: "#7FB2EC"
 typography:
   title:
-    fontFamily: Public Sans
+    fontFamily: Roboto
     fontSize: 24px
     fontWeight: 600
     lineHeight: 30px
   section:
-    fontFamily: Public Sans
+    fontFamily: Roboto
     fontSize: 16px
     fontWeight: 600
     lineHeight: 22px
   body:
-    fontFamily: Public Sans
+    fontFamily: Roboto
     fontSize: 14px
     fontWeight: 400
     lineHeight: 20px
   small:
-    fontFamily: Public Sans
+    fontFamily: Roboto
     fontSize: 12px
     fontWeight: 400
     lineHeight: 16px
   figure:
-    fontFamily: IBM Plex Mono
+    fontFamily: ui-monospace
     fontSize: 20px
     fontWeight: 500
     lineHeight: 26px
@@ -70,7 +70,7 @@ The metaphor lives in the drawing, never in the words. No page says train, track
 
 **Screen question:** what are my agents doing, and what needs me?
 
-**The face:** the one accent is the brand's gold, used as a 1px selection line and as the colour of anything held for a person. Every figure is set in IBM Plex Mono, so counts, money and times stack.
+**The face:** the one accent is the brand's gold, used as a 1px selection line and as the colour of anything held for a person. Every figure is set in the system monospace (`--dot-font-mono`), so counts, money and times stack.
 
 **The element only this product has:** the line. A run is drawn as one line with a stop for each step. A step waiting for a person is a held signal on that line. It appears on the run page, the agent profile, the execution centre and the workflow builder, so one picture means one thing everywhere.
 
@@ -87,7 +87,7 @@ Colour goes on state, not on chrome. Under 3% of a screen.
 
 ## Typography
 
-Public Sans for words, IBM Plex Mono for figures, ids and times. Sentence case. No tracked capitals. Page titles 24px at most: no hero headers inside the app.
+Roboto (self-hosted, the Dot ecosystem face since R-52) for words, the system monospace for figures, ids and times. Sentence case. No tracked capitals. Page titles 24px at most: no hero headers inside the app.
 
 ## Layout
 

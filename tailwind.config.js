@@ -1,9 +1,10 @@
-import defaultTheme from 'tailwindcss/defaultTheme';
+import dotPreset from './dot-ui/tailwind/tailwind-preset.cjs';
 import forms from '@tailwindcss/forms';
 import typography from '@tailwindcss/typography';
 
 /** @type {import('tailwindcss').Config} */
 export default {
+    presets: [dotPreset],
     darkMode: 'class',
     content: [
         './vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php',
@@ -15,10 +16,6 @@ export default {
 
     theme: {
         extend: {
-            fontFamily: {
-                sans: ['Inter', 'Space Grotesk', ...defaultTheme.fontFamily.sans],
-                display: ['Space Grotesk', 'Inter', ...defaultTheme.fontFamily.sans],
-            },
             colors: {
                 // Brand palette
                 brand: {

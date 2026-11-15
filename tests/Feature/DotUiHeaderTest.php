@@ -17,7 +17,7 @@ use Tests\TestCase;
 
 /**
  * The header carries the shared Dot UI (dot-ui): the platform switcher, and the in-page filters use its compact filter.
- * Dot.Agents has no header search, so none is added. The switcher only ever shows what InfoDot says the CURRENT
+ * Since R-52 the header also carries the shared search pill (tests/Feature/R52HeaderSearchTest.php). The switcher only ever shows what InfoDot says the CURRENT
  * business holds, linking through InfoDot's /go (never straight to a host, never with a token).
  */
 class DotUiHeaderTest extends TestCase
@@ -86,17 +86,17 @@ class DotUiHeaderTest extends TestCase
         return $m[0];
     }
 
-    // -- No header search is invented -------------------------------------------------
+    // -- The header search (R-52): the shared pill, over this business's own records --------
 
-    public function test_there_is_no_header_search_pill_because_the_platform_has_no_header_search(): void
+    public function test_the_header_carries_the_shared_search_pill(): void
     {
         $this->fakeInfoDot([self::url(self::ACME) => Http::response(self::body(self::ACME))]);
         [$user, $organization] = $this->memberOf(self::ACME, 'Acme Ltd');
 
         $html = $this->open($user, $organization)->get(route('dashboard'))->assertOk()->getContent();
 
-        $this->assertStringNotContainsString('dsr-input', $html);
-        $this->assertStringNotContainsString('role="search"', $html);
+        $this->assertStringContainsString('dsr-input', $html);
+        $this->assertStringContainsString('role="search"', $html);
     }
 
     public function test_a_guest_sees_no_switcher(): void
@@ -272,14 +272,14 @@ class DotUiHeaderTest extends TestCase
         $this->assertStringContainsString('See all platforms', $html);
     }
 
-    public function test_the_switcher_is_also_in_the_older_account_pages_layout(): void
+    public function test_the_switcher_is_also_in_the_account_pages(): void
     {
         $this->fakeInfoDot([self::url(self::ACME) => Http::response(self::body(self::ACME))]);
         [$user, $organization] = $this->memberOf(self::ACME, 'Acme Ltd');
 
         $html = $this->open($user, $organization)->get(route('teams.create'))->assertOk()->getContent();
 
-        $this->assertStringContainsString('class="topbar"', $html, 'the account pages use the older layout');
+        $this->assertStringContainsString('<header class="dh', $html, 'the account pages share the one header');
         $this->assertStringContainsString('/go/files?company='.self::ACME, $this->switcherHtml($html));
     }
 
@@ -293,7 +293,7 @@ class DotUiHeaderTest extends TestCase
         $response = $this->open($user, $organization)->get(route('dashboard'))->assertOk();
         $html = $response->getContent();
 
-        foreach (['css/dot-fonts.css', 'css/dot-tokens.css', 'css/dot-search.css', 'css/dot-switcher-fonts.css', 'css/dot-switcher.css', 'js/dot-switcher.js'] as $asset) {
+        foreach (['css/dot-ui.min.css', 'js/dot-ui-core.min.js', 'js/dot-theme-boot.min.js'] as $asset) {
             $this->assertStringContainsString(asset('dot-ui/'.$asset), $html, $asset.' is linked from this site');
             $this->assertFileExists(public_path('dot-ui/'.$asset));
         }
