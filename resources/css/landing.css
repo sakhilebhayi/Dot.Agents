@@ -63,6 +63,9 @@ h1 span { color: var(--gold); }
 .stop.refused::after { rotate: 0deg; border-color: var(--stop); background: var(--stop); }
 @keyframes hold { 50% { opacity: 0.45; } }
 .card { margin-top: 20px; padding: 16px; border: 1px solid var(--gold); border-radius: 6px; background: var(--raised); animation: rise 320ms var(--ease); }
+/* CLS: the card appears on a timer, so its room is kept while it waits (a shift the visitor did not ask for). */
+.card[hidden] { display: block; visibility: hidden; animation: none; }
+@media (scripting: none) { .card[hidden] { display: none; } }
 @keyframes rise { from { opacity: 0; translate: 0 8px; } }
 .card-what { font-weight: 600; }
 .card dl { display: grid; gap: 6px; margin: 10px 0 14px; font-size: 15px; }
@@ -166,6 +169,7 @@ h1 span { color: var(--gold); }
     .split, .hero-top { grid-template-columns: minmax(0, 1fr); }
     .run { --indent: 32px; }
     .hero-signin { display: none; }
+    .bar .brand, .bar nav a.signin, .foot nav a { display: inline-flex; align-items: center; min-height: 44px; min-width: 44px; }
     .agent, .dial, .record-figure { padding: 16px; }
     .dial-steps label { font-size: 14px; }
     .branch-wide { display: none !important; }
