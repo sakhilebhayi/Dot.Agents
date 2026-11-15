@@ -159,8 +159,12 @@ final class AgentsSearch
     /**
      * Every word must appear in one of the columns (case-insensitive, `%` and `_` typed by a person are literal).
      *
+     * @template TModel of \Illuminate\Database\Eloquent\Model
+     *
+     * @param  Builder<TModel>  $query
      * @param  list<string>  $words
      * @param  list<string>  $columns
+     * @return Builder<TModel>
      */
     private function matching(Builder $query, array $words, array $columns): Builder
     {

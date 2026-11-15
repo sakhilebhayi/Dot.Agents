@@ -230,7 +230,6 @@ a.row:hover, button.row:hover { background: var(--raised); }
     .side { position: fixed; inset: 0 auto 0 0; align-self: stretch; z-index: var(--dh-z-drawer, 120); width: min(300px, 88vw); height: auto; border-right: 1px solid var(--border); background: var(--ground); visibility: hidden; translate: -100% 0; transition: translate 220ms var(--ease), visibility 0s linear 220ms; }
     .side[data-dh-open] { visibility: visible; translate: 0 0; transition: translate 220ms var(--ease), visibility 0s; }
     .side-brand { display: flex; }
-    .side-item { height: 44px; }
     .side-group { padding-top: 18px; }
 }
 
@@ -529,12 +528,17 @@ a.row:hover, button.row:hover { background: var(--raised); }
     .desk-filter { padding: 4px 10px; }
     .tab { min-height: 44px; min-width: 44px; display: inline-flex; align-items: center; justify-content: center; padding-block: 0; }
     a.row-main { min-height: 44px; display: flex; flex-direction: column; justify-content: center; }
-    nav[role='navigation'] a, nav[role='navigation'] button { min-height: 44px; }
+    nav[role='navigation'] a, nav[role='navigation'] button { min-height: 44px; min-width: 44px; justify-content: center; }
+    .side-item { height: 44px; }
     .star { width: 44px; height: 44px; margin-left: -10px; }
     .check-line, .check { min-height: 44px; }
     .check-line input, .check input[type='checkbox'], .check input[type='radio'] { width: 20px; height: 20px; }
     .signal summary, .dash .tech summary, .acct .tech summary { min-height: 44px; display: inline-flex; align-items: center; }
-    .arrive-more a { min-width: 44px; justify-content: center; }
+    .arrive-more a { min-width: 44px; min-height: 44px; justify-content: center; }
+    .dash .star { width: 44px; height: 44px; }
+    .roster .star-col { width: 44px; }
+    .dash .btn.small, .dash .segmented .btn.small { height: 44px; padding: 0 12px; }
+    .dh .dsr-item { min-height: 44px; }
     .roster .row-main { min-height: 44px; display: flex; flex-direction: column; justify-content: center; }
     .table a, .table button { min-height: 44px; display: inline-flex; align-items: center; }
     .roster td.name a { min-height: 52px; }
