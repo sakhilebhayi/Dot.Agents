@@ -10,9 +10,7 @@ use Livewire\Component;
 class NotificationBell extends Component
 {
     /** Actions a read-only (viewer) role may still call; every other action is refused for it. */
-    public const READ_ONLY_ACTIONS = ['toggle', 'markAsRead', 'markAllAsRead', 'refresh', '__dispatch'];
-
-    public bool $open = false;
+    public const READ_ONLY_ACTIONS = ['markAsRead', 'markAllAsRead', 'refresh', '__dispatch'];
 
     #[Computed]
     public function notifications()
@@ -29,11 +27,6 @@ class NotificationBell extends Component
         return PlatformNotification::where('user_id', auth()->id())
             ->whereNull('read_at')
             ->count();
-    }
-
-    public function toggle(): void
-    {
-        $this->open = ! $this->open;
     }
 
     public function markAsRead(int $notificationId): void

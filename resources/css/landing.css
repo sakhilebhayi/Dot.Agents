@@ -2,7 +2,7 @@
 :root {
     --ground: #17151e; --surface: #121018; --raised: #211e2a; --line: #2a2733; --control: #433f50;
     --ink: #f5f4f7; --muted: #a9a7b4; --gold: #f0c23a; --on-gold: #1a1400; --clear: #4fbf94; --stop: #ef6a7e;
-    --sans: 'Public Sans', system-ui, sans-serif; --mono: 'IBM Plex Mono', ui-monospace, monospace;
+    --sans: var(--dot-font-sans); --mono: var(--dot-font-mono);
     --gutter: clamp(16px, 5vw, 72px); --ease: cubic-bezier(0.16, 1, 0.3, 1);
     color-scheme: dark;
 }

@@ -32,9 +32,10 @@
     --row: 44px;
     --control-h: 34px;
     --sidebar: 232px;
+    --side-top: var(--dot-header-offset, 56px);
     --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
-    --mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', monospace;
-    --sans: 'Public Sans', system-ui, sans-serif;
+    --mono: var(--dot-font-mono);
+    --sans: var(--dot-font-sans);
     color-scheme: dark;
 }
 
@@ -61,6 +62,32 @@
     color-scheme: light;
 }
 
+/* "System" in the account menu removes data-theme: follow the device. */
+@media (prefers-color-scheme: light) {
+    :root:not([data-theme]) {
+        --ground: #f4f3f6;
+        --surface: #ffffff;
+        --raised: #ececf0;
+        --active: #e2e1e7;
+        --border: #dedde4;
+        --rule: #ececf0;
+        --control: #bdbbc7;
+        --text: #17151e;
+        --muted: #5d5a69;
+        --accent: #8a6500;
+        --on-accent: #ffffff;
+        --clear: #16744f;
+        --clear-wash: #e2f3ec;
+        --stop: #b82a40;
+        --stop-wash: #fbe9ec;
+        --hold: #8a6500;
+        --hold-wash: #fbf1d3;
+        --running: #1f5fa8;
+        --running-wash: #e4eefa;
+        color-scheme: light;
+    }
+}
+
 html, body { height: 100%; }
 body.signal { margin: 0; background: var(--ground); color: var(--text); font: 400 14px/20px var(--sans); -webkit-font-smoothing: antialiased; }
 .signal h1, .signal h2, .signal h3, .signal p { margin: 0; }
@@ -72,14 +99,13 @@ body.signal { margin: 0; background: var(--ground); color: var(--text); font: 40
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 [x-cloak] { display: none !important; }
 
-/* Shell */
-.skip { position: absolute; left: 16px; top: -60px; z-index: 90; padding: 8px 12px; border-radius: var(--radius); background: var(--accent); color: var(--on-accent); font-weight: 600; }
-.skip:focus { top: 8px; }
-.shell { display: grid; grid-template-columns: var(--sidebar) minmax(0, 1fr); min-height: 100dvh; }
-.side { position: sticky; top: 0; display: flex; flex-direction: column; height: 100dvh; overflow-y: auto; border-right: 1px solid var(--border); background: var(--ground); }
-.side-brand { display: flex; align-items: center; gap: 10px; height: 56px; padding: 0 16px; font-weight: 600; text-decoration: none; flex: none; }
+/* Shell. The dot-ui header (56px, sticky) sits over a sidebar and the page; --dot-header-offset is the height of whatever is above. */
+.shell { display: grid; grid-template-columns: var(--sidebar) minmax(0, 1fr); min-height: calc(100vh - var(--dot-header-offset, 56px)); min-height: calc(100dvh - var(--dot-header-offset, 56px)); }
+.side { position: sticky; top: var(--dot-header-offset, 56px); align-self: start; display: flex; flex-direction: column; height: calc(100vh - var(--dot-header-offset, 56px)); height: calc(100dvh - var(--dot-header-offset, 56px)); overflow-y: auto; overscroll-behavior: contain; border-right: 1px solid var(--border); background: var(--ground); }
+.side-brand { display: none; align-items: center; justify-content: space-between; gap: 10px; height: 56px; padding: 0 8px 0 16px; font-weight: 600; flex: none; }
+.side-brand a { display: flex; align-items: center; gap: 10px; min-height: 44px; text-decoration: none; }
 .side-brand img { width: 26px; height: 26px; }
-.side-org { margin: 0 8px 8px; padding: 8px; border: 1px solid var(--border); border-radius: var(--radius); flex: none; }
+.side-org { margin: 8px 8px; padding: 8px; border: 1px solid var(--border); border-radius: var(--radius); flex: none; }
 .side-org b { display: block; font-weight: 500; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .side-org span { display: block; color: var(--muted); font-size: 12px; line-height: 16px; }
 .side-nav { flex: 1; padding: 0 8px 8px; }
@@ -89,23 +115,13 @@ body.signal { margin: 0; background: var(--ground); color: var(--text); font: 40
 .side-item:hover { background: var(--raised); color: var(--text); }
 .side-item[aria-current='page'] { color: var(--text); background: var(--raised); box-shadow: inset 1px 0 0 var(--accent); }
 .side-item .count { margin-left: auto; color: var(--hold); font: 500 12px/16px var(--mono); }
-.side-foot { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-top: 1px solid var(--border); flex: none; }
-.side-foot img { width: 26px; height: 26px; border-radius: 50%; }
-.side-foot .who { flex: 1; min-width: 0; }
-.side-foot b { display: block; font-weight: 500; font-size: 13px; line-height: 16px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-.side-foot span { display: block; color: var(--muted); font-size: 12px; line-height: 16px; }
 .main { display: flex; flex-direction: column; min-width: 0; }
-.top { position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 8px; height: 56px; padding: 0 var(--pad); border-bottom: 1px solid var(--border); background: var(--ground); }
-.top-title { min-width: 0; font-weight: 600; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-.top-space { flex: 1; }
-.menu-btn { display: none; }
 .page { width: min(1200px, 100%); margin-inline: auto; padding: var(--pad); }
 .page.narrow { width: min(760px, 100%); }
 .page-head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--gap); margin-bottom: var(--pad); }
 .page-head h1 { font-size: 24px; line-height: 30px; font-weight: 600; letter-spacing: -0.01em; }
 .page-head p { margin-top: 4px; color: var(--muted); max-width: 68ch; }
 .page-actions { display: flex; flex-wrap: wrap; gap: 8px; flex: none; }
-.veil { position: fixed; inset: 0; z-index: 40; background: rgb(0 0 0 / 0.55); }
 
 /* Controls */
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: var(--control-h); padding: 0 12px; border: 1px solid var(--control); border-radius: var(--radius); background: transparent; color: var(--text); font: 500 14px/1 var(--sans); text-decoration: none; cursor: pointer; white-space: nowrap; transition: background 120ms var(--ease), border-color 120ms var(--ease), translate 120ms var(--ease); }
@@ -139,7 +155,9 @@ body.signal { margin: 0; background: var(--ground); color: var(--text); font: 40
 .card-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; padding: 0 16px; border-bottom: 1px solid var(--rule); }
 .card-head h2 { font-size: 14px; line-height: 20px; font-weight: 600; }
 .card-body { padding: 16px; }
+:where(.grid) { grid-template-columns: minmax(0, 1fr); }
 .grid { display: grid; gap: var(--gap); }
+.grid > * { min-width: 0; }
 .grid.two { grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); }
 .row { display: flex; align-items: center; gap: 12px; min-height: var(--row); padding: 6px 16px; border-top: 1px solid var(--rule); text-decoration: none; }
 .row:first-child { border-top: 0; }
@@ -206,12 +224,17 @@ a.row:hover, button.row:hover { background: var(--raised); }
 .sheet-body { flex: 1; overflow-y: auto; padding: 16px; }
 .sheet-foot { display: flex; justify-content: flex-end; gap: 8px; padding: 12px 16px; border-top: 1px solid var(--border); }
 
+@media (max-width: 860px) {
+    .shell { grid-template-columns: minmax(0, 1fr); min-height: calc(100dvh - var(--dot-header-offset, 52px)); }
+    /* The menu button opens the sidebar (dot-ui adopt mode): off-canvas, hidden from the tab order while closed, above dot-ui's scrim. */
+    .side { position: fixed; inset: 0 auto 0 0; align-self: stretch; z-index: var(--dh-z-drawer, 120); width: min(300px, 88vw); height: auto; border-right: 1px solid var(--border); background: var(--ground); visibility: hidden; translate: -100% 0; transition: translate 220ms var(--ease), visibility 0s linear 220ms; }
+    .side[data-dh-open] { visibility: visible; translate: 0 0; transition: translate 220ms var(--ease), visibility 0s; }
+    .side-brand { display: flex; }
+    .side-item { height: 44px; }
+    .side-group { padding-top: 18px; }
+}
+
 @media (max-width: 960px) {
-    .shell { grid-template-columns: minmax(0, 1fr); }
-    .side { position: fixed; inset: 0 auto 0 0; z-index: 50; width: min(280px, 86vw); translate: -100% 0; transition: translate 200ms var(--ease); }
-    .side.open { translate: 0 0; }
-    .menu-btn { display: inline-flex; margin-left: -8px; }
-    .top { padding: 0 16px; }
     .page { padding: 16px; }
     .page-head { flex-direction: column; }
     .grid.two { grid-template-columns: minmax(0, 1fr); }
@@ -219,6 +242,7 @@ a.row:hover, button.row:hover { background: var(--raised); }
     .stat { border-left: 0; border-top: 1px solid var(--rule); }
     .stat:nth-child(-n + 2) { border-top: 0; }
     .stat:nth-child(even) { border-left: 1px solid var(--rule); }
+    .stats > .stat:last-child:nth-child(odd) { grid-column: 1 / -1; }
     .line { flex-direction: column; overflow: visible; }
     .stop-point { flex: none; width: 100%; padding: 0 0 14px 22px; }
     .stop-point::before { top: 0; bottom: 0; left: 5px !important; right: auto !important; width: 2px; height: auto; }
@@ -285,7 +309,7 @@ a.row:hover, button.row:hover { background: var(--raised); }
 .template { align-items: flex-start; padding-block: 12px; }
 .row-main p { margin: 2px 0 0; overflow-wrap: anywhere; }
 .setup { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: var(--gap); align-items: start; }
-.setup-review { position: sticky; top: 72px; }
+.setup-review { position: sticky; top: calc(var(--dot-header-offset, 56px) + 16px); }
 .verdict { color: var(--muted); }
 .verdict.stop { color: var(--stop); }
 .verdict.clear { color: var(--clear); }
@@ -445,8 +469,8 @@ a.row:hover, button.row:hover { background: var(--raised); }
 .upright .stop-point:last-child::before { display: none; }
 .upright .stop-point b { white-space: normal; }
 
-/* Shared Dot UI (public/dot-ui): the host maps its own tokens onto the package's. Plain :root, so it wins in both
-   themes; the switcher's panel stays InfoDot's paper sheet, only its button follows the Signal Box. */
+/* Shared Dot UI (public/dot-ui): the host maps its own tokens onto the package's. Plain :root, so it wins in both themes. The switcher's
+   panel stays InfoDot's paper sheet; its button and the whole header bar follow the Signal Box. */
 :root {
     --dsr-panel: var(--raised);
     --dsr-hover: var(--active);
@@ -463,11 +487,56 @@ a.row:hover, button.row:hover { background: var(--raised); }
     --dsr-filter-border: var(--control);
     --dsr-filter-border-hover: var(--muted);
     --dsr-filter-border-focus: var(--accent);
+    --dsr-focus-ring: var(--accent);
+    --dsr-filter-h: 34px;
+    --dh-bg: var(--ground);
+    --dh-ink: var(--text);
+    --dh-ink-2: var(--muted);
+    --dh-rule: var(--border);
+    --dh-hover: var(--raised);
+    --dh-accent: var(--accent);
+    --dh-focus: var(--accent);
+    --dh-radius: var(--radius);
+    --dh-badge-bg: var(--accent);
+    --dh-badge-ink: var(--on-accent);
+    --dh-avatar-bg: var(--accent);
+    --dh-avatar-ink: var(--on-accent);
+    --dh-logo-h: 28px;
+    --dh-search-w: clamp(280px, 32vw, 640px);
 }
-.top .dsw, .topbar .dsw {
-    --dsw-btn-ink: var(--muted);
-    --dsw-btn-border: var(--control);
-    --dsw-btn-bg-hover: var(--raised);
-    --dsw-focus: var(--accent);
+.dh .dsw {
     --dsw-radius: var(--radius);
+}
+.bell-host { display: contents; }
+.page.flash { padding-bottom: 0; }
+@media (max-width: 479px) { .dh-brand__name { display: none; } }
+.bell-item { align-items: flex-start; }
+.bell-text { flex: 1; min-width: 0; color: var(--dhp-ink-2, var(--muted)); }
+.bell-text b { display: block; font-weight: 500; overflow-wrap: anywhere; }
+.bell-item[data-unread] .bell-text b { font-weight: 600; }
+.bell-body { display: -webkit-box; margin: 2px 0 0; overflow: hidden; font-size: 13px; overflow-wrap: anywhere; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; }
+.bell-text time { display: block; margin-top: 2px; font-size: 12px; line-height: 16px; }
+.hs-sub { color: var(--dsr-text-3, var(--muted)); font-size: 12px; }
+.search-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+
+/* Touch and tablet: every control is at least 44px, text fields are 16px (iOS zooms the page into anything smaller). Desktop keeps the dense 34px. */
+@media (max-width: 1024px), (pointer: coarse) {
+    :root { --control-h: 44px; }
+    .btn, .btn.small, .icon-btn { min-height: 44px; }
+    .btn.small { height: 44px; padding: 0 12px; font-size: 14px; }
+    .icon-btn { min-width: 44px; }
+    .input, .select, .textarea, .desk-filter { min-height: 44px; font-size: 16px; line-height: 24px; }
+    .desk-filter { padding: 4px 10px; }
+    .tab { min-height: 44px; min-width: 44px; display: inline-flex; align-items: center; justify-content: center; padding-block: 0; }
+    a.row-main { min-height: 44px; display: flex; flex-direction: column; justify-content: center; }
+    nav[role='navigation'] a, nav[role='navigation'] button { min-height: 44px; }
+    .star { width: 44px; height: 44px; margin-left: -10px; }
+    .check-line, .check { min-height: 44px; }
+    .check-line input, .check input[type='checkbox'], .check input[type='radio'] { width: 20px; height: 20px; }
+    .signal summary, .dash .tech summary, .acct .tech summary { min-height: 44px; display: inline-flex; align-items: center; }
+    .arrive-more a { min-width: 44px; justify-content: center; }
+    .roster .row-main { min-height: 44px; display: flex; flex-direction: column; justify-content: center; }
+    .table a, .table button { min-height: 44px; display: inline-flex; align-items: center; }
+    .roster td.name a { min-height: 52px; }
+    .row.roster-row { min-height: 52px; }
 }

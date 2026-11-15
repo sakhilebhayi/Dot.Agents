@@ -20,6 +20,10 @@
 .arrive-logo img { display: block; width: auto; height: 64px; }
 .arrive-logo .on-light, :root[data-theme='light'] .arrive-logo .on-dark { display: none; }
 :root[data-theme='light'] .arrive-logo .on-light { display: block; }
+@media (prefers-color-scheme: light) {
+    :root:not([data-theme]) .arrive-logo .on-dark { display: none; }
+    :root:not([data-theme]) .arrive-logo .on-light { display: block; }
+}
 .arrive-lead { min-width: 0; grid-column: 1; }
 .arrive-welcome { color: var(--muted); }
 .arrive h1 { margin-top: 6px; max-width: 26ch; font-size: 28px; line-height: 34px; font-weight: 600; letter-spacing: -0.015em; text-wrap: balance; overflow-wrap: break-word; }

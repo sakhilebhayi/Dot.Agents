@@ -37,25 +37,6 @@ class NotificationBellTest extends TestCase
     }
 
     #[Test]
-    public function it_starts_closed(): void
-    {
-        Livewire::actingAs($this->user)
-            ->test(NotificationBell::class)
-            ->assertSet('open', false);
-    }
-
-    #[Test]
-    public function toggle_opens_and_closes_the_dropdown(): void
-    {
-        Livewire::actingAs($this->user)
-            ->test(NotificationBell::class)
-            ->call('toggle')
-            ->assertSet('open', true)
-            ->call('toggle')
-            ->assertSet('open', false);
-    }
-
-    #[Test]
     public function unread_count_reflects_unread_notifications_for_the_user(): void
     {
         PlatformNotification::factory()->count(3)->create([

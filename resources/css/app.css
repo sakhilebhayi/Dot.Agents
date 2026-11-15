@@ -169,7 +169,7 @@
         @apply text-xs font-medium text-[#909088] uppercase tracking-wide;
     }
     .da-metric-value {
-        @apply text-3xl font-bold text-[#111111] font-display mt-1;
+        @apply text-3xl font-bold text-[#111111] font-sans mt-1;
     }
     .da-metric-delta-up   { @apply text-xs font-medium text-green-600; }
     .da-metric-delta-down { @apply text-xs font-medium text-red-600; }
