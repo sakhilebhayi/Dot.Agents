@@ -23,9 +23,9 @@
         @auth
             <a class="button" href="{{ url('/dashboard') }}">Open platform</a>
         @else
-            <a class="signin" href="{{ route('login') }}">Sign in</a>
+            <a class="signin" href="{{ \App\Support\CentralSignIn::login() }}">Sign in</a>
             @if (Route::has('register'))
-                <a class="button solid" href="{{ route('register') }}">Get started</a>
+                <a class="button solid" href="{{ \App\Support\CentralSignIn::register(route('register')) }}">Get started</a>
             @endif
         @endauth
     </nav>

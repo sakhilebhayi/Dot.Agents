@@ -32,7 +32,7 @@
         <a href="#job">The job</a>
         <a href="#gate">What it can touch</a>
         <a href="#record">The record</a>
-        <a class="signin" href="{{ route('login') }}">Sign in</a>
+        <a class="signin" href="{{ \App\Support\CentralSignIn::login() }}">Sign in</a>
     </nav>
 </header>
 
@@ -43,8 +43,8 @@
             <div>
                 <p class="lede">Dot.Agents gives your business AI agents that do real work, with only the tools you allow. When something needs a person, the work holds at a signal until one answers.</p>
                 <div class="hero-actions">
-                    <a class="button solid" href="{{ route('register') }}">Set up your first agent</a>
-                    <a class="button hero-signin" href="{{ route('login') }}">Sign in</a>
+                    <a class="button solid" href="{{ \App\Support\CentralSignIn::register(route('register')) }}">Set up your first agent</a>
+                    <a class="button hero-signin" href="{{ \App\Support\CentralSignIn::login() }}">Sign in</a>
                 </div>
             </div>
         </div>
@@ -196,7 +196,7 @@
             <div>
                 <h2>Start with one agent and one job.</h2>
                 <p>Dot.Agents is part of the Dot business platforms.</p>
-                <a class="button solid" href="{{ route('register') }}">Set up your first agent</a>
+                <a class="button solid" href="{{ \App\Support\CentralSignIn::register(route('register')) }}">Set up your first agent</a>
             </div>
             <dl class="finished" aria-label="How the example run ended">
                 <div><dt>Invoice check</dt><dd class="ok">Finished</dd></div>

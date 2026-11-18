@@ -13,6 +13,7 @@ use App\Providers\JetstreamServiceProvider;
 use App\Providers\PolicyServiceProvider;
 use App\Providers\ReadOnlyServiceProvider;
 use App\Providers\SocialServiceProvider;
+use Dot\SsoClient\DotSsoServiceProvider;
 
 return [
     AppServiceProvider::class,
@@ -31,4 +32,5 @@ return [
     JetstreamServiceProvider::class,
     // Read-only (viewer) role: Gate, Livewire and Blade hooks
     ReadOnlyServiceProvider::class,
+    DotSsoServiceProvider::class,
 ];
