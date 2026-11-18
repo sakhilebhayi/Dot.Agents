@@ -17,7 +17,7 @@
             @endif
         @else
             <p class="auth-more">Sign in with the account for {{ $invitation->email }}. If you do not come back here after signing in, open the link in your email again.</p>
-            <p class="auth-more"><a class="button solid" href="{{ route('login') }}">Sign in</a></p>
+            <p class="auth-more"><a class="button solid" href="{{ \App\Support\CentralSignIn::login() }}">Sign in</a></p>
         @endauth
     @endif
 </x-guest-layout>

@@ -4,6 +4,7 @@ namespace App\Mail;
 
 use App\Models\Organization;
 use App\Models\User;
+use App\Support\CentralSignIn;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -34,7 +35,7 @@ class WelcomeEmail extends Mailable implements ShouldQueue
             with: [
                 'userName' => $this->user->name,
                 'orgName' => $this->organization->name,
-                'loginUrl' => url('/login'),
+                'loginUrl' => CentralSignIn::active() ? CentralSignIn::login() : url('/login'),
                 'docsUrl' => url('/docs'),
             ],
         );

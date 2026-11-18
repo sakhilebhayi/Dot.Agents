@@ -6,6 +6,7 @@ use App\Actions\Fortify\CreateNewUser;
 use App\Actions\Fortify\ResetUserPassword;
 use App\Actions\Fortify\UpdateUserPassword;
 use App\Actions\Fortify\UpdateUserProfileInformation;
+use App\Support\CentralSignIn;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
@@ -32,6 +33,10 @@ class FortifyServiceProvider extends ServiceProvider
         // Registered after every provider boots: Jetstream sets its own login view in its boot, and the last one wins.
         $this->app->booted(function () {
             $front = fn (string $view, string $path) => function () use ($view, $path) {
+                if (CentralSignIn::active()) {
+                    return redirect()->to(CentralSignIn::login());
+                }
+
                 $infodot = (string) config('ecosystem.platforms.infodot.url', '');
 
                 return $infodot !== '' && config('ecosystem.sso_only')
@@ -42,6 +47,10 @@ class FortifyServiceProvider extends ServiceProvider
             Fortify::loginView($front('auth.login', '/login'));
             Fortify::requestPasswordResetLinkView($front('auth.forgot-password', '/forgot-password'));
             Fortify::resetPasswordView(function () {
+                if (CentralSignIn::active()) {
+                    return redirect()->to(CentralSignIn::login());
+                }
+
                 $infodot = (string) config('ecosystem.platforms.infodot.url', '');
 
                 return $infodot !== '' && config('ecosystem.sso_only')

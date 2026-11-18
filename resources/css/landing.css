@@ -217,6 +217,23 @@ h1 span { color: var(--gold); }
 .auth-problem { margin-top: 16px; padding: 10px 12px; border-left: 2px solid var(--stop); background: var(--surface); }
 .auth-foot { color: var(--muted); font-size: 14px; }
 
+/* Claiming an existing account and the sign-in error page (R-54): one column, 44px targets, the Signal Box tokens only. */
+.claim-email { overflow-wrap: anywhere; }
+.auth .field .claim-code { font-size: 24px; font-weight: 600; letter-spacing: 0.3em; text-align: center; font-variant-numeric: tabular-nums; }
+.auth .field .claim-code[aria-invalid='true'] { border-color: var(--stop); }
+.claim-help { margin-top: 0; color: var(--muted); font-size: 14px; }
+.claim-error { margin-top: 0; color: var(--stop); }
+.claim-error:empty { display: none; }
+.auth .claim-aside { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.auth .claim-aside form { margin: 0; }
+.auth .claim-actions { display: grid; gap: 8px; margin-top: 24px; }
+.auth .claim-actions + .claim-help { margin-top: 16px; }
+.auth a.button { text-decoration: none; }
+.auth a.button:hover { color: var(--ink); }
+.auth a.button.solid:hover { color: var(--on-gold); }
+.claim-link { border-color: transparent; color: var(--muted); }
+.claim-link:hover { color: var(--ink); }
+
 /* Legal and error pages */
 .doc-page { display: flex; flex-direction: column; min-height: 100dvh; }
 .doc-page .bar { flex: none; }

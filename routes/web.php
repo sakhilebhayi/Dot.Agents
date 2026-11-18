@@ -19,6 +19,7 @@ use App\Models\AgentRun;
 use App\Models\AgentWorkflow;
 use App\Models\User;
 use App\Services\Agents\AgentPackage;
+use App\Support\CentralSignIn;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Auth;
@@ -252,6 +253,10 @@ Route::get('/guardian/health', GuardianHealthController::class)
 // invitation email that points at it lands on the login page instead of failing.
 if (! Features::enabled(Features::registration())) {
     Route::get('/register', function () {
+        if (CentralSignIn::active()) {
+            return redirect()->to(CentralSignIn::register('/login'));
+        }
+
         $infodot = (string) config('ecosystem.platforms.infodot.url', '');
 
         return $infodot !== '' && config('ecosystem.sso_only')

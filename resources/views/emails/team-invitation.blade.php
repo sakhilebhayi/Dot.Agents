@@ -56,7 +56,7 @@
     <p>If you don't have a Dot.Agents account yet, create one first and then accept your invitation:</p>
 
     <div class="btn-block">
-      <a href="{{ route('register') }}" class="btn-primary">Create Account</a>
+      <a href="{{ \App\Support\CentralSignIn::register(route('register')) }}" class="btn-primary">Create Account</a>
     </div>
 
     <hr class="divider">
