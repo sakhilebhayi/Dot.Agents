@@ -499,4 +499,152 @@ class CompanyEntitlementTest extends TestCase
     {
         $this->assertContains(EnsureCompanyEntitled::class, app(PersistentMiddleware::class)->getPersistentMiddleware());
     }
+
+    // ------------------------------------------------------------------ R-61 availability contract
+
+    private static function availability(bool $entitled, ?bool $available, ?string $message = null): array
+    {
+        $body = self::platforms(self::ACME, $entitled, $entitled ? 'active' : 'suspended');
+
+        foreach ($body['platforms'] as &$row) {
+            if ($row['key'] === 'agents') {
+                if ($available !== null) {
+                    $row['available'] = $available;
+                }
+                if ($message !== null) {
+                    $row['message'] = $message;
+                }
+            }
+        }
+
+        return $body;
+    }
+
+    private function says(array $body): void
+    {
+        $this->infodotSays([self::readUrl(self::ACME) => Http::response($body)]);
+    }
+
+    private function outage(): void
+    {
+        $this->infodotSays([self::readUrl(self::ACME) => Http::response('', 500)]);
+    }
+
+    public function test_a_platform_switched_off_gives_503_even_when_the_company_holds_it(): void
+    {
+        [$user, $acme] = $this->member();
+        $this->says(self::availability(true, false, 'Back at 18:00.'));
+
+        $response = $this->open($user, $acme)->get(route('dashboard'))->assertStatus(503);
+        $this->assertStringContainsString('Back at 18:00.', $response->getContent());
+        $this->assertSame('60', $response->headers->get('Retry-After'));
+        $this->assertStringContainsString('no-store', (string) $response->headers->get('Cache-Control'));
+
+        $json = $this->getJson(route('dashboard'))->assertStatus(503);
+        $this->assertSame('platform_unavailable', $json->json('reason'));
+        $this->assertAuthenticated();
+        $this->assertSame($acme->name, $acme->fresh()->name);
+    }
+
+    public function test_it_is_checked_before_what_the_company_holds(): void
+    {
+        [$user, $acme] = $this->member();
+        $this->says(self::availability(false, false));
+
+        $this->open($user, $acme)->get(route('dashboard'))->assertStatus(503);
+    }
+
+    public function test_the_persons_own_data_rights_stay_open_while_switched_off(): void
+    {
+        [$user, $acme] = $this->member();
+        $this->says(self::availability(true, false));
+
+        $this->open($user, $acme)->get(route('dashboard'))->assertStatus(503);
+        $this->get(route('runs.index'))->assertStatus(503);
+        $this->post(route('privacy.export'))->assertOk();
+    }
+
+    public function test_a_livewire_update_gets_a_json_503_while_switched_off(): void
+    {
+        [$user, $acme] = $this->member();
+        $this->infodotSays([self::readUrl(self::ACME) => Http::sequence()
+            ->push(self::availability(true, true))
+            ->push(self::availability(true, false, 'Maintenance.'))]);
+        $this->open($user, $acme);
+        $snapshot = $this->livewireSnapshot();
+
+        $this->travel(EntitlementClient::ANSWER_TTL + 1)->seconds();
+        $response = $this->livewireRename($snapshot, 'Hijacked');
+
+        $this->assertSame(503, $response->getStatusCode());
+        $this->assertSame('platform_unavailable', $response->json('reason'));
+        $this->assertArrayNotHasKey('components', (array) $response->json());
+        $this->assertSame('Acme Ltd', $acme->fresh()->name);
+    }
+
+    public function test_it_is_back_within_a_minute_of_switching_on(): void
+    {
+        [$user, $acme] = $this->member();
+        $this->says(self::availability(true, false));
+        $this->open($user, $acme)->get(route('dashboard'))->assertStatus(503);
+
+        $this->says(self::availability(true, true));
+        $this->travel(70)->seconds();
+        $this->get(route('dashboard'))->assertOk();
+    }
+
+    public function test_an_older_infodot_without_the_fields_is_not_a_switch_off(): void
+    {
+        [$user, $acme] = $this->member();
+        $this->says(self::availability(true, null));
+
+        $this->open($user, $acme)->get(route('dashboard'))->assertOk();
+    }
+
+    public function test_an_outage_keeps_the_last_unavailable_answer_for_six_hours_then_carries_on(): void
+    {
+        [$user, $acme] = $this->member();
+        $this->says(self::availability(true, false));
+        $this->open($user, $acme)->get(route('dashboard'))->assertStatus(503);
+
+        $this->outage();
+        $this->travel(2)->minutes();
+        $this->get(route('dashboard'))->assertStatus(503);
+        $this->travel(5)->hours();
+        $this->get(route('dashboard'))->assertStatus(503);
+
+        $this->travel(2)->hours();
+        $this->get(route('dashboard'))->assertOk();
+    }
+
+    public function test_available_stays_available_through_an_outage(): void
+    {
+        [$user, $acme] = $this->member();
+        $this->says(self::availability(true, true));
+        $this->open($user, $acme)->get(route('dashboard'))->assertOk();
+
+        $this->outage();
+        $this->travel(2)->minutes();
+        $this->get(route('dashboard'))->assertOk();
+    }
+
+    public function test_a_not_held_company_stays_refused_through_an_outage(): void
+    {
+        [$user, $acme] = $this->member();
+        $this->says(self::availability(false, true));
+        $this->open($user, $acme)->get(route('dashboard'))->assertStatus(403);
+
+        $this->outage();
+        $this->travel(2)->minutes();
+        $this->get(route('dashboard'))->assertStatus(403);
+    }
+
+    public function test_a_bearer_token_request_is_not_blocked_while_switched_off(): void
+    {
+        [$user, $acme] = $this->member();
+        $this->says(self::availability(true, false));
+
+        $this->open($user, $acme)->withHeader('Authorization', 'Bearer '.Str::random(20))->get(route('dashboard'))->assertOk();
+        Http::assertNothingSent();
+    }
 }
