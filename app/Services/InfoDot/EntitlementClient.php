@@ -11,15 +11,21 @@ use Throwable;
  * Asks InfoDot whether a company still holds this platform (R-50).
  *
  * One question, about one company, answered from InfoDot's read endpoint with this platform's own service secret.
- * The answer is kept for ten minutes per company; a failure for one minute. Anything that is not a clear answer
- * (InfoDot down, slow, refusing, a body this app cannot read, no secret configured) is "unknown", and unknown never
- * locks a company out: the caller carries on as if the check did not exist. A failure is logged once per window.
+ * The answer is kept for sixty seconds per company, so a switch made at InfoDot (R-61: the platform put in maintenance
+ * or made unavailable) takes effect within about a minute; it also says whether InfoDot has the platform switched on
+ * (`available`, `message`). Every clear answer is also remembered for six hours: when InfoDot gives no clear answer
+ * (InfoDot down, slow, refusing, a body this app cannot read, no secret configured) the last clear answer under six
+ * hours old is used, so a platform last told "unavailable" stays unavailable. With none, the answer is "unknown", which
+ * never locks a company out: the caller carries on as if the check did not exist. A failure is logged once per window.
  */
 class EntitlementClient
 {
-    public const ANSWER_TTL = 600;
+    public const ANSWER_TTL = 60;
 
     public const FAILURE_TTL = 60;
+
+    /** How long the last clear answer is used when InfoDot cannot be reached. */
+    public const LAST_KNOWN_TTL = 21600;
 
     public function enabled(): bool
     {
@@ -27,11 +33,27 @@ class EntitlementClient
     }
 
     /**
-     * @return array{entitled: bool, status: string}|null null when InfoDot gave no usable answer
+     * The answer already remembered for this company, or null. Never calls InfoDot.
+     *
+     * @return array{entitled: bool, status: string, available: bool, message: string|null}|null
+     */
+    public function remembered(string $uuid): ?array
+    {
+        try {
+            $cached = Cache::get($this->key($uuid));
+        } catch (Throwable) {
+            return null;
+        }
+
+        return $this->usable($cached);
+    }
+
+    /**
+     * @return array{entitled: bool, status: string, available: bool, message: string|null}|null null when InfoDot gave no usable answer
      */
     public function forCompany(string $uuid): ?array
     {
-        $key = 'infodot:entitlement:'.$this->platform().':'.$uuid;
+        $key = $this->key($uuid);
 
         try {
             $cached = Cache::get($key);
@@ -40,21 +62,72 @@ class EntitlementClient
         }
 
         if (is_array($cached)) {
-            return isset($cached['entitled']) ? ['entitled' => (bool) $cached['entitled'], 'status' => (string) ($cached['status'] ?? '')] : null;
+            return $this->usable($cached);
         }
 
         $answer = $this->ask($uuid);
 
         if (is_string($answer)) {
             Log::warning('InfoDot entitlement check gave no answer; carrying on without it.', ['company' => $uuid, 'reason' => $answer]);
+
+            // R-61: the last clear answer under six hours old stands in, so a platform last told "unavailable" stays so.
+            $last = $this->lastKnown($key);
+
+            if ($last !== null) {
+                $this->remember($key, $last, self::FAILURE_TTL);
+
+                return $last;
+            }
+
             $this->remember($key, ['unknown' => true], self::FAILURE_TTL);
 
             return null;
         }
 
         $this->remember($key, $answer, self::ANSWER_TTL);
+        $this->remember($key.':last', ['answer' => $answer, 'at' => time()], self::LAST_KNOWN_TTL);
 
         return $answer;
+    }
+
+    private function key(string $uuid): string
+    {
+        return 'infodot:entitlement:'.$this->platform().':'.$uuid;
+    }
+
+    /**
+     * @return array{entitled: bool, status: string, available: bool, message: string|null}|null
+     */
+    private function usable(mixed $value): ?array
+    {
+        if (! is_array($value) || ! isset($value['entitled'])) {
+            return null;
+        }
+
+        return [
+            'entitled' => (bool) $value['entitled'],
+            'status' => (string) ($value['status'] ?? ''),
+            'available' => ($value['available'] ?? true) !== false,
+            'message' => is_string($value['message'] ?? null) && $value['message'] !== '' ? $value['message'] : null,
+        ];
+    }
+
+    /**
+     * @return array{entitled: bool, status: string, available: bool, message: string|null}|null
+     */
+    private function lastKnown(string $key): ?array
+    {
+        try {
+            $last = Cache::get($key.':last');
+        } catch (Throwable) {
+            return null;
+        }
+
+        if (! is_array($last) || time() - (int) ($last['at'] ?? 0) >= self::LAST_KNOWN_TTL) {
+            return null;
+        }
+
+        return $this->usable($last['answer'] ?? null);
     }
 
     /**
@@ -70,7 +143,7 @@ class EntitlementClient
     }
 
     /**
-     * @return array{entitled: bool, status: string}|string the answer, or why there is none
+     * @return array{entitled: bool, status: string, available: bool, message: string|null}|string the answer, or why there is none
      */
     private function ask(string $uuid): array|string
     {
@@ -109,7 +182,13 @@ class EntitlementClient
                     return 'malformed body';
                 }
 
-                return ['entitled' => $row['entitled'], 'status' => is_string($row['status'] ?? null) ? $row['status'] : ''];
+                return [
+                    'entitled' => $row['entitled'],
+                    'status' => is_string($row['status'] ?? null) ? $row['status'] : '',
+                    // R-61: an InfoDot from before contract 2 gives no `available`, which is not a switch-off.
+                    'available' => ($row['available'] ?? true) !== false,
+                    'message' => is_string($row['message'] ?? null) && $row['message'] !== '' ? mb_substr($row['message'], 0, 400) : null,
+                ];
             }
         }
 
