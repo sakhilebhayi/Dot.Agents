@@ -7,6 +7,7 @@ use App\Http\Middleware\OrganizationContextMiddleware;
 use App\Models\AgentCategory;
 use App\Models\AgentDepartment;
 use App\Models\PersonalAccessToken;
+use App\Support\EssentialCron;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Blade;
@@ -37,6 +38,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        EssentialCron::listen();
+
         Sanctum::usePersonalAccessTokenModel(PersonalAccessToken::class);
 
         // Livewire's update route skips page middleware unless told otherwise: a person removed from a business must
