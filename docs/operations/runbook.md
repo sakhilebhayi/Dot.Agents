@@ -14,7 +14,7 @@ Three commands run every minute. On this host the deploy writes them to `~/.dot-
 
 A web request also runs the first steps of a new run after its response has gone (`RunKick`). The lease on each run keeps that apart from the queue worker.
 
-Scheduled every minute: `agents:sweep-runs` (finds stuck steps and resumes runs), `agents:fire-schedules`, `agents:seal-audit`, the scheduler heartbeat. Daily: `agents:forget-expired` at 02:30 and `agents:backup-database` at 03:00.
+Scheduled every minute: `agents:fire-schedules` and the scheduler heartbeat. Every five minutes (shared-host CPU, 2026-11-27): `agents:sweep-runs` (finds stuck steps and resumes runs) and `agents:seal-audit`. Daily: `agents:forget-expired` at 02:30 and `agents:backup-database` at 03:00.
 
 ## Is it healthy
 

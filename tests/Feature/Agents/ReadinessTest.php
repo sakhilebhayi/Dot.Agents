@@ -12,6 +12,7 @@ use App\Models\RetentionPurgeProposal;
 use App\Models\User;
 use App\Models\Webhook;
 use App\Services\Governance\AuditChain;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
@@ -188,6 +189,22 @@ class ReadinessTest extends TestCase
         foreach (['agents:sweep-runs', 'agents:fire-schedules', 'agents:seal-audit', 'agents:forget-expired'] as $command) {
             $this->assertStringContainsString($command, $list);
         }
+    }
+
+    public function test_only_fire_schedules_needs_every_minute_on_the_shared_host(): void
+    {
+        $cadence = [];
+        foreach (app(Schedule::class)->events() as $event) {
+            foreach (['agents:sweep-runs', 'agents:fire-schedules', 'agents:seal-audit'] as $command) {
+                if (str_contains((string) $event->command, $command)) {
+                    $cadence[$command] = $event->expression;
+                }
+            }
+        }
+
+        $this->assertSame('* * * * *', $cadence['agents:fire-schedules'] ?? null);
+        $this->assertSame('*/5 * * * *', $cadence['agents:sweep-runs'] ?? null);
+        $this->assertSame('*/5 * * * *', $cadence['agents:seal-audit'] ?? null);
     }
 
     public function test_the_deploy_runs_a_worker_for_agent_steps_with_a_lease_longer_than_the_timeout(): void
