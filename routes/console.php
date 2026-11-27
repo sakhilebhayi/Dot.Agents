@@ -34,9 +34,14 @@ Schedule::command('retention:detect-purge-candidates')
     ->onOneServer();
 
 // Expire pending approvals past their deadline — runs every 30 minutes
-Schedule::command('agents:sweep-runs')->everyMinute()->withoutOverlapping(5)->name('agents-sweep-runs');
+// Each scheduled command starts its own PHP process, and every Dot platform
+// shares one host whose CPU sat at 100% on 2026-11-27. fire-schedules stays
+// every minute so an agent schedule due at 09:00 fires in the 09:00 minute;
+// the stuck-run sweep (web requests and the queue worker drive runs first)
+// and the audit seal run every five minutes.
+Schedule::command('agents:sweep-runs')->everyFiveMinutes()->withoutOverlapping(5)->name('agents-sweep-runs');
 Schedule::command('agents:fire-schedules')->everyMinute()->withoutOverlapping(5)->name('agents-fire-schedules');
-Schedule::command('agents:seal-audit')->everyMinute()->withoutOverlapping(5)->name('agents-seal-audit');
+Schedule::command('agents:seal-audit')->everyFiveMinutes()->withoutOverlapping(5)->name('agents-seal-audit');
 Schedule::command('agents:forget-expired')->dailyAt('02:30')->name('agents-forget-expired');
 
 Schedule::command('approvals:expire-overdue')
